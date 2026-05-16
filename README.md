@@ -23,7 +23,19 @@ Instructions use the open **`AGENTS.md`** format (OpenCode, Cursor, Copilot, Cla
 
 ## Quickstart (30-second setup)
 
-1. Clone and install skills into `~/.agents/skills`:
+**VPN or on-site required.** The repo is readable without credentials on the network.
+
+### Option A — one-liner (recommended)
+
+Installs into `~/.agents/skills` and caches a clone at `~/.local/share/ai-skills`:
+
+```bash
+bash <(curl -fsSL 'https://raw.githubusercontent.com/rshingleton/skills/main/scripts/skills.sh')
+```
+
+Re-run the same command anytime to pull `main` and refresh symlinks.
+
+### Option B — from a git clone
 
 ```bash
 git clone https://github.com/rshingleton/skills.git
@@ -31,12 +43,12 @@ cd ai-skills
 bash scripts/skills.sh
 ```
 
-If you already have a working copy, run `bash scripts/link-skills.sh` from the repo root instead.
+### Option C — symlink from your working copy
 
-2. **Or** re-run the installer from an existing clone:
+If you develop skills locally and want live symlinks into your checkout:
 
 ```bash
-bash /path/to/ai-skills/scripts/skills.sh
+bash /path/to/ai-skills/scripts/link-skills.sh
 ```
 
 **Make sure you select `/setup-internal-skills`**.

@@ -17,7 +17,13 @@ Internal **ai-skills** monorepo — composable `SKILL.md` workflows for real eng
 
 **Repository:** `https://github.com/rshingleton/skills.git` (default branch `main`)
 
-Install into a machine with [scripts/skills.sh](scripts/skills.sh) or [scripts/link-skills.sh](scripts/link-skills.sh) (symlinks under `~/.agents/skills`). Then run `/setup-internal-skills` **in each application repo**.
+Install into a machine (VPN or on-site):
+
+```bash
+bash <(curl -fsSL 'https://raw.githubusercontent.com/rshingleton/skills/main/scripts/skills.sh')
+```
+
+Or use [scripts/skills.sh](scripts/skills.sh) / [scripts/link-skills.sh](scripts/link-skills.sh) from a clone. Then run `/setup-internal-skills` **in each application repo**.
 
 ## Skill buckets
 
@@ -57,7 +63,7 @@ On **existing repos**, setup audits Copilot and Cursor files (see `PLATFORM-AUDI
 
 | Script | Role |
 |--------|------|
-| [scripts/skills.sh](scripts/skills.sh) | Clone + link skills to `~/.agents/skills` |
+| [scripts/skills.sh](scripts/skills.sh) | Clone to `~/.local/share/ai-skills`, link to `~/.agents/skills` (curl one-liner in README) |
 | [scripts/link-skills.sh](scripts/link-skills.sh) | Link from this repo without clone |
 
 ## What not to do
