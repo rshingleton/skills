@@ -113,7 +113,8 @@ Parse the JSON response with `jq` to extract key, summary, status, and labels. S
    TRANSITION_ID=$(echo "$TRANSITIONS" | jq -r '.transitions[] | select(.name == "<Target Status>") | .id')
    ```
 
-   b. Update labels and/or status:
+   b. Update labels and/or status (if `JIRA_ASSIGNEE` is set, call `_jira_set_assignee` per [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#assignee-jira_assignee) before or with label PUT):
+
    ```bash
    # Update labels
    curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \

@@ -46,7 +46,7 @@ Tell the user:
 
 ### Jira
 
-POST Epic (`issuetype: "Epic"`, `customfield_10881`, `?notifyUsers=false`) — [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md). Edit epic body for Jira `summary` + `description` per [jira-description-style.md](../setup-internal-skills/jira-description-style.md) (structured detail, cut filler only). Then [jira-notifications.md](../setup-internal-skills/jira-notifications.md) `_jira_apply_watcher_policy "$EPIC_KEY" create`.
+POST Epic (`issuetype: "Epic"`, `customfield_10881`, `?notifyUsers=false`; include `assignee` when `JIRA_ASSIGNEE` set) — [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md). Edit epic body for Jira `summary` + `description` per [jira-description-style.md](../setup-internal-skills/jira-description-style.md) (structured detail, cut filler only). Then [jira-notifications.md](../setup-internal-skills/jira-notifications.md) `_jira_apply_watcher_policy "$EPIC_KEY" create`.
 
 Tell the user the Epic key and suggest:
 

@@ -4,7 +4,7 @@
 
 **Descriptions:** dense structured style on all `summary` / `description` fields — [jira-description-style.md](../setup-internal-skills/jira-description-style.md).
 
-After **every** create below: apply watcher policy per [jira-notifications.md](../setup-internal-skills/jira-notifications.md) (`JIRA_WATCHER_IGNORE`, `JIRA_WATCHER_USERNAME`, `JIRA_EMAIL`). Copy `_jira_apply_watcher_policy` and related helpers from that file.
+After **every** create below: apply watcher policy per [jira-notifications.md](../setup-internal-skills/jira-notifications.md) (`JIRA_WATCHER_IGNORE`, `JIRA_WATCHER_USERNAME`, `JIRA_EMAIL`). Copy `_jira_apply_watcher_policy` and related helpers from that file. On create, include `assignee: {name: $JIRA_ASSIGNEE}` in `fields` when `JIRA_ASSIGNEE` is set ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#assignee-jira_assignee)).
 
 ## Small Plan — Single Task
 

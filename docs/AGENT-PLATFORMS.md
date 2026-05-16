@@ -64,7 +64,7 @@ Then use engineering skills (`/plan-it`, `/implement-it`, `/audit-it`, `/verify-
 
 **Unfamiliar codebase:** run `/doc-it` to create `docs/reference/` and `docs/reference-audit/` before heavy feature work.
 
-**Jira API skills:** set `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` via [`.env.example`](../.env.example) and [scripts/load-jira-env.sh](../scripts/load-jira-env.sh) (project `.env` takes precedence when sourced from the app repo). Optional `JIRA_DEFAULT_EPIC` or `default_epic` in `docs/agents/issue-tracker.md` ([default Epic](../skills/engineering/setup-internal-skills/issue-tracker-jira.md#default-epic-optional)). Optional `JIRA_WATCHER_IGNORE` / `JIRA_WATCHER_USERNAME` / `JIRA_EMAIL` for watcher policy after writes ([jira-notifications.md](../skills/engineering/setup-internal-skills/jira-notifications.md); doc-manager pattern).
+**Jira API skills:** set `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` via [`.env.example`](../.env.example) and [scripts/load-jira-env.sh](../scripts/load-jira-env.sh) (project `.env` takes precedence when sourced from the app repo). Optional `JIRA_DEFAULT_EPIC`, `JIRA_ASSIGNEE`, or `default_epic` in `docs/agents/issue-tracker.md` ([default Epic](../skills/engineering/setup-internal-skills/issue-tracker-jira.md#default-epic-optional)). Optional `JIRA_WATCHER_IGNORE` / `JIRA_WATCHER_USERNAME` / `JIRA_EMAIL` for watcher policy after writes ([jira-notifications.md](../skills/engineering/setup-internal-skills/jira-notifications.md); doc-manager pattern).
 
 ---
 

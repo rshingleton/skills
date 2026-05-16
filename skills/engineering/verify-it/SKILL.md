@@ -47,7 +47,7 @@ See [EXAMPLES.md](EXAMPLES.md) for purge/archive examples.
 
 **Local:** On linked `docs/issues/...` files, set `status: done` (or appropriate triage role) and append under `## Comments` that verify-it completed the Doc Cycle.
 
-**Jira:** Post summary comment and any transition with `?notifyUsers=false`; apply watcher policy after each write (`_jira_apply_watcher_policy` — update mode) ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md), [jira-notifications.md](../setup-internal-skills/jira-notifications.md)). Ask *"Close this Jira? (y/n)"* before transitioning to Resolved.
+**Jira:** If `JIRA_ASSIGNEE` is set, `_jira_set_assignee "$KEY"` before other writes ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#assignee-jira_assignee)). Post summary comment and any transition with `?notifyUsers=false`; `_jira_apply_watcher_policy` after each write ([jira-notifications.md](../setup-internal-skills/jira-notifications.md)). Ask *"Close this Jira? (y/n)"* before transitioning to Resolved.
 
 ### 5. Conclusion
 

@@ -110,7 +110,7 @@ Epic key for linking, first match:
 
 If no Epic key after resolution, stop and ask — Tasks need `customfield_10880` or user confirmation for standalone Tasks.
 
-For each `tasks/*.md` without `jira_key`, POST Task with `?notifyUsers=false` (link Epic via `customfield_10880` when Epic key set). Edit per [jira-description-style.md](../setup-internal-skills/jira-description-style.md). `_jira_apply_watcher_policy "$KEY" create` after each create.
+For each `tasks/*.md` without `jira_key`, POST Task with `?notifyUsers=false` (link Epic via `customfield_10880` when Epic key set; `assignee` when `JIRA_ASSIGNEE` set — [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#assignee-jira_assignee)). Edit per [jira-description-style.md](../setup-internal-skills/jira-description-style.md). `_jira_apply_watcher_policy "$KEY" create` after each create.
 
 Write each `jira_key` back into task frontmatter.
 

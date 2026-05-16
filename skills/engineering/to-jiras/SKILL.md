@@ -51,7 +51,7 @@ Present breakdown: title, type (HITL/AFK), blocked-by, user stories covered. Ite
 
 **Local:** Follow [LOCAL-PUBLISH.md](LOCAL-PUBLISH.md).
 
-**Jira:** For each approved slice, POST Task with `?notifyUsers=false` (link Epic via `customfield_10880` when a parent Epic was resolved). **Summary + description:** [jira-description-style.md](../setup-internal-skills/jira-description-style.md) (dense structured — no verbose paste). Apply watcher policy — [jira-notifications.md](../setup-internal-skills/jira-notifications.md). See curl templates below.
+**Jira:** For each approved slice, POST Task with `?notifyUsers=false` (link Epic via `customfield_10880` when a parent Epic was resolved). Include `assignee` when `JIRA_ASSIGNEE` is set ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#assignee-jira_assignee)). **Summary + description:** [jira-description-style.md](../setup-internal-skills/jira-description-style.md). Apply watcher policy — [jira-notifications.md](../setup-internal-skills/jira-notifications.md). See curl templates below.
 
 Publish in dependency order so blockers can reference real keys (Jira keys or local task paths).
 
@@ -84,14 +84,18 @@ KEY=$(curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
     --arg project "$JIRA_PROJECT_KEY" \
     --arg summary "<Task title>" \
     --arg body "$BODY" \
+    --arg assignee "${JIRA_ASSIGNEE:-}" \
     '{
-      fields: {
-        project: {key: $project},
-        summary: $summary,
-        description: $body,
-        issuetype: {name: "Task"},
-        labels: ["vertical-slice", "ai-generated"]
-      }
+      fields: (
+        {
+          project: {key: $project},
+          summary: $summary,
+          description: $body,
+          issuetype: {name: "Task"},
+          labels: ["vertical-slice", "ai-generated"]
+        }
+        + (if $assignee != "" then {assignee: {name: $assignee}} else {} end)
+      )
     }')" | jq -r '.key')
 # _jira_apply_watcher_policy "$KEY" create — jira-notifications.md
 ```

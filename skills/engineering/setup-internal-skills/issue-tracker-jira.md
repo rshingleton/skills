@@ -15,6 +15,7 @@ The skills read these from the environment:
 | `JIRA_WATCHER_IGNORE` | Optional. Comma-separated Jira usernames to **remove** from watchers after each write (`DELETE .../watchers?username=...`). When set, replaces the `JIRA_EMAIL` default. |
 | `JIRA_WATCHER_USERNAME` | Optional. Comma-separated Jira usernames to **add** as watchers after each **create** (`POST .../watchers`). |
 | `JIRA_DEFAULT_EPIC` | Optional. Default parent Epic key for new Tasks when skills omit `--parent` (see [Default Epic](#default-epic-optional)). |
+| `JIRA_ASSIGNEE` | Optional. Jira **username** (`assignee.name`) for agent-owned work. Set on creates and on Doc Cycle updates (`/implement-it`, `/verify-it`). Omit to leave assignee unchanged. |
 
 ### Loading credentials
 
@@ -66,6 +67,41 @@ Skips cause watcher email noise to service accounts and shared inboxes.
 ## Description style (required on create)
 
 All **`summary`** and **`description`** fields on `POST /issue` must follow [jira-description-style.md](jira-description-style.md): **structured and detailed**, no AI essay prose. Edit local `docs/issues/` for Jira — preserve implementable detail, cut filler only.
+
+## Assignee (`JIRA_ASSIGNEE`)
+
+When `JIRA_ASSIGNEE` is set (e.g. `alice`), include assignee on **creates** and set/update on **Doc Cycle** Jira writes:
+
+| Skill | When |
+|-------|------|
+| `/implement-it` | Before transitioning linked issue to In Progress |
+| `/verify-it` | Before comment/transition when closing or updating linked issue |
+| `/to-jiras`, `/to-epic`, `/promote-to-jira`, `/plan-it` | Optional on `POST` create (`fields.assignee.name`) |
+| `/triage` | Optional on `PUT` when taking ownership of triage |
+
+`/audit-it` does not call Jira.
+
+**Assign existing issue** (after any PUT, run watcher policy):
+
+```bash
+_jira_set_assignee() {
+  local key="$1"
+  [ -z "${JIRA_ASSIGNEE:-}" ] || [ -z "$key" ] && return 0
+  curl -s -o /dev/null -X PUT \
+    -H "Authorization: Bearer $JIRA_API_TOKEN" \
+    -H "Content-Type: application/json" \
+    "$JIRA_BASE_URL/rest/api/2/issue/${key}?notifyUsers=false" \
+    -d "{\"fields\": {\"assignee\": {\"name\": \"${JIRA_ASSIGNEE}\"}}}"
+  _jira_apply_watcher_policy "$key" update
+}
+```
+
+**On create** (jq — omit assignee key when unset):
+
+```bash
+# Inside fields: add assignee only when JIRA_ASSIGNEE is set
+# assignee: (if $assignee != "" then {name: $assignee} else null end)
+```
 
 ## Epic custom fields
 

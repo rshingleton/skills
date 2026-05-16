@@ -86,6 +86,7 @@ Skills that call the Jira API need `JIRA_BASE_URL`, `JIRA_API_TOKEN`, and `JIRA_
 | `JIRA_WATCHER_IGNORE` | Comma-separated usernames to **remove** from watchers after each write (`DELETE`) |
 | `JIRA_WATCHER_USERNAME` | Comma-separated usernames to **add** as watchers after each create (`POST`) |
 | `JIRA_EMAIL` | If `JIRA_WATCHER_IGNORE` is unset, remove the PAT owner (`${JIRA_EMAIL%%@*}`) after writes — doc-manager pattern |
+| `JIRA_ASSIGNEE` | Jira username for `assignee` on agent creates and Doc Cycle updates (`/implement-it`, `/verify-it`) |
 
 Watcher policy and `notifyUsers=false`: [jira-notifications.md](./skills/engineering/setup-internal-skills/jira-notifications.md). Jira create text: [jira-description-style.md](./skills/engineering/setup-internal-skills/jira-description-style.md) (dense structured issues; anti-verbose, not fragment-caveman).
 
@@ -238,7 +239,7 @@ Software engineering fundamentals matter more than ever. These skills are my bes
 | | `/implement-it` | `/audit-it` | `/verify-it` |
 |---|---|---|---|
 | **Does** | TDD per plan phase | Phase audit (spec, standards, compliance, architecture) | Durable docs after audit PASS |
-| **Jira** | Auto-transitions to "In Progress" | — | Prompts to close (transition to "Resolved") |
+| **Jira** | Assignee + In Progress when `JIRA_ASSIGNEE` set | — | Assignee + close (transition to "Resolved") |
 
 **Doc Cycle (plan-it–driven):** `/plan-it` → `/implement-it` (each phase) → `/audit-it` → `/verify-it`
 
