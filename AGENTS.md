@@ -57,6 +57,8 @@ On **existing repos**, setup audits Copilot and Cursor files (see `PLATFORM-AUDI
 
 **Doc Cycle:** `/plan-it` → `/implement-it` (each phase) → `/audit-it` → `/verify-it`.
 
+**Codebase reference:** `/doc-it` → `docs/reference/` + `docs/reference-audit/` (onboarding; not `/verify-it`).
+
 **Jira later:** `/promote-to-jira` after local planning is stable.
 
 **Jira credentials:** `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` via shell export or `.env` ([.env.example](.env.example), [load-jira-env.sh](scripts/load-jira-env.sh)). Project repo `.env` wins over user-wide files when sourced from that repo.

@@ -5,3 +5,5 @@ disable-model-invocation: true
 ---
 
 I don't know this area of code well. Go up a layer of abstraction. Give me a map of all the relevant modules and callers, using the project's domain glossary vocabulary.
+
+For durable reference files and a sliced audit backlog, use `/doc-it` instead (`docs/reference/` and `docs/reference-audit/`).

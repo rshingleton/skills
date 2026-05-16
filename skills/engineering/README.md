@@ -14,6 +14,7 @@ Pipeline for plan-it–driven work (implement every phase, then audit and verify
 ## Other engineering skills
 
 - **[diagnose](./diagnose/SKILL.md)** — Disciplined diagnosis loop for hard bugs and performance regressions.
+- **[doc-it](./doc-it/SKILL.md)** — `docs/reference/` then `docs/reference-audit/` (sliced: tech-debt, testing, architecture, follow-ups). Not `/verify-it` or `/zoom-out`.
 - **[grill-with-docs](./grill-with-docs/SKILL.md)** — Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates `CONTEXT.md` and ADRs inline.
 - **[improve-codebase-architecture](./improve-codebase-architecture/SKILL.md)** — Find deepening opportunities in a codebase.
 - **[internal-compliance](./internal-compliance/SKILL.md)** — Pre-flight compliance check against internal security linting rules before finalizing any PR.

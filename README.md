@@ -10,7 +10,7 @@ Developing real applications is hard. Approaches like GSD, BMAD, and Spec-Kit tr
 
 ### Purpose
 
-Each skill is a focused workflow in `SKILL.md` that an agent loads when invoked by name (for example `/plan-it` or `/triage`). Together they cover alignment and shared vocabulary (`/grill-with-docs`, `/grill-me`), planning and issue breakdown (`/plan-it`, `/to-epic`, `/to-jiras`), implementation with tests (`/implement-it`, `/tdd`, `/diagnose`), independent audit (`/audit-it`), and durable documentation (`/verify-it`). Engineering skills target day-to-day code work; productivity skills cover general workflow. The [skill map](#skill-map--planning-slicing-executing) and [reference](#reference) sections list everything that ships in this repo.
+Each skill is a focused workflow in `SKILL.md` that an agent loads when invoked by name (for example `/plan-it` or `/triage`). Together they cover alignment and shared vocabulary (`/grill-with-docs`, `/grill-me`), planning and issue breakdown (`/plan-it`, `/to-epic`, `/to-jiras`), implementation with tests (`/implement-it`, `/tdd`, `/diagnose`), independent audit (`/audit-it`), durable documentation after a plan (`/verify-it`), and **baseline codebase reference** (`/doc-it` → `docs/reference/` and `docs/reference-audit/`). Engineering skills target day-to-day code work; productivity skills cover general workflow. The [skill map](#skill-map--planning-slicing-executing) and [reference](#reference) sections list everything that ships in this repo.
 
 ### Usage guidelines
 
@@ -230,12 +230,22 @@ Software engineering fundamentals matter more than ever. These skills are my bes
 
 **Doc Cycle (plan-it–driven):** `/plan-it` → `/implement-it` (each phase) → `/audit-it` → `/verify-it`
 
+**Codebase reference (onboarding or unfamiliar repo):**
+
+| Skill | Writes | Use when |
+|-------|--------|----------|
+| **`/doc-it`** | `docs/reference/` + `docs/reference-audit/` | Baseline maps plus sliced audit (`tech-debt.md`, `testing.md`, `architecture.md`, `follow-ups.md`). Two phases in one skill. |
+| `/zoom-out` | *(chat only)* | Quick orientation; no files. |
+| `/audit-it` (repo) | `docs/AUDIT.md` | Tech-debt / simplification lens after you already know the repo. |
+| `/verify-it` | ADRs, `CONTEXT.md`, changelog | **After** implementation of a plan, not discovery. |
+
 **Typical flows:**
 
 ```
 Small change:  /to-jiras → /implement-it → /audit-it → /verify-it
 Feature:       /grill-with-docs → /to-epic → /to-jiras --parent EPIC-123 → /implement-it → /audit-it → /verify-it
 Large plan:    /grill-with-docs → /plan-it → (publish to Jira) → /implement-it (each phase) → /audit-it → /verify-it
+Unfamiliar repo: /doc-it → /to-jiras or /plan-it (from reference-audit follow-ups)
 ```
 
 ## Reference
@@ -246,6 +256,7 @@ Skills I use daily for code work.
 
 - **[audit-it](./skills/engineering/audit-it/SKILL.md)** — Doc Cycle audit phase; repo reviews write `docs/AUDIT.md`. Gates verify-it.
 - **[diagnose](./skills/engineering/diagnose/SKILL.md)** — Disciplined diagnosis loop for hard bugs and performance regressions.
+- **[doc-it](./skills/engineering/doc-it/SKILL.md)** — **Baseline codebase documentation:** Phase 1 writes `docs/reference/`. Phase 2 writes `docs/reference-audit/` (`tech-debt.md`, `testing.md`, `architecture.md`, `follow-ups.md`, index `README.md`). Not `/verify-it` or `/zoom-out`.
 - **[grill-with-docs](./skills/engineering/grill-with-docs/SKILL.md)** — Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates `CONTEXT.md` and ADRs inline.
 - **[implement-it](./skills/engineering/implement-it/SKILL.md)** — Doc Cycle implement phase. TDD with repo standards. Transitions Jira to "In Progress" on start.
 - **[improve-codebase-architecture](./skills/engineering/improve-codebase-architecture/SKILL.md)** — Find deepening opportunities in a codebase, informed by the domain language in `CONTEXT.md` and the decisions in `docs/adr/`.

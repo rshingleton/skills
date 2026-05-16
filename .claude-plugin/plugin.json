@@ -3,6 +3,7 @@
   "skills": [
     "./skills/engineering/audit-it",
     "./skills/engineering/diagnose",
+    "./skills/engineering/doc-it",
     "./skills/engineering/grill-with-docs",
     "./skills/engineering/implement-it",
     "./skills/engineering/improve-codebase-architecture",
