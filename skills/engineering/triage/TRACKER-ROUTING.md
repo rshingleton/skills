@@ -21,6 +21,10 @@ From [triage-labels.md](../setup-internal-skills/triage-labels.md):
 
 Category (`bug` vs `enhancement`) on local: `type:` frontmatter (`bug` | `feature` | `todo` | `defer`).
 
+## Email / ServiceNow
+
+Paste request text in the **project repo** → `/triage` → `docs/issues/<slug>.md` (`source: email` | `servicenow`). Full flow: [SCENARIO-EMAIL-SERVICENOW.md](../setup-internal-skills/SCENARIO-EMAIL-SERVICENOW.md).
+
 ## Create issue (never plan or phase Jira here)
 
 | Tracker | Skill path |

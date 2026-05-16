@@ -32,7 +32,7 @@ At **`--from-issues`**, move each inbox file → `docs/planning/<id>/sources/` s
 | `--from-issues ready` | All `docs/issues/*.md` with `status: ready-for-plan` |
 | `--jira` | After scaffold: create/sync Jira + write `jira.md` ([JIRA.md](JIRA.md)) |
 | `--jira --sync-only` | Re-sync: pull Epic children into `jira.md` only — **no new POSTs** |
-| `--parent EPIC-123` | Link new Tasks to this Epic (with `--jira`) |
+| `--parent EPIC-123` | **Override** parent Epic for this publish — **beats** `JIRA_DEFAULT_EPIC` in `.env` and existing defaults ([JIRA.md](JIRA.md#parent-epic-override)) |
 
 ### Re-sync an existing plan (no re-grill)
 
@@ -123,6 +123,8 @@ Design deep interfaces; update `CONTEXT.md` terminology.
 ### 5. Jira (optional)
 
 If user wants Jira (or passed `--jira`), follow [JIRA.md](JIRA.md): publish phase Tasks (with **time estimates** per phase), fill **`docs/planning/{ID}/jira.md`**. Sync-from-Epic first when `JIRA_DEFAULT_EPIC` may already have phase tasks. If `estimate_hours` is missing on a phase, ask for hours before POST or use `JIRA_DEFAULT_ESTIMATE_HOURS`.
+
+When `JIRA_DEFAULT_EPIC` is set but this plan belongs elsewhere, require or confirm **`--parent EPIC-KEY`** — do not silently use the env default if the user named a different Epic.
 
 Do **not** create `docs/issues/<slug>/tasks/` for plan phases.
 

@@ -9,7 +9,7 @@ Pre-plan work lives in **`docs/issues/`** (inbox only). At plan creation, files 
 | Skill | Role |
 |-------|------|
 | [issues-it](./issues-it/SKILL.md) | Capture one inbox file |
-| [triage](./triage/SKILL.md) | Groom or create (local or Jira) — [TRACKER-ROUTING](./triage/TRACKER-ROUTING.md) |
+| [triage](./triage/SKILL.md) | Groom or create (local or Jira); paste email/ServiceNow — [SCENARIO-EMAIL-SERVICENOW](./setup-internal-skills/SCENARIO-EMAIL-SERVICENOW.md) |
 | [audit-to-issues](./setup-internal-skills/audit-to-issues.md) | File selected audit findings into inbox |
 
 **Plan:** [plan-it](./plan-it/SKILL.md) — **always grills** (ad-hoc or `--from-issues`); optional `/triage` beforehand does not skip the grill.

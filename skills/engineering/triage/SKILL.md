@@ -56,10 +56,26 @@ Map to tracker fields via `docs/agents/triage-labels.md`. One category + one sta
 
 | Tracker | Action |
 |---------|--------|
-| **Local** | Write `docs/issues/<slug>.md` per [issues-it](../issues-it/SKILL.md) + [INTAKE-TEMPLATE.md](../issues-it/INTAKE-TEMPLATE.md): `status: intake`, `source: user` (or `triage`). |
+| **Local** | Write `docs/issues/<slug>.md` per [issues-it](../issues-it/SKILL.md) + [INTAKE-TEMPLATE.md](../issues-it/INTAKE-TEMPLATE.md): `status: intake`, `source:` as appropriate (see below). |
 | **Jira** | `POST /rest/api/2/issue?notifyUsers=false` — wiki `description`, `summary`, `issuetype` (`Bug` or `Task`), label `needs-triage`, optional `JIRA_ASSIGNEE`, **`timetracking`** (ask hours or `JIRA_DEFAULT_ESTIMATE_HOURS`). Then `_jira_apply_watcher_policy "$KEY" create`. |
 
 Deprecated: `/to-epic`, `/to-jiras`, `/promote-to-jira`, `/issues-it --jira` → [issues-it § Deprecated](../issues-it/SKILL.md).
+
+### Email, ServiceNow, or pasted request (local inbox)
+
+When the maintainer invokes `/triage` and **pastes** email or ServiceNow text (no file yet):
+
+1. Work in the **application project repo** (not the ai-skills monorepo).
+2. Derive `title`, `type`, and `slug` from the paste; ask if category is unclear.
+3. Create `docs/issues/<slug>.md` with `source: email` or `source: servicenow`; optional `external_id:` (ticket number), `requester:`, `received:`.
+4. Put the **verbatim paste** under `## Context`; distill **Problem / request** and minimal **Acceptance**.
+5. Leave `status: intake` unless the paste is already fully specified (then `triaged` or `ready-for-plan` with maintainer confirmation).
+
+Full org flow: [SCENARIO-EMAIL-SERVICENOW.md](../setup-internal-skills/SCENARIO-EMAIL-SERVICENOW.md).
+
+Handoff:
+
+> Created `docs/issues/<slug>.md` from pasted request. **Next:** review the file, `/triage` to groom, then `/plan-it --from-issues docs/issues/<slug>.md`.
 
 ## Local workflow
 

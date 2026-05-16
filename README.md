@@ -276,6 +276,8 @@ Re-sync Jira:    /plan-it <id> --jira --sync-only   (keys in jira.md only)
 Unfamiliar repo: /doc-it  →  follow-ups  →  issues-it / plan-it --from-issues
 ```
 
+**Email / ServiceNow (org):** paste request in project repo → [`/triage`](./skills/engineering/triage/SKILL.md) → review `docs/issues/<slug>.md` → `/plan-it --from-issues` → `/plan-it <id> --jira [--parent EPIC]` (override `.env` default Epic). See [SCENARIO-EMAIL-SERVICENOW.md](./skills/engineering/setup-internal-skills/SCENARIO-EMAIL-SERVICENOW.md).
+
 Deprecated: `/to-epic`, `/to-jiras`, `/promote-to-jira`, `/issues-it --jira` — see [issues-it](./skills/engineering/issues-it/SKILL.md).
 
 ## Reference

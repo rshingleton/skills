@@ -65,7 +65,9 @@ On **existing repos**, setup audits Copilot and Cursor files (see `PLATFORM-AUDI
 
 **Codebase reference:** `/doc-it` → `docs/reference/` + `docs/reference-audit/`. Optional inbox from follow-ups via audit-to-issues.
 
-**Jira (optional):** `/plan-it --jira` → `jira.md` (phase Tasks, timetracking, Epic link). Re-sync: `/plan-it <id> --jira --sync-only`.
+**Jira (optional):** `/plan-it --jira` → `jira.md` (phase Tasks, timetracking, Epic link). **`--parent EPIC` overrides `JIRA_DEFAULT_EPIC`.** Re-sync: `/plan-it <id> --jira --sync-only`.
+
+**Email / ServiceNow:** paste in project repo → `/triage` → review inbox → `/plan-it --from-issues` — [SCENARIO-EMAIL-SERVICENOW.md](skills/engineering/setup-internal-skills/SCENARIO-EMAIL-SERVICENOW.md).
 
 **Jira credentials:** `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` via shell export or `.env` ([.env.example](.env.example), [load-jira-env.sh](scripts/load-jira-env.sh)). Optional `JIRA_DEFAULT_EPIC`, `JIRA_ASSIGNEE`, `JIRA_DEFAULT_ESTIMATE_HOURS`, `JIRA_WATCHER_IGNORE` (remove watchers), `JIRA_WATCHER_USERNAME` (add watchers on create), or `JIRA_EMAIL` (PAT self-unwatch fallback). Default Epic resolution: [issue-tracker-jira.md](skills/engineering/setup-internal-skills/issue-tracker-jira.md#default-epic-optional). Writes use `notifyUsers=false` per [jira-notifications.md](skills/engineering/setup-internal-skills/jira-notifications.md). Jira creates use [jira-description-style.md](skills/engineering/setup-internal-skills/jira-description-style.md) (**wiki markup** `h2.` / `*` bullets — not markdown `##` / `- [ ]`). Re-sync keys: `/plan-it <id> --jira --sync-only` → [jira-epic-sync.md](skills/engineering/setup-internal-skills/jira-epic-sync.md). Project repo `.env` wins over user-wide files when sourced from that repo.
 

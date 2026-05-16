@@ -36,7 +36,10 @@ Do **not** leave `status: in-plan` files in `docs/issues/`. Do **not** mirror ph
 title: Short summary
 type: bug | defer | todo | feature
 status: intake | triaged | ready-for-plan | wontfix
-source: user | review | grill | doc-it | improve-codebase-architecture | audit-it | jira
+source: user | email | servicenow | review | grill | doc-it | improve-codebase-architecture | audit-it | jira
+external_id:
+requester:
+received:
 jira_key:              # only if intake came from existing Jira
 ---
 ```
@@ -48,7 +51,10 @@ jira_key:              # only if intake came from existing Jira
 title: Short summary
 type: bug | defer | todo | feature
 status: in-plan              # verify-it → done
-source: user | review | grill | doc-it | improve-codebase-architecture | audit-it | jira
+source: user | email | servicenow | review | grill | doc-it | improve-codebase-architecture | audit-it | jira
+external_id:
+requester:
+received:
 moved_from: docs/issues/<slug>.md
 jira_key:
 ---

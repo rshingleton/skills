@@ -248,15 +248,17 @@ Use a default parent Epic so `/plan-it --jira` can link phase Tasks without pass
 
 | Priority | Source | Example |
 |----------|--------|---------|
-| 1 | `--parent` on the skill invocation | `/plan-it --jira my-plan --parent MT-100` |
+| 1 | **`--parent` on the skill invocation** | `/plan-it --jira my-plan --parent MT-100` — **always overrides `.env`** |
 | 2 | Plan Jira map | `epic_key:` in `docs/planning/<plan-id>/jira.md` |
-| 3 | Intake file | `jira_key:` on `docs/issues/<slug>.md` (feature intake from Jira) |
+| 3 | Intake file | `jira_key:` on `docs/issues/<slug>.md` or `sources/*.md` |
 | 4 | Project `.env` | `JIRA_DEFAULT_EPIC=MT-100` |
 | 5 | This file | **default_epic:** `MT-100` below |
 
 **default_epic:** ``
 
 When all are empty, Tasks are created without Epic Link unless the user passes `--parent`.
+
+**Agents:** If `JIRA_DEFAULT_EPIC` is set but the user or plan context implies a different Epic, use **`--parent`** — never override an explicit `--parent` with the env default.
 
 ### Resolving the parent Epic (agents)
 

@@ -42,7 +42,10 @@ docs/issues/
 title: Short summary
 type: bug | defer | todo | feature
 status: intake
-source: user | review | grill | doc-it | improve-codebase-architecture | audit-it | jira
+source: user | email | servicenow | review | grill | doc-it | improve-codebase-architecture | audit-it | jira
+external_id:
+requester:
+received:
 jira_key:
 ---
 ```

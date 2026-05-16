@@ -20,7 +20,7 @@ Flat single file: `docs/issues/<slug>.md`
 title: Short summary
 type: bug | defer | todo | feature
 status: intake | triaged | ready-for-plan | wontfix
-source: user | review | grill | doc-it | improve-codebase-architecture | audit-it | jira
+source: user | email | servicenow | review | grill | doc-it | improve-codebase-architecture | audit-it | jira
 jira_key:              # only if filed from existing Jira
 ---
 ```
@@ -34,7 +34,7 @@ Capture with **`/issues-it`**. `wontfix` may stay in the inbox or move to `docs/
 title: Short summary
 type: bug | defer | todo | feature
 status: in-plan              # verify-it sets done
-source: user | review | grill | doc-it | improve-codebase-architecture | audit-it | jira
+source: user | email | servicenow | review | grill | doc-it | improve-codebase-architecture | audit-it | jira
 moved_from: docs/issues/<slug>.md
 jira_key:
 ---
