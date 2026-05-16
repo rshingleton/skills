@@ -79,10 +79,16 @@ echo "    Skills installed to: $SKILLS_DEST"
 echo "    Source clone:        $CLONE_DIR"
 echo ""
 echo "==> Next steps:"
-echo "  1. Set Jira env vars required by the skills:"
-echo "       export JIRA_BASE_URL=https://jira.example.com"
-echo "       export JIRA_API_TOKEN=<your-jira-pat>"
-echo "       export JIRA_PROJECT_KEY=MT"
-echo "  2. Run /setup-internal-skills in your agent to configure the issue tracker"
-echo "     and triage labels for this repo."
+if [ -f "$CLONE_DIR/scripts/load-jira-env.sh" ]; then
+  # shellcheck source=/dev/null
+  source "$CLONE_DIR/scripts/load-jira-env.sh" 2>/dev/null || true
+fi
+if [ -n "${JIRA_API_TOKEN:-}" ]; then
+  echo "  1. Jira credentials: loaded (${_jira_env_loaded:-from environment})"
+else
+  echo "  1. Jira credentials: copy .env.example to ~/.config/ai-skills/.env"
+  echo "       then: source $CLONE_DIR/scripts/load-jira-env.sh"
+  echo "     (or export JIRA_BASE_URL, JIRA_API_TOKEN, JIRA_PROJECT_KEY)"
+fi
+echo "  2. Run /setup-internal-skills in each application repo."
 echo "  3. Re-run this script anytime to refresh skills from $DEFAULT_BRANCH."

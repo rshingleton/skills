@@ -59,11 +59,14 @@ On **existing repos**, setup audits Copilot and Cursor files (see `PLATFORM-AUDI
 
 **Jira later:** `/promote-to-jira` after local planning is stable.
 
+**Jira credentials:** `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` via shell export or `.env` ([.env.example](.env.example), [load-jira-env.sh](scripts/load-jira-env.sh)). Project repo `.env` wins over user-wide files when sourced from that repo.
+
 ## Scripts
 
 | Script | Role |
 |--------|------|
 | [scripts/skills.sh](scripts/skills.sh) | Clone to `~/.local/share/ai-skills`, link to `~/.agents/skills` (curl one-liner in README) |
+| [scripts/load-jira-env.sh](scripts/load-jira-env.sh) | Source to load Jira vars from `.env` (project `.env` first) |
 | [scripts/cleanup-legacy-skills.sh](scripts/cleanup-legacy-skills.sh) | Remove Matt Pocock / pre-`-it` skill folders from `~/.agents/skills` |
 | [scripts/link-skills.sh](scripts/link-skills.sh) | Link from this repo without clone |
 

@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# Load Jira credentials into the current shell.
+#
+# Usage (must source, not execute):
+#   source scripts/load-jira-env.sh
+#   source ~/.local/share/ai-skills/scripts/load-jira-env.sh
+#
+# Search order (first file found wins):
+#   1. $JIRA_ENV_FILE (explicit override)
+#   2. ./.env in the current working directory (application repo)
+#   3. ~/.agents/.env
+#   4. ~/.config/ai-skills/.env
+#
+# Set JIRA_ENV_VERBOSE=1 to print which file was loaded.
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  echo "Source this script instead of executing it:" >&2
+  echo "  source scripts/load-jira-env.sh" >&2
+  exit 1
+fi
+
+_jira_env_loaded=""
+
+_load_jira_env_file() {
+  local f="$1"
+  [ -f "$f" ] || return 1
+  set -a
+  # shellcheck disable=SC1090
+  source "$f"
+  set +a
+  _jira_env_loaded="$f"
+  return 0
+}
+
+if [ -n "${JIRA_ENV_FILE:-}" ]; then
+  _load_jira_env_file "$JIRA_ENV_FILE" || true
+else
+  for candidate in \
+    "${PWD}/.env" \
+    "${HOME}/.agents/.env" \
+    "${HOME}/.config/ai-skills/.env"; do
+    if _load_jira_env_file "$candidate"; then
+      break
+    fi
+  done
+fi
+
+if [ -n "${_jira_env_loaded}" ] && [ "${JIRA_ENV_VERBOSE:-0}" = "1" ]; then
+  echo "Loaded Jira env from ${_jira_env_loaded}" >&2
+fi

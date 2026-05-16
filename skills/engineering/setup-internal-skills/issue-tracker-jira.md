@@ -10,7 +10,31 @@ The skills read these from the environment:
 |---|---|
 | `JIRA_BASE_URL` | Jira instance base URL (e.g. `https://jira.example.com`). |
 | `JIRA_API_TOKEN` | Personal access token (Bearer auth in `Authorization` header). |
-| `JIRA_PROJECT_KEY` | Jira project key where issues live (e.g. `MT`). |
+| `JIRA_PROJECT_KEY` | Jira project key where issues live (e.g. `your-project-key`). |
+
+### Loading credentials
+
+**`.env` file (recommended).** Copy [`.env.example`](../../../.env.example) from the ai-skills repo to one of:
+
+| Path | Scope | Precedence |
+|------|--------|------------|
+| `.env` at the application repo root | Per project | **Highest** (when cwd is that repo) |
+| `~/.agents/.env` | Beside installed skills | |
+| `~/.config/ai-skills/.env` | User-wide default | Lowest |
+
+Set `JIRA_PROJECT_KEY` to your Jira project key and `JIRA_API_TOKEN` in that file. Do not commit tokens.
+
+Before Jira `curl` in a shell, run from the application repo (so its `.env` wins):
+
+```bash
+source ~/.local/share/ai-skills/scripts/load-jira-env.sh
+```
+
+The loader checks: `JIRA_ENV_FILE` (if set), then `./.env`, then `~/.agents/.env`, then `~/.config/ai-skills/.env`. From an ai-skills clone: `source scripts/load-jira-env.sh`.
+
+**Shell exports.** Alternatively `export JIRA_BASE_URL=...` etc. in your profile.
+
+**Agents.** Before calling the Jira API, ensure all three variables are set. If the shell may not have them, `source` the loader script or read the `.env` file and export values for the session. Do not print tokens in chat output.
 
 Optional project alias mapping (matching the doc-manager `PROJECT_<ALIAS>_KEY` convention):
 

@@ -11,7 +11,7 @@ description: >
 
 Move **local** planning and issue tracking into Jira. Does not replace `/to-jiras` for initial slice breakdown — use this when issues already exist under `docs/issues/` or you want to publish a completed plan.
 
-Requires `JIRA_BASE_URL`, `JIRA_API_TOKEN`, and `JIRA_PROJECT_KEY`. Jira API patterns: [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md).
+Requires `JIRA_BASE_URL`, `JIRA_API_TOKEN`, and `JIRA_PROJECT_KEY` (shell export or `.env`; see [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md)). Jira API patterns in that doc.
 
 Read `docs/agents/issue-tracker.md` first. If the repo is already Jira-only, tell the user promotion is unnecessary.
 

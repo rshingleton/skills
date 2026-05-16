@@ -1,14 +1,23 @@
 # Internal Skills (ai-skills)
 
-**Canonical repository:** [https://github.com/rshingleton/skills.git](https://github.com/rshingleton/skills.git) (Bitbucket, VPN required)
+**Canonical repository:** [https://github.com/rshingleton/skills.git](https://github.com/rshingleton/skills.git)
 
-Descended from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT License), adapted for our internal workflow.
+Composable agent skills for disciplined engineering: planning, implementation, audit, and verification workflows that teams can adopt without surrendering the process to a single rigid playbook.
 
-My agent skills that I use every day to do real engineering - not vibe coding.
+Developing real applications is hard. Approaches like GSD, BMAD, and Spec-Kit try to help by owning the process end-to-end. That can work, but it also makes it harder to spot when the *process itself* is wrong. These tools stay small, swappable, and model-agnostic so engineers keep control of *what* gets built and *how* it gets reviewed.
 
-Developing real applications is hard. Approaches like GSD, BMAD, and Spec-Kit try to help by owning the process. But while doing so, they take away your control and make bugs in the process hard to resolve.
+**Agent-assisted coding is becoming more mainstream.** Teams use coding agents for implementation, exploration, and documentation with growing acceptance in day-to-day engineering. These skills are not a substitute for engineering judgment. They are meant to **supplement** knowledge and practice, not replace it. The successful engineer uses agents to move faster on well-understood work, then applies **eyes-on** review: read the diff, run the tests, question the design. Manual auditing of agent-produced code is **always** recommended before anything ships.
 
-These skills are designed to be small, easy to adapt, and composable. They work with any model. They're based on decades of engineering experience. Hack around with them. Make them your own. Enjoy.
+### Purpose
+
+Each skill is a focused workflow in `SKILL.md` that an agent loads when invoked by name (for example `/plan-it` or `/triage`). Together they cover alignment and shared vocabulary (`/grill-with-docs`, `/grill-me`), planning and issue breakdown (`/plan-it`, `/to-epic`, `/to-jiras`), implementation with tests (`/implement-it`, `/tdd`, `/diagnose`), independent audit (`/audit-it`), and durable documentation (`/verify-it`). Engineering skills target day-to-day code work; productivity skills cover general workflow. The [skill map](#skill-map--planning-slicing-executing) and [reference](#reference) sections list everything that ships in this repo.
+
+### Usage guidelines
+
+1. **Install once** on your machine using the [quickstart](#quickstart-30-second-setup) below. Skills land in `~/.agents/skills` and work across Cursor, Copilot, OpenCode, and Claude Code.
+2. **Configure each application repo** with `/setup-internal-skills`. That seeds `AGENTS.md`, `docs/agents/`, and (by default) local issues under `docs/issues/` so skills know your tracker, labels, and domain language.
+3. **Compose skills for the task.** You are not required to run a fixed pipeline. For multi-phase feature work, the recommended **Doc Cycle** is `/plan-it` → `/implement-it` (each phase) → `/audit-it` → `/verify-it`, then a human commit. Smaller changes might use `/to-jiras` and `/implement-it` alone.
+4. **Keep humans in the loop.** Treat agent output as a draft. Read diffs, run tests, and check spec fit before merge. Skills like `/audit-it` and `/internal-compliance` support review; they do not replace it.
 
 ## Agent platforms
 
@@ -65,22 +74,41 @@ bash /path/to/ai-skills/scripts/link-skills.sh
 
 **Make sure you select `/setup-internal-skills`**.
 
-3. Set the required environment variables:
+### Jira credentials (when using Jira skills)
+
+Skills that call the Jira API need `JIRA_BASE_URL`, `JIRA_API_TOKEN`, and `JIRA_PROJECT_KEY`. Use either exports or a `.env` file (see [.env.example](./.env.example)).
+
+**Option 1: `.env` file (recommended)**
 
 ```bash
-# Required for Jira integration
-export JIRA_BASE_URL="https://jira.example.com"
-export JIRA_API_TOKEN="your-jira-pat"
-export JIRA_PROJECT_KEY="MT"
+mkdir -p ~/.config/ai-skills
+cp .env.example ~/.config/ai-skills/.env   # from your ai-skills clone
+# Edit ~/.config/ai-skills/.env and set JIRA_API_TOKEN
+
+source ~/.local/share/ai-skills/scripts/load-jira-env.sh
 ```
 
-4. Run `/setup-internal-skills` in your **application repo** (in Cursor, Copilot, or OpenCode). It will:
+A `.env` in the **application repo root** takes precedence over user-wide files when you run the loader from that repo. Also supported: `~/.agents/.env`, `~/.config/ai-skills/.env`. Override the path with `JIRA_ENV_FILE=/path/to/.env`.
+
+**Option 2: shell exports**
+
+```bash
+export JIRA_BASE_URL="https://jira.example.com"
+export JIRA_API_TOKEN="your-jira-pat"
+export JIRA_PROJECT_KEY="your-project-key"
+```
+
+Agents running Jira `curl` commands should `source` the loader (or read the `.env` file) before calling the API. Details: [issue-tracker-jira.md](./skills/engineering/setup-internal-skills/issue-tracker-jira.md).
+
+### Configure application repos
+
+Run `/setup-internal-skills` in your **application repo** (in Cursor, Copilot, or OpenCode). It will:
    - Write **`AGENTS.md`** and `docs/agents/` (open format; local issues in `docs/issues/` by default)
    - Optionally add `opencode.json`, Copilot instructions, or Cursor rules
    - Ask about triage labels and domain doc layout
    - Check for `CONTRIBUTING.md` and `SECURITY_POLICY.md`
 
-5. Bam - you're ready to go.
+You are ready to invoke skills in that repo.
 
 ## Why These Skills Exist
 

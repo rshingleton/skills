@@ -18,6 +18,7 @@ Every comment or issue posted to the issue tracker during triage **must** start 
 - [AGENT-BRIEF.md](AGENT-BRIEF.md) — how to write durable agent briefs
 - [OUT-OF-SCOPE.md](OUT-OF-SCOPE.md) — how the `.out-of-scope/` knowledge base works
 - `docs/agents/issue-tracker.md` — Jira API reference (created by `/setup-internal-skills`)
+- [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md) — Jira credentials (export or `.env`; `source` loader before `curl`)
 
 ## Roles
 

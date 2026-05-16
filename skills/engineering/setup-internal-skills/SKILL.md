@@ -53,7 +53,7 @@ Summarise present vs missing. Walk **one section at a time** with explainer + de
 Choices:
 
 - **Local markdown** (recommended) — `docs/issues/`. Publish with `/to-epic`, `/to-jiras`. Push to Jira later with `/promote-to-jira`.
-- **Jira** — issues in Jira API ([issue-tracker-jira.md](./issue-tracker-jira.md)). Requires `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY`.
+- **Jira** — issues in Jira API ([issue-tracker-jira.md](./issue-tracker-jira.md)). Requires `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` (export or `.env`; see issue-tracker doc).
 - **Other** — user describes workflow; record as prose in `issue-tracker.md`.
 
 **Section B — Triage label vocabulary.**
