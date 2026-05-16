@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Links all skills in the repository to ~/.claude/skills, so that
-# they can be used by the local Claude CLI.
+# Links all skills in this repo to ~/.agents/skills for OpenCode, Cursor, Copilot, Claude Code.
+# Canonical remote: https://github.com/rshingleton/skills.git
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
-DEST="$HOME/.claude/skills"
+DEST="$HOME/.agents/skills"
 
-# If ~/.claude/skills is a symlink that resolves into this repo, we'd end up
+# If ~/.agents/skills is a symlink that resolves into this repo, we'd end up
 # writing the per-skill symlinks back into the repo's own skills/ tree. Detect
 # and bail out instead of polluting the working copy.
 if [ -L "$DEST" ]; then
@@ -23,7 +23,12 @@ fi
 
 mkdir -p "$DEST"
 
-find "$REPO/skills" -name SKILL.md -not -path '*/node_modules/*' -not -path '*/deprecated/*' -print0 |
+find "$REPO/skills" -name SKILL.md \
+  -not -path '*/node_modules/*' \
+  -not -path '*/deprecated/*' \
+  -not -path '*/in-progress/*' \
+  -not -path '*/personal/*' \
+  -print0 |
 while IFS= read -r -d '' skill_md; do
   src="$(dirname "$skill_md")"
   name="$(basename "$src")"

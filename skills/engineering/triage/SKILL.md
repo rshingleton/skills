@@ -17,6 +17,7 @@ Every comment or issue posted to the issue tracker during triage **must** start 
 
 - [AGENT-BRIEF.md](AGENT-BRIEF.md) — how to write durable agent briefs
 - [OUT-OF-SCOPE.md](OUT-OF-SCOPE.md) — how the `.out-of-scope/` knowledge base works
+- `docs/agents/issue-tracker.md` — Jira API reference (created by `/setup-internal-skills`)
 
 ## Roles
 
@@ -35,32 +36,61 @@ Five **state** roles:
 
 Every triaged issue should carry exactly one category role and one state role. If state roles conflict, flag it and ask the maintainer before doing anything else.
 
-These are canonical role names — the actual label strings used in the issue tracker may differ. The mapping should have been provided to you - run `/setup-matt-pocock-skills` if not.
+These are canonical role names — the actual label strings or issue statuses used in the issue tracker may differ. The mapping should have been provided to you — run `/setup-internal-skills` if not.
 
 State transitions: an unlabeled issue normally goes to `needs-triage` first; from there it moves to `needs-info`, `ready-for-agent`, `ready-for-human`, or `wontfix`. `needs-info` returns to `needs-triage` once the reporter replies. The maintainer can override at any time — flag transitions that look unusual and ask before proceeding.
+
+For Jira, the triage roles map to status + label:
+
+| Role | Jira status | Jira label |
+|---|---|---|
+| `needs-triage` | `Open` | `needs-triage` |
+| `needs-info` | `On Hold` | `needs-info` |
+| `ready-for-agent` | `Open` | `ready-for-agent` |
+| `ready-for-human` | `Open` | `ready-for-human` |
+| `wontfix` | `Closed` | `wontfix` |
+
+Always resolve transition IDs dynamically — the actual transition names depend on the Jira project workflow.
 
 ## Invocation
 
 The maintainer invokes `/triage` and describes what they want in natural language. Interpret the request and act. Examples:
 
 - "Show me anything that needs my attention"
-- "Let's look at #42"
-- "Move #42 to ready-for-agent"
+- "Let's look at MT-42"
+- "Move MT-42 to ready-for-agent"
 - "What's ready for agents to pick up?"
 
 ## Show what needs attention
 
-Query the issue tracker and present three buckets, oldest first:
+Query Jira and present three buckets, oldest first:
 
-1. **Unlabeled** — never triaged.
-2. **`needs-triage`** — evaluation in progress.
-3. **`needs-info` with reporter activity since the last triage notes** — needs re-evaluation.
+```bash
+# needs-triage (Open, label = needs-triage)
+curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
+  "$JIRA_BASE_URL/rest/api/2/search?jql=project+%3D+$JIRA_PROJECT_KEY+AND+status+%3D+%22Open%22+AND+labels+%3D+needs-triage&maxResults=20"
 
-Show counts and a one-line summary per issue. Let the maintainer pick.
+# needs-info (On Hold, label = needs-info)
+curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
+  "$JIRA_BASE_URL/rest/api/2/search?jql=project+%3D+$JIRA_PROJECT_KEY+AND+status+%3D+%22On+Hold%22+AND+labels+%3D+needs-info&maxResults=20"
+
+# ready-for-agent (Open, label = ready-for-agent)
+curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
+  "$JIRA_BASE_URL/rest/api/2/search?jql=project+%3D+$JIRA_PROJECT_KEY+AND+labels+%3D+ready-for-agent&maxResults=20"
+```
+
+Parse the JSON response with `jq` to extract key, summary, status, and labels. Show counts and a one-line summary per issue. Let the maintainer pick.
 
 ## Triage a specific issue
 
-1. **Gather context.** Read the full issue (body, comments, labels, reporter, dates). Parse any prior triage notes so you don't re-ask resolved questions. Explore the codebase using the project's domain glossary, respecting ADRs in the area. Read `.out-of-scope/*.md` and surface any prior rejection that resembles this issue.
+1. **Gather context.** Read the full Jira issue (body, comments, reporter, dates):
+   ```bash
+   curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
+     "$JIRA_BASE_URL/rest/api/2/issue/<KEY>"
+   curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
+     "$JIRA_BASE_URL/rest/api/2/issue/<KEY>/comment"
+   ```
+   Parse any prior triage notes so you don't re-ask resolved questions. Explore the codebase using the project's domain glossary, respecting ADRs in the area. Read `.out-of-scope/*.md` and surface any prior rejection that resembles this issue.
 
 2. **Recommend.** Tell the maintainer your category and state recommendation with reasoning, plus a brief codebase summary relevant to the issue. Wait for direction.
 
@@ -69,16 +99,51 @@ Show counts and a one-line summary per issue. Let the maintainer pick.
 4. **Grill (if needed).** If the issue needs fleshing out, run a `/grill-with-docs` session.
 
 5. **Apply the outcome:**
-   - `ready-for-agent` — post an agent brief comment ([AGENT-BRIEF.md](AGENT-BRIEF.md)).
-   - `ready-for-human` — same structure as an agent brief, but note why it can't be delegated (judgment calls, external access, design decisions, manual testing).
-   - `needs-info` — post triage notes (template below).
-   - `wontfix` (bug) — polite explanation, then close.
-   - `wontfix` (enhancement) — write to `.out-of-scope/`, link to it from a comment, then close ([OUT-OF-SCOPE.md](OUT-OF-SCOPE.md)).
-   - `needs-triage` — apply the role. Optional comment if there's partial progress.
+
+   a. Find the transition ID for the target status:
+   ```bash
+   TRANSITIONS=$(curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
+     "$JIRA_BASE_URL/rest/api/2/issue/<KEY>/transitions")
+   TRANSITION_ID=$(echo "$TRANSITIONS" | jq -r '.transitions[] | select(.name == "<Target Status>") | .id')
+   ```
+
+   b. Update labels and/or status:
+   ```bash
+   # Update labels
+   curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
+     -H "Content-Type: application/json" \
+     -X PUT \
+     "$JIRA_BASE_URL/rest/api/2/issue/<KEY>?notifyUsers=false" \
+     -d '{"fields": {"labels": ["ready-for-agent"]}}'
+
+   # Transition status (if needed)
+   curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
+     -H "Content-Type: application/json" \
+     -X POST \
+     "$JIRA_BASE_URL/rest/api/2/issue/<KEY>/transitions?notifyUsers=false" \
+     -d "{\"transition\": {\"id\": \"$TRANSITION_ID\"}}"
+   ```
+
+   c. Post a comment with details:
+   ```bash
+   curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
+     -H "Content-Type: application/json" \
+     -X POST \
+     "$JIRA_BASE_URL/rest/api/2/issue/<KEY>/comment?notifyUsers=false" \
+     -d '{"body": "> *This was generated by AI during triage.*\n\n..."}'
+   ```
+
+   Actions per outcome:
+   - `ready-for-agent` — post an agent brief comment ([AGENT-BRIEF.md](AGENT-BRIEF.md)). Set label to `ready-for-agent`. Transition to `Open` if needed.
+   - `ready-for-human` — same structure as an agent brief, but note why it can't be delegated. Transition to `Open`, label `ready-for-human`.
+   - `needs-info` — post triage notes (template below). Transition to `On Hold`, label `needs-info`.
+   - `wontfix` (bug) — polite explanation, then close. Set label `wontfix`, transition to `Closed`.
+   - `wontfix` (enhancement) — write to `.out-of-scope/`, link to it from a comment, then close.
+   - `needs-triage` — apply the `needs-triage` label. Optional comment if there's partial progress.
 
 ## Quick state override
 
-If the maintainer says "move #42 to ready-for-agent", trust them and apply the role directly. Confirm what you're about to do (role changes, comment, close), then act. Skip grilling. If moving to `ready-for-agent` without a grilling session, ask whether they want to write an agent brief.
+If the maintainer says "move MT-42 to ready-for-agent", trust them and apply the label/transition directly. Confirm what you're about to do (label change, transition, comment), then act. Skip grilling. If moving to `ready-for-agent` without a grilling session, ask whether they want to write an agent brief.
 
 ## Needs-info template
 

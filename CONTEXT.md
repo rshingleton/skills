@@ -1,15 +1,21 @@
-# Matt Pocock Skills
+# Internal Skills (Private Fork)
 
-A collection of agent skills (slash commands and behaviors) loaded by Claude Code. Skills are organized into buckets and consumed by per-repo configuration emitted by `/setup-matt-pocock-skills`.
+A collection of agent skills (slash commands and behaviors) loaded by Claude Code. Skills are organized into buckets and consumed by per-repo configuration emitted by `/setup-internal-skills`.
+
+Canonical repo: [ai-skills](https://github.com/rshingleton/skills.git) on Bitbucket. Descended from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT License).
 
 ## Language
 
 **Issue tracker**:
-The tool that hosts a repo's issues — GitHub Issues, Linear, a local `.scratch/` markdown convention, or similar. Skills like `to-issues`, `to-prd`, `triage`, and `qa` read from and write to it.
+The tool that hosts a repo's issues — by default local markdown under `docs/issues/`, or Jira after `/promote-to-jira`. Skills like `to-jiras`, `to-epic`, `plan-it`, `implement-it`, `verify-it`, `promote-to-jira`, `triage`, and `qa` read from and write to it per `docs/agents/issue-tracker.md`.
 _Avoid_: backlog manager, backlog backend, issue host
 
+**Epic**:
+The top-level feature specification for a body of work — local file `docs/issues/<feature-slug>/epic.md` (`type: epic` in frontmatter) or a Jira Epic issue. Produced by `/to-epic`. Tasks slice the Epic into implementable vertical bullets via `/to-jiras`.
+_Avoid_: PRD, product requirements document
+
 **Issue**:
-A single tracked unit of work inside an **Issue tracker** — a bug, task, PRD, or slice produced by `to-issues`.
+A single tracked unit of work inside an **Issue tracker** — a bug, task, Epic, or slice produced by `to-jiras` or `plan-it`.
 _Avoid_: ticket (use only when quoting external systems that call them tickets)
 
 **Triage role**:

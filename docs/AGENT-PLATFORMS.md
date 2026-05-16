@@ -1,0 +1,81 @@
+# Agent platforms
+
+How to use this skills repo with **OpenCode**, **Cursor**, **GitHub Copilot**, and **Claude Code**.
+
+## Canonical file: `AGENTS.md`
+
+[AGENTS.md](../AGENTS.md) at the repo root is the **open format** project instructions file (same idea as OpenCode rules and Cursor’s `AGENTS.md` convention). Tool-specific files should **point here**, not duplicate maintenance rules.
+
+In **application repos** (after `/setup-internal-skills`), `AGENTS.md` also holds a `## Agent skills` block linking `docs/agents/issue-tracker.md`, triage labels, and domain layout.
+
+---
+
+## OpenCode
+
+1. Install skills: `bash scripts/link-skills.sh` from this repo (or `scripts/skills.sh`).
+2. Commit [opencode.json](../opencode.json) (or merge `instructions` into your global config).
+3. OpenCode loads `AGENTS.md` automatically; `CLAUDE.md` is a fallback only if `AGENTS.md` is missing.
+
+Optional global rules: `~/.config/opencode/AGENTS.md` for personal prefs (not committed).
+
+Skills path: `~/.agents/skills/` (same as this repo’s linker). See [OpenCode Agent Skills](https://open-code.ai/en/docs/skills).
+
+---
+
+## Cursor
+
+**Verified:** [Cursor Rules docs](https://cursor.com/docs/context/rules) list **AGENTS.md** as a first-class rule type (alongside Project, User, and Team rules). Cursor loads it natively — it is not an unofficial workaround.
+
+1. Install skills to `~/.agents/skills` (scripts above).
+2. Put shared, cross-tool instructions in root **`AGENTS.md`** (open standard; also used by OpenCode and Copilot). Cursor reads project-root and **nested** `AGENTS.md` files (subdir instructions merge; nearer files take precedence).
+3. **`.cursor/rules/`** is Cursor’s structured alternative (`.md` / `.mdc` with `globs`, `alwaysApply`, `@`-mention). Use it for file-scoped or “apply intelligently” rules — not for duplicating `AGENTS.md` / `docs/agents/` skill config. Official docs describe AGENTS.md as the simple alternative when you do not need that metadata.
+4. **Legacy:** `.cursorrules` still works but is deprecated — prefer `AGENTS.md` + `.cursor/rules/`.
+5. **Scope:** Project/User/Team rules and AGENTS.md apply to **Agent (Chat)**. They do **not** apply to Cursor Tab or Inline Edit (Cmd/Ctrl+K) per Cursor docs.
+6. `/setup-internal-skills` **audits** existing `.github/copilot-instructions.md` and `.cursor/rules/` on mature repos; it ensures `AGENTS.md` + `docs/agents/` exist and avoids redundant Cursor-only copies of the same content.
+
+---
+
+## GitHub Copilot
+
+1. [.github/copilot-instructions.md](../.github/copilot-instructions.md) is Copilot-specific (GitHub loads this path).
+2. On existing repos, `/setup-internal-skills` **reads** that file and appends a short pointer to `AGENTS.md` + `docs/agents/` if missing — it does not replace your Copilot instructions.
+3. Keep Copilot file short; full conventions live in `AGENTS.md`.
+4. Copilot does not load `SKILL.md` automatically — reference skill names in chat or use org Copilot skill integration when available.
+
+---
+
+## Claude Code
+
+1. [CLAUDE.md](../CLAUDE.md) points at `AGENTS.md`.
+2. [.claude-plugin/plugin.json](../.claude-plugin/plugin.json) lists skill paths for the plugin marketplace / project skills.
+3. Legacy workflows that only read `CLAUDE.md` still work via the pointer.
+
+---
+
+## Per-project setup (all platforms)
+
+Run once per application repository:
+
+```text
+/setup-internal-skills
+```
+
+Then use engineering skills (`/plan-it`, `/implement-it`, …). Issue tracker defaults to `docs/issues/`; Jira via `/promote-to-jira`.
+
+---
+
+## Recommended layout (application repo)
+
+```text
+AGENTS.md                 # Human + agent entry (## Agent skills block)
+docs/agents/              # issue-tracker, triage-labels, domain, compliance
+docs/issues/              # local Epics + tasks (default)
+docs/planning/            # Doc Cycle plans
+CONTEXT.md
+docs/adr/
+opencode.json             # optional — instructions: ["AGENTS.md"]
+.github/copilot-instructions.md   # Copilot-only; setup patches if present
+.cursor/rules/            # optional extras; Cursor still uses AGENTS.md
+```
+
+Seed template for new app repos: [skills/engineering/setup-internal-skills/templates/AGENTS.md](../skills/engineering/setup-internal-skills/templates/AGENTS.md).

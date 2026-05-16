@@ -1,14 +1,7 @@
-Skills are organized into bucket folders under `skills/`:
+# Claude Code
 
-- `engineering/` — daily code work
-- `productivity/` — daily non-code workflow tools
-- `misc/` — kept around but rarely used
-- `personal/` — tied to my own setup, not promoted
-- `in-progress/` — drafts not yet ready to ship
-- `deprecated/` — no longer used
+**Canonical instructions:** [AGENTS.md](./AGENTS.md)
 
-Every skill in `engineering/`, `productivity/`, or `misc/` must have a reference in the top-level `README.md` and an entry in `.claude-plugin/plugin.json`. Skills in `personal/`, `in-progress/`, and `deprecated/` must not appear in either.
+Claude Code loads this file by convention. Keep it as a pointer so Cursor, Copilot, and OpenCode can share one source of truth.
 
-Each skill entry in the top-level `README.md` must link the skill name to its `SKILL.md`.
-
-Each bucket folder has a `README.md` that lists every skill in the bucket with a one-line description, with the skill name linked to its `SKILL.md`.
+Skills for Claude Code are registered in [.claude-plugin/plugin.json](.claude-plugin/plugin.json). Install linked skills via [scripts/link-skills.sh](scripts/link-skills.sh) or [scripts/skills.sh](scripts/skills.sh).

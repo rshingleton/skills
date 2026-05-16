@@ -1,0 +1,8 @@
+---
+description: DEPRECATED — prefer root AGENTS.md (Cursor open standard). Only use if the team refuses to commit AGENTS.md.
+alwaysApply: true
+---
+
+Follow [AGENTS.md](../../AGENTS.md) for all agent/skills configuration.
+
+Do not duplicate issue-tracker or triage rules here — they belong in `AGENTS.md` and `docs/agents/`.

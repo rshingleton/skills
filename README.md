@@ -1,16 +1,8 @@
-<p>
-  <a href="https://www.aihero.dev/s/skills-newsletter">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://res.cloudinary.com/total-typescript/image/upload/v1777382277/skills-repo-dark_2x.png">
-      <source media="(prefers-color-scheme: light)" srcset="https://res.cloudinary.com/total-typescript/image/upload/v1777382277/skill-repo-light_2x.png">
-      <img alt="Skills" src="https://res.cloudinary.com/total-typescript/image/upload/v1777382277/skill-repo-light_2x.png" width="369">
-    </picture>
-  </a>
-</p>
+# Internal Skills (ai-skills)
 
-# Skills For Real Engineers
+**Canonical repository:** [https://github.com/rshingleton/skills.git](https://github.com/rshingleton/skills.git) (Bitbucket, VPN required)
 
-[![skills.sh](https://skills.sh/b/mattpocock/skills)](https://skills.sh/mattpocock/skills)
+Descended from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT License), adapted for our internal workflow.
 
 My agent skills that I use every day to do real engineering - not vibe coding.
 
@@ -18,26 +10,53 @@ Developing real applications is hard. Approaches like GSD, BMAD, and Spec-Kit tr
 
 These skills are designed to be small, easy to adapt, and composable. They work with any model. They're based on decades of engineering experience. Hack around with them. Make them your own. Enjoy.
 
-If you want to keep up with changes to these skills, and any new ones I create, you can join ~60,000 other devs on my newsletter:
+## Agent platforms
 
-[Sign Up To The Newsletter](https://www.aihero.dev/s/skills-newsletter)
+Instructions use the open **`AGENTS.md`** format (OpenCode, Cursor, Copilot, Claude Code). See [AGENTS.md](./AGENTS.md) and [docs/AGENT-PLATFORMS.md](./docs/AGENT-PLATFORMS.md).
+
+| Tool | Config |
+|------|--------|
+| OpenCode | [opencode.json](./opencode.json) |
+| Cursor | [.cursor/rules/](./.cursor/rules/) |
+| GitHub Copilot | [.github/copilot-instructions.md](./.github/copilot-instructions.md) |
+| Claude Code | [CLAUDE.md](./CLAUDE.md) + [.claude-plugin/plugin.json](./.claude-plugin/plugin.json) |
 
 ## Quickstart (30-second setup)
 
-1. Run the skills.sh installer:
+1. Clone and install skills into `~/.agents/skills`:
 
 ```bash
-npx skills@latest add mattpocock/skills
+git clone https://github.com/rshingleton/skills.git
+cd ai-skills
+bash scripts/skills.sh
 ```
 
-2. Pick the skills you want, and which coding agents you want to install them on. **Make sure you select `/setup-matt-pocock-skills`**.
+If you already have a working copy, run `bash scripts/link-skills.sh` from the repo root instead.
 
-3. Run `/setup-matt-pocock-skills` in your agent. It will:
-   - Ask you which issue tracker you want to use (GitHub, Linear, or local files)
-   - Ask you what labels you apply to ticks when you triage them (`/triage` uses labels)
-   - Ask you where you want to save any docs we create
+2. **Or** re-run the installer from an existing clone:
 
-4. Bam - you're ready to go.
+```bash
+bash /path/to/ai-skills/scripts/skills.sh
+```
+
+**Make sure you select `/setup-internal-skills`**.
+
+3. Set the required environment variables:
+
+```bash
+# Required for Jira integration
+export JIRA_BASE_URL="https://jira.example.com"
+export JIRA_API_TOKEN="your-jira-pat"
+export JIRA_PROJECT_KEY="MT"
+```
+
+4. Run `/setup-internal-skills` in your **application repo** (in Cursor, Copilot, or OpenCode). It will:
+   - Write **`AGENTS.md`** and `docs/agents/` (open format; local issues in `docs/issues/` by default)
+   - Optionally add `opencode.json`, Copilot instructions, or Cursor rules
+   - Ask about triage labels and domain doc layout
+   - Check for `CONTRIBUTING.md` and `SECURITY_POLICY.md`
+
+5. Bam - you're ready to go.
 
 ## Why These Skills Exist
 
@@ -99,7 +118,7 @@ It's hard to explain how powerful this is. It might be the single coolest techni
 
 ### #3: The Code Doesn't Work
 
-> "Always take small, deliberate steps. The rate of feedback is your speed limit. Never take on a task that’s too big."
+> "Always take small, deliberate steps. The rate of feedback is your speed limit. Never take on a task that's too big."
 >
 > David Thomas & Andrew Hunt, [The Pragmatic Programmer](https://www.amazon.co.uk/Pragmatic-Programmer-Anniversary-Journey-Mastery/dp/B0833F1T3V)
 
@@ -131,7 +150,8 @@ For debugging, I've also built a **[`/diagnose`](./skills/engineering/diagnose/S
 
 This is built in to every layer of these skills:
 
-- [`/to-prd`](./skills/engineering/to-prd/SKILL.md) quizzes you about which modules you're touching before creating a PRD
+- [`/plan-it`](./skills/engineering/plan-it/SKILL.md) quizzes you about which modules you're touching before creating a plan
+- [`/to-epic`](./skills/engineering/to-epic/SKILL.md) saves an Epic under `docs/issues/` (or Jira if configured)
 - [`/zoom-out`](./skills/engineering/zoom-out/SKILL.md) tells the agent to explain code in the context of the whole system
 
 And crucially, [`/improve-codebase-architecture`](./skills/engineering/improve-codebase-architecture/SKILL.md) helps you rescue a codebase that has become a ball of mud. I recommend running it on your codebase once every few days.
@@ -140,22 +160,54 @@ And crucially, [`/improve-codebase-architecture`](./skills/engineering/improve-c
 
 Software engineering fundamentals matter more than ever. These skills are my best effort at condensing these fundamentals into repeatable practices, to help you ship the best apps of your career. Enjoy.
 
+## Skill map — planning, slicing, executing
+
+| | `/plan-it` | `/to-epic` | `/to-jiras` |
+|---|---|---|---|
+| **Purpose** | Grill, design, scaffold phases | Synthesize conversation → Epic | Break into implementable Tasks |
+| **Jira output** | Optional: Task (≤3 phases) or Epic+Tasks (larger) | Epic with full Epic body | Tasks (standalone or `--parent EPIC-123`) |
+| **Interview?** | Yes, deeply | No — synthesizes | Yes, on granularity |
+| **When** | Exploring design, need architecture | Spec is clear, need formal Epic | Ready to assign work |
+
+**Execution & close:**
+
+| | `/implement-it` | `/audit-it` | `/verify-it` |
+|---|---|---|---|
+| **Does** | TDD per plan phase | Phase audit (spec, standards, compliance, architecture) | Durable docs after audit PASS |
+| **Jira** | Auto-transitions to "In Progress" | — | Prompts to close (transition to "Resolved") |
+
+**Doc Cycle (plan-it–driven):** `/plan-it` → `/implement-it` (each phase) → `/audit-it` → `/verify-it`
+
+**Typical flows:**
+
+```
+Small change:  /to-jiras → /implement-it → /audit-it → /verify-it
+Feature:       /grill-with-docs → /to-epic → /to-jiras --parent EPIC-123 → /implement-it → /audit-it → /verify-it
+Large plan:    /grill-with-docs → /plan-it → (publish to Jira) → /implement-it (each phase) → /audit-it → /verify-it
+```
+
 ## Reference
 
 ### Engineering
 
 Skills I use daily for code work.
 
-- **[diagnose](./skills/engineering/diagnose/SKILL.md)** — Disciplined diagnosis loop for hard bugs and performance regressions: reproduce → minimise → hypothesise → instrument → fix → regression-test.
+- **[audit-it](./skills/engineering/audit-it/SKILL.md)** — Doc Cycle audit phase; repo reviews write `docs/AUDIT.md`. Gates verify-it.
+- **[diagnose](./skills/engineering/diagnose/SKILL.md)** — Disciplined diagnosis loop for hard bugs and performance regressions.
 - **[grill-with-docs](./skills/engineering/grill-with-docs/SKILL.md)** — Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates `CONTEXT.md` and ADRs inline.
-- **[triage](./skills/engineering/triage/SKILL.md)** — Triage issues through a state machine of triage roles.
+- **[implement-it](./skills/engineering/implement-it/SKILL.md)** — Doc Cycle implement phase. TDD with repo standards. Transitions Jira to "In Progress" on start.
 - **[improve-codebase-architecture](./skills/engineering/improve-codebase-architecture/SKILL.md)** — Find deepening opportunities in a codebase, informed by the domain language in `CONTEXT.md` and the decisions in `docs/adr/`.
-- **[setup-matt-pocock-skills](./skills/engineering/setup-matt-pocock-skills/SKILL.md)** — Scaffold the per-repo config (issue tracker, triage label vocabulary, domain doc layout) that the other engineering skills consume. Run once per repo before using `to-issues`, `to-prd`, `triage`, `diagnose`, `tdd`, `improve-codebase-architecture`, or `zoom-out`.
-- **[tdd](./skills/engineering/tdd/SKILL.md)** — Test-driven development with a red-green-refactor loop. Builds features or fixes bugs one vertical slice at a time.
-- **[to-issues](./skills/engineering/to-issues/SKILL.md)** — Break any plan, spec, or PRD into independently-grabbable GitHub issues using vertical slices.
-- **[to-prd](./skills/engineering/to-prd/SKILL.md)** — Turn the current conversation context into a PRD and submit it as a GitHub issue. No interview — just synthesizes what you've already discussed.
-- **[zoom-out](./skills/engineering/zoom-out/SKILL.md)** — Tell the agent to zoom out and give broader context or a higher-level perspective on an unfamiliar section of code.
-- **[prototype](./skills/engineering/prototype/SKILL.md)** — Build a throwaway prototype to flesh out a design — either a runnable terminal app for state/business-logic questions, or several radically different UI variations toggleable from one route.
+- **[internal-compliance](./skills/engineering/internal-compliance/SKILL.md)** — Pre-flight compliance check against internal security linting rules before finalizing any PR.
+- **[plan-it](./skills/engineering/plan-it/SKILL.md)** — Doc Cycle plan phase. Grill, scaffold planning structure, draft ADRs. Optionally publish phases to Jira.
+- **[prototype](./skills/engineering/prototype/SKILL.md)** — Build a throwaway prototype to flesh out a design.
+- **[setup-internal-skills](./skills/engineering/setup-internal-skills/SKILL.md)** — Per-repo config; **default** local issues in `docs/issues/`. Run once per repo.
+- **[tdd](./skills/engineering/tdd/SKILL.md)** — Test-driven development with red-green-refactor loop.
+- **[to-epic](./skills/engineering/to-epic/SKILL.md)** — Epic as local `epic.md` or Jira Epic.
+- **[to-jiras](./skills/engineering/to-jiras/SKILL.md)** — Vertical-slice tasks in `docs/issues/` or Jira.
+- **[promote-to-jira](./skills/engineering/promote-to-jira/SKILL.md)** — Push local issues and optional plans to Jira.
+- **[triage](./skills/engineering/triage/SKILL.md)** — Triage issues through a state machine (Jira issue tracker).
+- **[verify-it](./skills/engineering/verify-it/SKILL.md)** — Doc Cycle verify phase. Finalizes ADRs, CONTEXT.md, changelog, and planning cleanup. Optionally close Jira issues.
+- **[zoom-out](./skills/engineering/zoom-out/SKILL.md)** — Get broader context on unfamiliar code.
 
 ### Productivity
 
@@ -166,11 +218,14 @@ General workflow tools, not code-specific.
 - **[handoff](./skills/productivity/handoff/SKILL.md)** — Compact the current conversation into a handoff document so another agent can continue the work.
 - **[write-a-skill](./skills/productivity/write-a-skill/SKILL.md)** — Create new skills with proper structure, progressive disclosure, and bundled resources.
 
-### Misc
+## Credits
 
-Tools I keep around but rarely use.
+This repository is an **internal adaptation** of [mattpocock/skills](https://github.com/mattpocock/skills) (MIT License), originally created by [Matt Pocock](https://github.com/mattpocock). Canonical home: [ai-skills on Bitbucket](https://github.com/rshingleton/skills.git).
 
-- **[git-guardrails-claude-code](./skills/misc/git-guardrails-claude-code/SKILL.md)** — Set up Claude Code hooks to block dangerous git commands (push, reset --hard, clean, etc.) before they execute.
-- **[migrate-to-shoehorn](./skills/misc/migrate-to-shoehorn/SKILL.md)** — Migrate test files from `as` type assertions to @total-typescript/shoehorn.
-- **[scaffold-exercises](./skills/misc/scaffold-exercises/SKILL.md)** — Create exercise directory structures with sections, problems, solutions, and explainers.
-- **[setup-pre-commit](./skills/misc/setup-pre-commit/SKILL.md)** — Set up Husky pre-commit hooks with lint-staged, Prettier, type checking, and tests.
+We are grateful for the original work and have adapted it for our internal workflow. The core skills, design philosophy, and documentation structure remain largely based on Matt's original repository.
+
+**All support requests should be directed to the internal Tools Team** — please do not file issues against the upstream repository for fork-specific modifications.
+
+### License
+
+This fork carries forward the original MIT License. See [LICENSE](./LICENSE).
