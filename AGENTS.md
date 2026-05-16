@@ -13,7 +13,7 @@ Platform setup details: [docs/AGENT-PLATFORMS.md](docs/AGENT-PLATFORMS.md).
 
 ## Purpose
 
-Internal **ai-skills** monorepo — composable `SKILL.md` workflows for real engineering (planning, implementation, audit, verify).
+Internal **ai-skills** monorepo — composable `SKILL.md` workflows for planning, implementation, audit, verify, and baseline codebase reference (`/doc-it`).
 
 **Repository:** `https://github.com/rshingleton/skills.git` (default branch `main`)
 
@@ -33,12 +33,12 @@ Under `skills/`:
 |--------|-----|
 | `engineering/` | Daily code work — shipped in README + plugin |
 | `productivity/` | Non-code workflow |
-| `misc/` | Rarely used, still listed |
-| `personal/`, `in-progress/`, `deprecated/` | **Not** in top-level README or `.claude-plugin/plugin.json` |
+| `in-progress/` | Draft skills (e.g. `review`) — not in README or plugin |
+| `personal/`, `deprecated/` | **Not** in top-level README or `.claude-plugin/plugin.json` |
 
 ## Maintaining this monorepo
 
-1. Every shipped skill in `engineering/`, `productivity/`, or `misc/` needs:
+1. Every shipped skill in `engineering/` or `productivity/` needs:
    - A linked entry in the top-level [README.md](README.md)
    - An entry in [.claude-plugin/plugin.json](.claude-plugin/plugin.json)
 2. Each bucket has a [README.md](skills/engineering/README.md) listing its skills (name → `SKILL.md`).
@@ -57,7 +57,7 @@ On **existing repos**, setup audits Copilot and Cursor files (see `PLATFORM-AUDI
 
 **Doc Cycle:** `/plan-it` → `/implement-it` (each phase) → `/audit-it` → `/verify-it`.
 
-**Codebase reference:** `/doc-it` → `docs/reference/` + `docs/reference-audit/` (onboarding; not `/verify-it`).
+**Codebase reference:** `/doc-it` → `docs/reference/` + `docs/reference-audit/` (`tech-debt.md`, `testing.md`, `architecture.md`, `follow-ups.md`). Onboarding or unfamiliar repos; not `/verify-it` (post-plan finalize).
 
 **Jira later:** `/promote-to-jira` after local planning is stable.
 

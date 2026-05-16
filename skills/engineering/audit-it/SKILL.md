@@ -18,7 +18,7 @@ Two modes — pick by trigger:
 | **Phase audit** | After **all** `/implement-it` phases are complete; required before `/verify-it` | `docs/planning/{ID}/audit-report.md` |
 | **Repo audit** | Ad-hoc tech-debt or sprint review | `docs/AUDIT.md` |
 
-For **baseline reference maps** and a sliced audit (`docs/reference-audit/tech-debt.md`, `architecture.md`, …), use `/doc-it`. Use repo audit mode here for a shorter pass to `docs/AUDIT.md` without building `docs/reference/`.
+For **baseline reference maps** and a sliced audit (`docs/reference-audit/`: `tech-debt.md`, `testing.md`, `architecture.md`, `follow-ups.md`), use `/doc-it`. Use repo audit mode here for a shorter pass to `docs/AUDIT.md` without building `docs/reference/`.
 
 ## Phase audit (default in Doc Cycle)
 

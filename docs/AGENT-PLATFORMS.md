@@ -60,7 +60,11 @@ Run once per application repository:
 /setup-internal-skills
 ```
 
-Then use engineering skills (`/plan-it`, `/implement-it`, …). Issue tracker defaults to `docs/issues/`; Jira via `/promote-to-jira`.
+Then use engineering skills (`/plan-it`, `/implement-it`, `/audit-it`, `/verify-it`, …). Issue tracker defaults to `docs/issues/`; Jira via `/promote-to-jira`.
+
+**Unfamiliar codebase:** run `/doc-it` to create `docs/reference/` and `docs/reference-audit/` before heavy feature work.
+
+**Jira API skills:** set `JIRA_*` via [`.env.example`](../.env.example) and [scripts/load-jira-env.sh](../scripts/load-jira-env.sh) (project `.env` takes precedence when sourced from the app repo).
 
 ---
 
@@ -71,6 +75,8 @@ AGENTS.md                 # Human + agent entry (## Agent skills block)
 docs/agents/              # issue-tracker, triage-labels, domain, compliance
 docs/issues/              # local Epics + tasks (default)
 docs/planning/            # Doc Cycle plans
+docs/reference/           # baseline maps (/doc-it Phase 1)
+docs/reference-audit/     # sliced review (/doc-it Phase 2)
 CONTEXT.md
 docs/adr/
 opencode.json             # optional — instructions: ["AGENTS.md"]

@@ -1,13 +1,13 @@
-# Internal Skills (Private Fork)
+# Internal Skills (ai-skills)
 
-A collection of agent skills (slash commands and behaviors) loaded by Claude Code. Skills are organized into buckets and consumed by per-repo configuration emitted by `/setup-internal-skills`.
+A collection of agent skills (slash commands and behaviors) for engineering workflows. Skills are organized into buckets and consumed by per-repo configuration emitted by `/setup-internal-skills`.
 
 Canonical repo: [ai-skills](https://github.com/rshingleton/skills.git) on Bitbucket. Descended from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT License).
 
 ## Language
 
 **Issue tracker**:
-The tool that hosts a repo's issues — by default local markdown under `docs/issues/`, or Jira after `/promote-to-jira`. Skills like `to-jiras`, `to-epic`, `plan-it`, `implement-it`, `verify-it`, `promote-to-jira`, `triage`, and `qa` read from and write to it per `docs/agents/issue-tracker.md`.
+The tool that hosts a repo's issues — by default local markdown under `docs/issues/`, or Jira after `/promote-to-jira`. Skills like `/to-jiras`, `/to-epic`, `/plan-it`, `/implement-it`, `/verify-it`, `/promote-to-jira`, and `/triage` read from and write to it per `docs/agents/issue-tracker.md`.
 _Avoid_: backlog manager, backlog backend, issue host
 
 **Epic**:

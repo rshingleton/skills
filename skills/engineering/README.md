@@ -11,6 +11,12 @@ Pipeline for plan-it–driven work (implement every phase, then audit and verify
 - **[audit-it](./audit-it/SKILL.md)** — Independent phase auditor (spec, standards, compliance, architecture). Repo reviews write `docs/AUDIT.md`. Gates verify-it.
 - **[verify-it](./verify-it/SKILL.md)** — After phase audit passes, finalize ADRs, CONTEXT.md, changelog, and planning cleanup. Optionally close Jira issues.
 
+## Codebase reference
+
+Run when onboarding or before large work on an unfamiliar repo (not part of the Doc Cycle):
+
+- **[doc-it](./doc-it/SKILL.md)** — Phase 1: `docs/reference/` (maps, entry points, test landscape). Phase 2: `docs/reference-audit/` (`tech-debt.md`, `testing.md`, `architecture.md`, `follow-ups.md`). Hand off to `/to-jiras`, `/plan-it`, or `/improve-codebase-architecture`.
+
 ## Other engineering skills
 
 - **[diagnose](./diagnose/SKILL.md)** — Disciplined diagnosis loop for hard bugs and performance regressions.

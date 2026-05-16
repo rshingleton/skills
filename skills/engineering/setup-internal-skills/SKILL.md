@@ -148,9 +148,11 @@ Tell the user setup is complete.
 
 > Issues go in `docs/issues/`. Use `/to-epic` and `/to-jiras` while planning; `/promote-to-jira` when ready for Jira.
 >
-> Doc Cycle: `/plan-it` → `/implement-it` → `/audit-it` → `/verify-it`.
+> Doc Cycle: `/plan-it` → `/implement-it` (each phase) → `/audit-it` → `/verify-it`.
+>
+> Unfamiliar codebase: `/doc-it` → `docs/reference/` + `docs/reference-audit/`.
 
-**If Jira chosen:** remind them to set `JIRA_*` env vars.
+**If Jira chosen:** remind them to set `JIRA_*` (shell export or `.env` per [issue-tracker-jira.md](./issue-tracker-jira.md#loading-credentials)).
 
 They can edit `docs/agents/*.md` and `AGENTS.md` later; re-run setup to switch trackers.
 

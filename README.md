@@ -204,9 +204,10 @@ This is built in to every layer of these skills:
 
 - [`/plan-it`](./skills/engineering/plan-it/SKILL.md) quizzes you about which modules you're touching before creating a plan
 - [`/to-epic`](./skills/engineering/to-epic/SKILL.md) saves an Epic under `docs/issues/` (or Jira if configured)
-- [`/zoom-out`](./skills/engineering/zoom-out/SKILL.md) tells the agent to explain code in the context of the whole system
+- [`/zoom-out`](./skills/engineering/zoom-out/SKILL.md) gives a quick chat map of unfamiliar code
+- [`/doc-it`](./skills/engineering/doc-it/SKILL.md) writes durable `docs/reference/` and a sliced `docs/reference-audit/` (tech debt, testing, architecture) when you need a real baseline
 
-And crucially, [`/improve-codebase-architecture`](./skills/engineering/improve-codebase-architecture/SKILL.md) helps you rescue a codebase that has become a ball of mud. I recommend running it on your codebase once every few days.
+[`/improve-codebase-architecture`](./skills/engineering/improve-codebase-architecture/SKILL.md) grills one deepening candidate; pair it with `/doc-it` when the repo needs both maps and a written backlog.
 
 ### Summary
 

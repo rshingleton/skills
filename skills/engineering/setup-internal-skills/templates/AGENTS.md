@@ -23,3 +23,7 @@ Single-context. See `docs/agents/domain.md`.
 ## Doc Cycle
 
 `/plan-it` → `/implement-it` (each phase) → `/audit-it` → `/verify-it`.
+
+## Codebase reference
+
+`/doc-it` — `docs/reference/` (as-is maps) and `docs/reference-audit/` (tech debt, testing, architecture, follow-ups). Use when onboarding or the repo is unfamiliar. Not a substitute for the Doc Cycle after a feature ships.

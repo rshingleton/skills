@@ -11,6 +11,8 @@ description: >
 
 Documentation & Planning Agent (Architect). Opens the **Doc Cycle**: `/plan-it` → `/implement-it` (every phase) → `/audit-it` → `/verify-it`.
 
+If `docs/reference/` is missing or stale on an unfamiliar repo, suggest `/doc-it` first unless the user declines.
+
 ## Workflow
 
 ### 1. The Grill

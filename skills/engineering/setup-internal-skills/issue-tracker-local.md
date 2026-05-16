@@ -16,6 +16,7 @@ docs/issues/
 Optional cross-links:
 
 - `docs/planning/<plan-id>/` — Doc Cycle plans; reference from epic frontmatter via `planning_id`
+- `docs/reference/`, `docs/reference-audit/` — baseline from `/doc-it`; draft issues in `follow-ups.md` can become tasks here
 - After Jira promotion, each file records `jira_key` in frontmatter
 
 ## Frontmatter (required on every issue file)
