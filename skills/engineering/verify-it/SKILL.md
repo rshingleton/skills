@@ -45,11 +45,11 @@ See [EXAMPLES.md](EXAMPLES.md) for purge/archive examples.
 
 `docs/agents/issue-tracker.md` should have been provided — run `/setup-internal-skills` if missing.
 
-**Jira** — for each phase row in `docs/planning/{ID}/jira.md` ([issue-tracker-local.md](../setup-internal-skills/issue-tracker-local.md#resolving-jira-for-implement-it--verify-it)):
+**Jira** — for each phase row with a key in `docs/planning/{ID}/jira.md`:
 
 - If `JIRA_ASSIGNEE` is set, `_jira_set_assignee "$KEY"` before other writes ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#assignee-jira_assignee)).
-- Post summary comment and transition with `?notifyUsers=false`; `_jira_apply_watcher_policy` after each write ([jira-notifications.md](../setup-internal-skills/jira-notifications.md)).
-- Ask *"Close this Jira? (y/n)"* per key before Resolved.
+- **Prompt for resolution comment:** ask *"What concise resolution comment should be posted to {KEY}? (press Enter to skip)"* or draft one from the phase summary and let the user edit. Post the comment via `POST /issue/{KEY}/comment?notifyUsers=false` ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#helper-functions-copy-into-shell-before-jira-work)).
+- **Resolve:** ask *"Resolve {KEY}? (y/n)"* per key. If yes, transition to the `Resolved` or `Done` status (`POST /issue/{KEY}/transitions?notifyUsers=false`). Apply `_jira_apply_watcher_policy "$KEY" update` after each write ([jira-notifications.md](../setup-internal-skills/jira-notifications.md)).
 
 If any phase row lacks a Jira key, report it — run `/plan-it --jira {ID} --sync-only` before closing Jira.
 

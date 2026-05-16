@@ -128,11 +128,13 @@ When `JIRA_DEFAULT_EPIC` is set but this plan belongs elsewhere, require or conf
 
 Do **not** create `docs/issues/<slug>/tasks/` for plan phases.
 
+**If Jira was not requested:** ask the user *"Create Jira issues for this plan now?"* If yes, run the Jira publish flow (step 5a); if no, note that they can later run `/plan-it {ID} --jira` or `/plan-it {ID} --jira --sync-only` to publish or re-sync.
+
 ### 6. Next skill
 
 > Plan `{ID}` ready — {N} phase(s): {list}.
 >
-> Jira: `docs/planning/{ID}/jira.md` (if published).
+> **Jira:** `docs/planning/{ID}/jira.md` (if published). To publish later: `/plan-it {ID} --jira`.
 >
 > **Next:** `/implement-it` on `docs/planning/{ID}/phase-1/ai-prompt.md` → … → `/audit-it` → `/verify-it`.
 
