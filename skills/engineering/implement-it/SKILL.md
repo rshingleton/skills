@@ -24,7 +24,7 @@ Flag ambiguities to the Planning Agent (Architect) via the user — do not guess
 **Issue tracker** — read `docs/agents/issue-tracker.md`:
 
 - **Local:** If this phase maps to `docs/issues/...`, set frontmatter `status: in-progress` and append a dated note under `## Comments`.
-- **Jira:** Transition linked issue to "In Progress" (see [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md)). Ask for the key if unknown.
+- **Jira:** Transition linked issue to "In Progress" with `?notifyUsers=false`, then remove API user from watchers ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md), [jira-notifications.md](../setup-internal-skills/jira-notifications.md)). Ask for the key if unknown.
 
 ### 2. TDD Loop
 

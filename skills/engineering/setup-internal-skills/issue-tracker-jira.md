@@ -11,6 +11,8 @@ The skills read these from the environment:
 | `JIRA_BASE_URL` | Jira instance base URL (e.g. `https://jira.example.com`). |
 | `JIRA_API_TOKEN` | Personal access token (Bearer auth in `Authorization` header). |
 | `JIRA_PROJECT_KEY` | Jira project key where issues live (e.g. `your-project-key`). |
+| `JIRA_EMAIL` | Optional. **Not sent on API calls** — only used to derive watcher username (`${JIRA_EMAIL%%@*}`) for notification suppression. Same role as in doc-manager. |
+| `JIRA_WATCHER_USERNAME` | Optional. Jira username for watcher DELETE when it differs from the email prefix (e.g. `dashboard` if email is `dashboard@example.com`). Takes precedence over `JIRA_EMAIL`. |
 
 ### Loading credentials
 
@@ -50,6 +52,15 @@ $JIRA_BASE_URL/rest/api/2
 
 All calls use `Authorization: Bearer $JIRA_API_TOKEN` and `Content-Type: application/json`.
 
+## Notification suppression (required on writes)
+
+Follow [jira-notifications.md](jira-notifications.md) on **every** create, update, transition, and comment (same as doc-manager):
+
+1. Append **`?notifyUsers=false`** to the URL.
+2. After create or field/status change, **`DELETE /issue/{key}/watchers?username=...`** for the API user (`JIRA_WATCHER_USERNAME` or `${JIRA_EMAIL%%@*}`).
+
+Skips cause watcher email noise to service accounts and shared inboxes.
+
 ## Epic custom fields
 
 These standard Jira custom fields are used when creating or linking Epics:
@@ -78,6 +89,17 @@ If your Jira instance uses different customfield IDs, update them in the skill f
       }
     }'
   ```
+
+  Then remove the API user from watchers (best-effort):
+
+  ```bash
+  WATCHER_USER="${JIRA_WATCHER_USERNAME:-${JIRA_EMAIL%%@*}}"
+  curl -s -o /dev/null -X DELETE \
+    -H "Authorization: Bearer $JIRA_API_TOKEN" \
+    "$JIRA_BASE_URL/rest/api/2/issue/<NEW_KEY>/watchers?username=${WATCHER_USER}" || true
+  ```
+
+  See [jira-notifications.md](jira-notifications.md) for the helper and rationale.
 
 - **Create an issue with multi-line body** (use `jq` to build JSON safely):
   ```bash
@@ -179,7 +201,7 @@ If your Jira instance uses different customfield IDs, update them in the skill f
 
 ## When a skill says "publish to the issue tracker"
 
-Create a Jira issue via `curl` POST to `/rest/api/2/issue`.
+Create a Jira issue via `curl` POST to `/rest/api/2/issue?notifyUsers=false`, then remove the API user from watchers per [jira-notifications.md](jira-notifications.md).
 
 ## When a skill says "fetch the relevant ticket"
 

@@ -48,7 +48,7 @@ Present breakdown: title, type (HITL/AFK), blocked-by, user stories covered. Ite
 
 **Local:** Follow [LOCAL-PUBLISH.md](LOCAL-PUBLISH.md).
 
-**Jira:** For each approved slice, POST Task (link Epic via `customfield_10880` when `--parent` set). See curl templates below.
+**Jira:** For each approved slice, POST Task with `?notifyUsers=false` (link Epic via `customfield_10880` when `--parent` set). Remove API user from watchers on each new key — [jira-notifications.md](../setup-internal-skills/jira-notifications.md). See curl templates below.
 
 Publish in dependency order so blockers can reference real keys (Jira keys or local task paths).
 
@@ -90,6 +90,7 @@ KEY=$(curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
         labels: ["vertical-slice", "ai-generated"]
       }
     }')" | jq -r '.key')
+# _remove_jira_watcher "$KEY" — see jira-notifications.md
 ```
 
 **Jira with parent Epic:** add `customfield_10880: $epic` — see prior skill revision / [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md).

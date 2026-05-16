@@ -16,4 +16,4 @@ Install skills into `~/.agents/skills` with [scripts/skills.sh](../scripts/skill
 
 **Codebase reference:** `doc-it` writes `docs/reference/` and `docs/reference-audit/` (tech debt, testing, architecture, follow-ups).
 
-**Jira:** copy [`.env.example`](../.env.example) to `~/.config/ai-skills/.env` or the app repo `.env`; `source` [load-jira-env.sh](../scripts/load-jira-env.sh) before API calls.
+**Jira:** copy [`.env.example`](../.env.example) to `~/.config/ai-skills/.env` or the app repo `.env`; `source` [load-jira-env.sh](../scripts/load-jira-env.sh) before API calls. Optional `JIRA_EMAIL` / `JIRA_WATCHER_USERNAME` for watcher cleanup; all writes use [jira-notifications.md](../skills/engineering/setup-internal-skills/jira-notifications.md).

@@ -46,7 +46,7 @@ Tell the user:
 
 ### Jira
 
-POST Epic (`issuetype: "Epic"`, `customfield_10881` for Epic Name) — see [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md).
+POST Epic (`issuetype: "Epic"`, `customfield_10881`, `?notifyUsers=false`) — [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md). Then [jira-notifications.md](../setup-internal-skills/jira-notifications.md) watcher removal on the new key.
 
 Tell the user the Epic key and suggest: *"Run /to-jiras --parent $EPIC_KEY to break this into Tasks."*
 

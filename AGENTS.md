@@ -61,7 +61,7 @@ On **existing repos**, setup audits Copilot and Cursor files (see `PLATFORM-AUDI
 
 **Jira later:** `/promote-to-jira` after local planning is stable.
 
-**Jira credentials:** `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` via shell export or `.env` ([.env.example](.env.example), [load-jira-env.sh](scripts/load-jira-env.sh)). Project repo `.env` wins over user-wide files when sourced from that repo.
+**Jira credentials:** `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` via shell export or `.env` ([.env.example](.env.example), [load-jira-env.sh](scripts/load-jira-env.sh)). Optional `JIRA_EMAIL` or `JIRA_WATCHER_USERNAME` for watcher removal (not Bearer auth). Writes use `notifyUsers=false` per [jira-notifications.md](skills/engineering/setup-internal-skills/jira-notifications.md). Project repo `.env` wins over user-wide files when sourced from that repo.
 
 ## Scripts
 

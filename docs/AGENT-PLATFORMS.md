@@ -64,7 +64,7 @@ Then use engineering skills (`/plan-it`, `/implement-it`, `/audit-it`, `/verify-
 
 **Unfamiliar codebase:** run `/doc-it` to create `docs/reference/` and `docs/reference-audit/` before heavy feature work.
 
-**Jira API skills:** set `JIRA_*` via [`.env.example`](../.env.example) and [scripts/load-jira-env.sh](../scripts/load-jira-env.sh) (project `.env` takes precedence when sourced from the app repo).
+**Jira API skills:** set `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` via [`.env.example`](../.env.example) and [scripts/load-jira-env.sh](../scripts/load-jira-env.sh) (project `.env` takes precedence when sourced from the app repo). Optional `JIRA_EMAIL` or `JIRA_WATCHER_USERNAME` for watcher suppression ([jira-notifications.md](../skills/engineering/setup-internal-skills/jira-notifications.md); doc-manager pattern).
 
 ---
 
@@ -72,7 +72,7 @@ Then use engineering skills (`/plan-it`, `/implement-it`, `/audit-it`, `/verify-
 
 ```text
 AGENTS.md                 # Human + agent entry (## Agent skills block)
-docs/agents/              # issue-tracker, triage-labels, domain, compliance
+docs/agents/              # issue-tracker, jira-notifications (Jira), triage-labels, domain, compliance
 docs/issues/              # local Epics + tasks (default)
 docs/planning/            # Doc Cycle plans
 docs/reference/           # baseline maps (/doc-it Phase 1)

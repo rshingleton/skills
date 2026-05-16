@@ -76,7 +76,7 @@ bash /path/to/ai-skills/scripts/link-skills.sh
 
 ### Jira credentials (when using Jira skills)
 
-Skills that call the Jira API need `JIRA_BASE_URL`, `JIRA_API_TOKEN`, and `JIRA_PROJECT_KEY`. Use either exports or a `.env` file (see [.env.example](./.env.example)).
+Skills that call the Jira API need `JIRA_BASE_URL`, `JIRA_API_TOKEN`, and `JIRA_PROJECT_KEY`. For notification suppression on creates/updates (same as doc-manager), also set `JIRA_EMAIL` or `JIRA_WATCHER_USERNAME` in `.env` — not used for Bearer auth, only watcher cleanup. Use either exports or a `.env` file (see [.env.example](./.env.example)).
 
 **Option 1: `.env` file (recommended)**
 
@@ -98,7 +98,7 @@ export JIRA_API_TOKEN="your-jira-pat"
 export JIRA_PROJECT_KEY="your-project-key"
 ```
 
-Agents running Jira `curl` commands should `source` the loader (or read the `.env` file) before calling the API. Details: [issue-tracker-jira.md](./skills/engineering/setup-internal-skills/issue-tracker-jira.md).
+Agents running Jira `curl` commands should `source` the loader (or read the `.env` file) before calling the API. API patterns and `notifyUsers=false`: [issue-tracker-jira.md](./skills/engineering/setup-internal-skills/issue-tracker-jira.md). Watcher suppression: [jira-notifications.md](./skills/engineering/setup-internal-skills/jira-notifications.md).
 
 ### Configure application repos
 

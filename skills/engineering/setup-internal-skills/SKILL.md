@@ -133,7 +133,7 @@ For **Jira** tracker, say "Jira REST API" instead and omit promote line unless t
 Seed files:
 
 - Local → copy [issue-tracker-local.md](./issue-tracker-local.md) to `docs/agents/issue-tracker.md`
-- Jira → copy [issue-tracker-jira.md](./issue-tracker-jira.md)
+- Jira → copy [issue-tracker-jira.md](./issue-tracker-jira.md) to `docs/agents/issue-tracker.md` and [jira-notifications.md](./jira-notifications.md) to `docs/agents/jira-notifications.md`
 - [triage-labels.md](./triage-labels.md), [domain.md](./domain.md)
 
 When choosing local, create `docs/issues/` if missing and seed [docs-issues-README.md](./docs-issues-README.md) as `docs/issues/README.md`.
@@ -152,7 +152,7 @@ Tell the user setup is complete.
 >
 > Unfamiliar codebase: `/doc-it` → `docs/reference/` + `docs/reference-audit/`.
 
-**If Jira chosen:** remind them to set `JIRA_*` (shell export or `.env` per [issue-tracker-jira.md](./issue-tracker-jira.md#loading-credentials)).
+**If Jira chosen:** remind them to set `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` (shell export or `.env` per [issue-tracker-jira.md](./issue-tracker-jira.md#loading-credentials)), plus optional `JIRA_EMAIL` or `JIRA_WATCHER_USERNAME` for watcher suppression ([jira-notifications.md](./jira-notifications.md)).
 
 They can edit `docs/agents/*.md` and `AGENTS.md` later; re-run setup to switch trackers.
 

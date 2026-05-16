@@ -11,7 +11,7 @@ description: >
 
 Move **local** planning and issue tracking into Jira. Does not replace `/to-jiras` for initial slice breakdown — use this when issues already exist under `docs/issues/` or you want to publish a completed plan.
 
-Requires `JIRA_BASE_URL`, `JIRA_API_TOKEN`, and `JIRA_PROJECT_KEY` (shell export or `.env`; see [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md)). Jira API patterns in that doc.
+Requires `JIRA_BASE_URL`, `JIRA_API_TOKEN`, and `JIRA_PROJECT_KEY` (shell export or `.env`; see [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md)). On every create: [jira-notifications.md](../setup-internal-skills/jira-notifications.md) (`notifyUsers=false` + remove API user from watchers).
 
 Read `docs/agents/issue-tracker.md` first. If the repo is already Jira-only, tell the user promotion is unnecessary.
 
@@ -51,14 +51,15 @@ Get confirmation before calling Jira.
 If `epic.md` exists and no `jira_key`:
 
 ```bash
-# See issue-tracker-jira.md — issuetype Epic, customfield_10881 Epic Name
+# issue-tracker-jira.md — POST .../issue?notifyUsers=false, issuetype Epic, customfield_10881
+# Then DELETE .../issue/{KEY}/watchers?username=... per jira-notifications.md
 ```
 
 Write returned key into `epic.md` frontmatter: `jira_key: MT-…`
 
 ### 4. Create Tasks
 
-For each `tasks/*.md` without `jira_key`, POST Task to Jira (link Epic via `customfield_10880` when Epic exists). Use task file body as Jira description. Preserve acceptance criteria and blocked-by; rewrite `blocked_by` to Jira keys where local blockers were already promoted.
+For each `tasks/*.md` without `jira_key`, POST Task to Jira with `?notifyUsers=false` (link Epic via `customfield_10880` when Epic exists). Remove API user from watchers on each new key. Use task file body as Jira description. Preserve acceptance criteria and blocked-by; rewrite `blocked_by` to Jira keys where local blockers were already promoted.
 
 Write each `jira_key` back into the task file frontmatter.
 
