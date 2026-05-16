@@ -48,7 +48,7 @@ Summarise present vs missing. Walk **one section at a time** with explainer + de
 
 > Where issues live. Skills read/write via `docs/agents/issue-tracker.md`. Local tracking keeps planning and slices in-repo until you explicitly push to Jira.
 
-**Default: Local markdown** — `docs/issues/<feature-slug>/` ([issue-tracker-local.md](./issue-tracker-local.md)).
+**Default: Local markdown** — inbox `docs/issues/*.md`; plans under `docs/planning/` ([issue-tracker-local.md](./issue-tracker-local.md)).
 
 Choices:
 

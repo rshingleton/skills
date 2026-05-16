@@ -12,7 +12,8 @@ User: `/doc-it` on a legacy service.
    - `docs/reference-audit/architecture.md` — findings 1–4, core value, accretion
    - `docs/reference-audit/follow-ups.md` — three draft issues
    - `docs/reference-audit/README.md` — summary + links
-4. Handoff: `/issues-it` from `follow-ups.md`.
+4. Agent offers intake issues; user picks two → `docs/issues/deepen-payment-seam.md`, `docs/issues/tr-1-payment-integration.md` (`source: doc-it`); `follow-ups.md` updated with `Tracked:` links.
+5. Handoff: `/plan-it --from-issues` when ready.
 
 ## Audit only
 

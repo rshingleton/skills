@@ -28,7 +28,7 @@ Look for the originating spec, in this order:
 
 1. Issue references in the commit messages (`#123`, `Closes #45`, etc.) — fetch via the workflow in `docs/agents/issue-tracker.md`.
 2. A path the user passed as an argument.
-3. Plan `docs/planning/<id>/` (README + phase prompts), intake `docs/issues/*.md`, legacy `docs/issues/…/epic.md`, `specs/`, or `.scratch/`.
+3. Plan `docs/planning/<id>/` (README, `sources/`, `phase-N/ai-prompt.md`, `jira.md`), inbox `docs/issues/*.md` (unplanned only), `specs/`, or `.scratch/`.
 4. If nothing is found, ask the user where the spec is. If they say there isn't one, the **Spec** sub-agent will skip and report "no spec available".
 
 ### 3. Identify the standards sources

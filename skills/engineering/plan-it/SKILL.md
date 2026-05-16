@@ -18,11 +18,11 @@ If `docs/reference/` is missing or stale on an unfamiliar repo, suggest `/doc-it
 
 | Layer | Path | Purpose |
 |-------|------|---------|
-| **Intake** | `docs/issues/*.md` | Pre-plan: bugs, defers, todos, feature requests ([issues-it](../issues-it/SKILL.md)) |
-| **Plan** | `docs/planning/<id>/` | Phases, `ai-prompt.md`, ADR draft, orchestration README |
+| **Inbox** | `docs/issues/*.md` | Unplanned intake only ([issues-it](../issues-it/SKILL.md)) |
+| **Plan** | `docs/planning/<id>/` | Phases, `sources/` (moved intake), ADR, README |
 | **Jira map** | `docs/planning/<id>/jira.md` | Phase ↔ Jira keys only ([JIRA.md](JIRA.md)) |
 
-Execution specs live in **phase prompts**. Jira keys live in **`jira.md`**. Intake issues are **sources**, not phase copies.
+At **`--from-issues`**, move each inbox file → `docs/planning/<id>/sources/` so the inbox stays clean. Execution specs live in **phase prompts**; Jira keys in **`jira.md`**.
 
 ## Arguments
 
@@ -54,13 +54,25 @@ Does **not** rewrite Jira descriptions on existing issues — only keys in `jira
 
 ### 0. Intake (optional)
 
-If `--from-issues`, follow [FROM-ISSUES.md](FROM-ISSUES.md) first, then continue at step 2 with merged scope.
+**Ad-hoc** (`/plan-it` with no flags) — skip to [The Grill](#1-the-grill). No inbox file required.
 
-If user has intake but no flag, ask: *"Start from `docs/issues/` files?"*
+**From issue(s)** (`--from-issues <path>…` or `ready`) — follow [FROM-ISSUES.md](FROM-ISSUES.md): read inbox files, optional readiness gate, then **always** continue to The Grill with merged scope.
+
+If the user passes an inbox path without `--from-issues`, ask: *"Start planning from `docs/issues/<slug>.md`?"*
+
+**Triage is optional pre-work.** `/triage` grooms the queue (`intake` → `ready-for-plan`). It does **not** replace plan-it's grill. Do **not** invoke `/triage` automatically when `--from-issues` is set.
+
+| Inbox `status:` | Before The Grill |
+|-----------------|------------------|
+| `ready-for-plan` | Proceed — grill still runs |
+| `triaged` | Proceed — grill resolves planning questions triage left open |
+| `intake` | Offer `/triage` or a few inline clarifiers; if user says plan now, proceed to The Grill |
 
 ### 1. The Grill
 
-Interview relentlessly until shared understanding. One question at a time; recommend an answer each time.
+**Always runs** — ad-hoc or from issues, with or without prior `/triage`. Interview relentlessly until shared understanding. One question at a time; recommend an answer each time.
+
+Use intake and `sources/` as context, not a substitute for grilling: challenge vague scope, merge or split issues, and decide one plan vs several.
 
 - Domain language vs `CONTEXT.md`
 - Shallow modules / mixed concerns
@@ -74,20 +86,28 @@ Explore the codebase when that answers faster than asking. Update `CONTEXT.md` a
 Create `docs/planning/{ID}/`:
 
 - **README.md** — phase list, dependency order, hand-off (`/implement-it` → `/audit-it` → `/verify-it`), non-goals.
-  - If from intake: **`## Sources`** with paths to `docs/issues/*.md` ([FROM-ISSUES.md](FROM-ISSUES.md)).
-- **phase-N/ai-prompt.md** (every phase) — scope & boundaries, verification criteria, relevant files. **No** duplicate of intake issue bodies; **no** `jira_key` in frontmatter (use `jira.md`).
-- **jira.md** — stub when user may use Jira later:
+  - **`sources/`** — moved intake `.md` files ([FROM-ISSUES.md](FROM-ISSUES.md)); **`## Sources`** lists `sources/<slug>.md` only.
+- **phase-N/ai-prompt.md** (every phase) — scope & boundaries, verification criteria, relevant files. Optional `estimate_hours:` (number) for Jira time tracking when using `--jira`. **No** duplicate of intake issue bodies; **no** `jira_key` in frontmatter (use `jira.md`).
+- **jira.md** — stub when user may use Jira later ([JIRA.md](JIRA.md) — include **Parent Epic** when `epic_key` is known):
 
 ```markdown
 ---
 epic_key:
+epic_summary:
+parent_source:
 ---
 
 # Jira map
 
-| Phase | Jira | Summary |
-|-------|------|---------|
-| phase-1 | | |
+## Parent Epic
+
+(Set when epic_key is known — key, summary, browse link, parent_source.)
+
+## Phase tasks
+
+| Phase | Jira | Summary | Est. |
+|-------|------|---------|------|
+| phase-1 | | | |
 ```
 
 Write all phase prompts before implementation begins.
@@ -102,7 +122,7 @@ Design deep interfaces; update `CONTEXT.md` terminology.
 
 ### 5. Jira (optional)
 
-If user wants Jira (or passed `--jira`), follow [JIRA.md](JIRA.md): publish phase Tasks, fill **`docs/planning/{ID}/jira.md`**. Sync-from-Epic first when `JIRA_DEFAULT_EPIC` may already have phase tasks.
+If user wants Jira (or passed `--jira`), follow [JIRA.md](JIRA.md): publish phase Tasks (with **time estimates** per phase), fill **`docs/planning/{ID}/jira.md`**. Sync-from-Epic first when `JIRA_DEFAULT_EPIC` may already have phase tasks. If `estimate_hours` is missing on a phase, ask for hours before POST or use `JIRA_DEFAULT_ESTIMATE_HOURS`.
 
 Do **not** create `docs/issues/<slug>/tasks/` for plan phases.
 

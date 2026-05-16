@@ -53,7 +53,7 @@ See [EXAMPLES.md](EXAMPLES.md) for purge/archive examples.
 
 If any phase row lacks a Jira key, report it — run `/plan-it --jira {ID} --sync-only` before closing Jira.
 
-**Intake** — for paths in plan README `## Sources`, append under `docs/issues/*.md` that verify-it completed the Doc Cycle (intake files stay the historical record).
+**Sources** — on each `docs/planning/{ID}/sources/*.md`, set `status: done` and append that verify-it completed the Doc Cycle. When archiving the plan, move `sources/` with `docs/planning/{ID}/` to `docs/archive/planning/{ID}/`.
 
 ### 5. Conclusion
 
@@ -67,7 +67,7 @@ End with:
 >
 > Before opening a PR, run `/internal-compliance`.
 >
-> For non-blocking architecture notes from the audit, consider `/improve-codebase-architecture` or a follow-up `/plan-it` slice.
+> For non-blocking architecture notes, consider `/improve-codebase-architecture`, `/issues-it` or [audit-to-issues](../setup-internal-skills/audit-to-issues.md) for inbox tracking, or a follow-up `/plan-it` slice.
 
 ## Core Tenets
 

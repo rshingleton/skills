@@ -8,11 +8,12 @@ description: >
 
 # Issues It
 
-**Intake only** — record work **before** a Doc Cycle plan exists.
+**Intake only** — record work **before** a Doc Cycle plan exists. Audit skills (`/doc-it`, `/improve-codebase-architecture`, `/audit-it` repo) may create files here via [audit-to-issues.md](../setup-internal-skills/audit-to-issues.md).
 
 | Use | Skill |
 |-----|--------|
 | Bug, defer, todo, feature request, review follow-up | **`/issues-it`** |
+| Groom inbox status / triage notes | **`/triage`** (local) — same files, updates `status` + `## Comments` |
 | Grill → plan → optional Jira | **`/plan-it`** ([FROM-ISSUES.md](../plan-it/FROM-ISSUES.md), [JIRA.md](../plan-it/JIRA.md)) |
 | Implement a plan phase | **`/implement-it`** |
 
@@ -29,7 +30,7 @@ docs/issues/
 └── defer-legacy-csv.md
 ```
 
-**Not** used for plan phase tasks, Epics per plan, or `jira.md` — those live under `docs/planning/<id>/`.
+**Inbox only** — once `/plan-it --from-issues` runs, files move to `docs/planning/<id>/sources/`. Not used for phases or `jira.md`.
 
 ## Capture process
 
@@ -41,8 +42,7 @@ docs/issues/
 title: Short summary
 type: bug | defer | todo | feature
 status: intake
-source: user | review | grill | doc-it | jira
-planned_in:
+source: user | review | grill | doc-it | improve-codebase-architecture | audit-it | jira
 jira_key:
 ---
 ```
@@ -54,12 +54,14 @@ Body: [INTAKE-TEMPLATE.md](INTAKE-TEMPLATE.md).
 
 > Saved `docs/issues/<slug>.md`. **Next:** `/plan-it --from-issues docs/issues/<slug>.md` when ready to plan.
 
-## Status flow
+## Status flow (inbox only)
 
 ```
-intake → triaged → ready-for-plan → planned (plan-it sets planned_in)
+intake → triaged → ready-for-plan → (plan-it moves to planning/<id>/sources/, status in-plan)
                   ↘ wontfix
 ```
+
+After move, lifecycle continues under `docs/planning/<id>/sources/` (`in-plan` → `done` at verify-it).
 
 ## Optional: link existing Jira
 

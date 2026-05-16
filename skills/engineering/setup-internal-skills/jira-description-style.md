@@ -1,6 +1,6 @@
 # Jira description style
 
-**Required** for every Jira **create** (`POST /issue`): `summary`, `description`, and triage **create** body.
+**Required** for every Jira **create** (`POST /issue`): `summary`, `description`, and triage **create** body. **Time tracking:** set `timetracking.originalEstimate` + `remainingEstimate` on Task creates when hours are known ([issue-tracker-jira.md § Time estimates](issue-tracker-jira.md#time-estimates-timetracking)).
 
 **Renderer:** Jira Server / Data Center **wiki markup** in the `description` field — **not** GitHub Markdown. Markdown headings and `- [ ]` checkboxes produce broken output (e.g. `1. 1. What`, literal `[ ]` text).
 

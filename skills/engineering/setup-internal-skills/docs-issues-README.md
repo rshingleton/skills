@@ -1,9 +1,10 @@
-# Issues (intake)
+# Issues (inbox)
 
-Pre-plan work items: bugs, defers, todos, feature requests.
+**Unplanned work only** — one file per item: `docs/issues/<slug>.md`.
 
-- **Capture:** `/issues-it` → `docs/issues/<slug>.md`
-- **Plan:** `/plan-it --from-issues …` → `docs/planning/<id>/`
-- **Jira (optional):** `/plan-it --jira` → `docs/planning/<id>/jira.md`
+- **Capture:** `/issues-it` or `/triage` create
+- **Groom:** `/triage` (optional before plan)
+- **Plan:** `/plan-it --from-issues` → files **move** to `docs/planning/<id>/sources/`; plan-it **always grills**
+- **Jira:** `/plan-it --jira` → `docs/planning/<id>/jira.md`
 
-Do not store Doc Cycle phase tasks here — they live under `docs/planning/`.
+Planned or in-flight work must **not** remain here — it lives under `docs/planning/`.

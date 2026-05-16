@@ -10,11 +10,11 @@ See `docs/agents/` for machine-readable skill configuration (issue tracker, tria
 
 ### Issue tracker
 
-Intake: `docs/issues/`. Plans: `docs/planning/<id>/`. Jira map: `jira.md` via `/plan-it --jira`.
+Intake: `docs/issues/` (`/issues-it`, `/triage`, [audit-to-issues](../audit-to-issues.md)). Plans: `docs/planning/<id>/` (`/plan-it` always grills; `--from-issues` → `sources/`). Jira map: `jira.md` via `/plan-it --jira`.
 
 ### Triage labels
 
-Five canonical roles. See `docs/agents/triage-labels.md`.
+Five canonical roles — `/triage` on local inbox or Jira. See `docs/agents/triage-labels.md` and [TRACKER-ROUTING.md](../../triage/TRACKER-ROUTING.md).
 
 ### Domain docs
 
@@ -26,4 +26,4 @@ Single-context. See `docs/agents/domain.md`.
 
 ## Codebase reference
 
-`/doc-it` — `docs/reference/` (as-is maps) and `docs/reference-audit/` (tech debt, testing, architecture, follow-ups). Use when onboarding or the repo is unfamiliar. Not a substitute for the Doc Cycle after a feature ships.
+`/doc-it` — `docs/reference/` (as-is maps) and `docs/reference-audit/` (tech debt, testing, architecture, follow-ups). Optional: file selected findings in `docs/issues/` ([audit-to-issues.md](../audit-to-issues.md)). Not a substitute for the Doc Cycle after a feature ships.

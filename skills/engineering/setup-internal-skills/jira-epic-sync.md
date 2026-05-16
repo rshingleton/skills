@@ -44,18 +44,20 @@ Never assign one Jira key to two phases.
 
 ## 4. Write `jira.md`
 
-Update the phase table — one row per phase:
+1. Set frontmatter `epic_key` and `epic_summary` (GET Epic `summary` when possible).
+2. Write **`## Parent Epic`** table — key, summary, browse link, `parent_source` ([JIRA.md](../../plan-it/JIRA.md)).
+3. Update **`## Phase tasks`** table — one row per phase:
 
 ```markdown
-| phase-1 | CDS-142 | Auth shell |
-| phase-2 | CDS-143 | API wire |
+| phase-1 | CDS-142 | Auth shell | 4h |
+| phase-2 | CDS-143 | API wire | 8h |
 ```
 
-Add `## Unmatched` for orphan Jira rows or phases without keys.
+4. Add `## Unmatched` for orphan Jira rows or phases without keys.
 
 ## 5. Create vs skip (`--jira` without sync-only)
 
-After sync, POST Tasks only for phases with empty Jira column. Update `jira.md` after each create.
+After sync, POST Tasks only for phases with empty Jira column. Include **`timetracking`** from each phase's `estimate_hours:` ([issue-tracker-jira.md § Time estimates](issue-tracker-jira.md#time-estimates-timetracking)). Update `jira.md` after each create (Jira key + **Est.** column).
 
 ## 6. Report
 

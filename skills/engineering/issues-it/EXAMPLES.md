@@ -16,7 +16,15 @@
 /plan-it --from-issues docs/issues/auth-bug.md docs/issues/defer-csv-edge-cases.md --jira
 ```
 
-→ `docs/planning/auth-v2/`, `## Sources`, `jira.md` with phase ↔ CDS-* keys.
+→ inbox files moved to `docs/planning/auth-v2/sources/`; `jira.md` with phase ↔ CDS-* keys.
+
+## Groom via triage
+
+```text
+/triage docs/issues/auth-bug.md
+```
+
+→ updates `status` + `## Comments` per triage roles; when `ready-for-plan`, hand off to plan-it.
 
 ## Groom backlog
 

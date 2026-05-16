@@ -16,6 +16,7 @@ The skills read these from the environment:
 | `JIRA_WATCHER_USERNAME` | Optional. Comma-separated Jira usernames to **add** as watchers after each **create** (`POST .../watchers`). |
 | `JIRA_DEFAULT_EPIC` | Optional. Default parent Epic key for new Tasks when skills omit `--parent` (see [Default Epic](#default-epic-optional)). |
 | `JIRA_ASSIGNEE` | Optional. Jira **username** (`assignee.name`) for agent-owned work. Set on creates and on Doc Cycle updates (`/implement-it`, `/verify-it`). Omit to leave assignee unchanged. |
+| `JIRA_DEFAULT_ESTIMATE_HOURS` | Optional. Fallback hours for Task **create** when phase/issue has no `estimate_hours` (e.g. `4` → `"4h"`). Omit to skip timetracking on create. |
 
 ### Loading credentials
 
@@ -68,6 +69,7 @@ All calls use `Authorization: Bearer $JIRA_API_TOKEN` and `Content-Type: applica
 | `resolve_jira_parent_epic` | [Default Epic](#default-epic-optional) | Before `/plan-it --jira` creates |
 | `_jira_phase_key` | Below | Read Jira key for current phase from `jira.md` |
 | `_jira_wiki_body` | [jira-description-style.md](jira-description-style.md) | Optional markdown → wiki sed helper |
+| `_jira_timetracking_fields` | [Time estimates](#time-estimates-timetracking) | Build `timetracking` object for `POST /issue` |
 
 ## Notification suppression (required on writes)
 
@@ -81,6 +83,101 @@ Skips cause watcher email noise to service accounts and shared inboxes.
 ## Description style (required on create)
 
 All **`summary`** and **`description`** fields on `POST /issue` must follow [jira-description-style.md](jira-description-style.md): **Jira wiki markup** (`h2.`, `*` bullets) — **never** markdown `##` or `- [ ]` in the POST body. Structured and detailed; no AI essay prose.
+
+## Time estimates (`timetracking`)
+
+On **Task** (and **Story** / **Bug**) **create**, set **Original** and **Remaining** estimate so Jira time tracking works. Use the REST **`timetracking`** object (Jira Server / DC v2):
+
+```json
+{
+  "fields": {
+    "timetracking": {
+      "originalEstimate": "2h",
+      "remainingEstimate": "2h"
+    }
+  }
+}
+```
+
+| Skill | When |
+|-------|------|
+| `/plan-it --jira` | Each new phase Task — hours from `phase-N/ai-prompt.md` `estimate_hours:` or ask during publish |
+| `/triage` | Only when **creating** a new Jira issue — ask maintainer for hours |
+
+**Duration format:** Jira duration strings — prefer **`{N}h`** for whole hours (`2h`, `8h`). Fractional hours: `30m`, `1h 30m`. Do not send raw numbers without a unit.
+
+On create, set **`originalEstimate`** and **`remainingEstimate`** to the **same** value (remaining is updated as work logs).
+
+**Omit** `timetracking` when no estimate is known and `JIRA_DEFAULT_ESTIMATE_HOURS` is unset.
+
+### Resolve hours for a phase
+
+1. `estimate_hours:` in `docs/planning/<id>/phase-N/ai-prompt.md` frontmatter (number).
+2. Else `JIRA_DEFAULT_ESTIMATE_HOURS` from env.
+3. Else ask once per phase during `/plan-it --jira` publish (record in frontmatter + `jira.md` **Est.** column).
+
+### Shell helper
+
+```bash
+# Usage: _jira_hours_to_duration 4  → 4h
+# Usage: _jira_timetracking_fields 4  → JSON fragment for jq --argjson
+_jira_hours_to_duration() {
+  local h="${1:-}"
+  [ -z "$h" ] && return 1
+  case "$h" in
+    *h|*m|*d|*w) echo "$h" ;;  # already Jira duration
+    *.*) printf '%sm' "$(echo "$h * 60" | bc 2>/dev/null | cut -d. -f1)" ;;
+    *) echo "${h}h" ;;
+  esac
+}
+
+_jira_timetracking_fields() {
+  local dur
+  dur="$(_jira_hours_to_duration "$1")" || return 1
+  jq -n --arg o "$dur" --arg r "$dur" \
+    '{timetracking: {originalEstimate: $o, remainingEstimate: $r}}'
+}
+```
+
+### jq create (Task + Epic link + estimate + assignee)
+
+```bash
+EST_HOURS=$(awk -F': *' '/^estimate_hours:/{gsub(/[" \t]/,"",$2); print $2; exit}' \
+  "docs/planning/${PLAN_ID}/phase-1/ai-prompt.md")
+[ -z "$EST_HOURS" ] && EST_HOURS="${JIRA_DEFAULT_ESTIMATE_HOURS:-}"
+
+PAYLOAD=$(jq -n \
+  --arg project "$JIRA_PROJECT_KEY" \
+  --arg summary "Phase 1 title" \
+  --arg body "$BODY" \
+  --arg epic "$EPIC_KEY" \
+  --arg assignee "${JIRA_ASSIGNEE:-}" \
+  '{
+    fields: ({
+      project: {key: $project},
+      summary: $summary,
+      description: $body,
+      issuetype: {name: "Task"},
+      customfield_10880: $epic,
+      labels: ["ai-generated"]
+    } + (if $assignee != "" then {assignee: {name: $assignee}} else {} end))
+  }')
+
+if [ -n "$EST_HOURS" ]; then
+  DUR=$(_jira_hours_to_duration "$EST_HOURS")
+  PAYLOAD=$(echo "$PAYLOAD" | jq --arg o "$DUR" --arg r "$DUR" \
+    '.fields.timetracking = {originalEstimate: $o, remainingEstimate: $r}')
+fi
+
+curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -X POST "$JIRA_BASE_URL/rest/api/2/issue?notifyUsers=false" \
+  -d "$PAYLOAD"
+```
+
+After POST, `_jira_apply_watcher_policy "$KEY" create`.
+
+**Sync-only** (`--jira --sync-only`) does not backfill estimates on existing issues — use Jira UI or a manual PUT if needed.
 
 ## Assignee (`JIRA_ASSIGNEE`)
 
@@ -245,18 +342,24 @@ After `/plan-it --jira` creates an Epic, suggest adding `JIRA_DEFAULT_EPIC=<key>
       --arg project "$JIRA_PROJECT_KEY" \
       --arg summary "Issue title" \
       --arg body "$BODY" \
+      --arg est "${JIRA_DEFAULT_ESTIMATE_HOURS:-}" \
       '{
-        fields: {
+        fields: ({
           project: {key: $project},
           summary: $summary,
           description: $body,
           issuetype: {name: "Task"},
           labels: ["ai-generated"]
-        }
+        } + (if $est != "" then {
+          timetracking: {
+            originalEstimate: ($est + "h"),
+            remainingEstimate: ($est + "h")
+          }
+        } else {} end))
       }')"
   ```
 
-  Issue `issuetype` values: `Task`, `Story`, `Bug`, `Epic`, `Sub-task`, `Improvement`.
+  Issue `issuetype` values: `Task`, `Story`, `Bug`, `Epic`, `Sub-task`, `Improvement`. See [Time estimates](#time-estimates-timetracking) for per-phase hours.
 
 - **Create an Epic**:
   ```bash

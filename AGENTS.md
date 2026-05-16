@@ -51,18 +51,23 @@ After installing skills, run **`/setup-internal-skills`** once per repo. It writ
 
 - `AGENTS.md` — `## Agent skills` block (issue tracker, triage, domain docs)
 - `docs/agents/*.md` — machine-readable config skills read at runtime
-- `docs/issues/` — pre-plan intake (default)
-- `docs/planning/<id>/jira.md` — phase ↔ Jira when published
+- `docs/issues/` — **inbox only** (unplanned intake; moved to `docs/planning/<id>/sources/` at `--from-issues`)
+- `docs/planning/<id>/` — phases, ADRs, `sources/`
+- `docs/planning/<id>/jira.md` — phase ↔ Jira keys when published
 
 On **existing repos**, setup audits Copilot and Cursor files (see `PLATFORM-AUDIT.md` in the setup skill): patches `.github/copilot-instructions.md` in place, lists `.cursor/rules/` without requiring new Cursor config.
 
-**Doc Cycle:** `/plan-it` → `/implement-it` (each phase) → `/audit-it` (once) → `/verify-it` (once: ADR, CONTEXT, changelog, issues).
+**Intake:** `/issues-it` (capture) · `/triage` (groom/create, local or Jira) · audit skills → [audit-to-issues.md](skills/engineering/setup-internal-skills/audit-to-issues.md).
 
-**Codebase reference:** `/doc-it` → `docs/reference/` + `docs/reference-audit/` (`tech-debt.md`, `testing.md`, `architecture.md`, `follow-ups.md`). Onboarding or unfamiliar repos; not `/verify-it` (post-plan finalize).
+**Plan:** `/plan-it` (ad-hoc or `--from-issues`) — **always grills** before scaffold; optional triage pre-work does not replace the grill.
 
-**Jira (optional):** `/plan-it --jira` writes `docs/planning/<id>/jira.md`.
+**Doc Cycle:** `/plan-it` → `/implement-it` (each phase) → `/audit-it` (once) → `/verify-it` (once: ADR, CONTEXT, changelog, sources).
 
-**Jira credentials:** `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` via shell export or `.env` ([.env.example](.env.example), [load-jira-env.sh](scripts/load-jira-env.sh)). Optional `JIRA_DEFAULT_EPIC`, `JIRA_ASSIGNEE`, `JIRA_WATCHER_IGNORE` (remove watchers), `JIRA_WATCHER_USERNAME` (add watchers on create), or `JIRA_EMAIL` (PAT self-unwatch fallback). Default Epic resolution: [issue-tracker-jira.md](skills/engineering/setup-internal-skills/issue-tracker-jira.md#default-epic-optional). Writes use `notifyUsers=false` per [jira-notifications.md](skills/engineering/setup-internal-skills/jira-notifications.md). Jira creates use [jira-description-style.md](skills/engineering/setup-internal-skills/jira-description-style.md) (**wiki markup** `h2.` / `*` bullets — not markdown `##` / `- [ ]`). Re-sync keys: `/plan-it <id> --jira --sync-only` → [jira-epic-sync.md](skills/engineering/setup-internal-skills/jira-epic-sync.md). Project repo `.env` wins over user-wide files when sourced from that repo.
+**Codebase reference:** `/doc-it` → `docs/reference/` + `docs/reference-audit/`. Optional inbox from follow-ups via audit-to-issues.
+
+**Jira (optional):** `/plan-it --jira` → `jira.md` (phase Tasks, timetracking, Epic link). Re-sync: `/plan-it <id> --jira --sync-only`.
+
+**Jira credentials:** `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` via shell export or `.env` ([.env.example](.env.example), [load-jira-env.sh](scripts/load-jira-env.sh)). Optional `JIRA_DEFAULT_EPIC`, `JIRA_ASSIGNEE`, `JIRA_DEFAULT_ESTIMATE_HOURS`, `JIRA_WATCHER_IGNORE` (remove watchers), `JIRA_WATCHER_USERNAME` (add watchers on create), or `JIRA_EMAIL` (PAT self-unwatch fallback). Default Epic resolution: [issue-tracker-jira.md](skills/engineering/setup-internal-skills/issue-tracker-jira.md#default-epic-optional). Writes use `notifyUsers=false` per [jira-notifications.md](skills/engineering/setup-internal-skills/jira-notifications.md). Jira creates use [jira-description-style.md](skills/engineering/setup-internal-skills/jira-description-style.md) (**wiki markup** `h2.` / `*` bullets — not markdown `##` / `- [ ]`). Re-sync keys: `/plan-it <id> --jira --sync-only` → [jira-epic-sync.md](skills/engineering/setup-internal-skills/jira-epic-sync.md). Project repo `.env` wins over user-wide files when sourced from that repo.
 
 ## Scripts
 

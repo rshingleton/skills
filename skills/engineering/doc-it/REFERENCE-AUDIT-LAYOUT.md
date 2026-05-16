@@ -26,7 +26,7 @@ Use vocabulary from [improve-codebase-architecture/LANGUAGE.md](../improve-codeb
 
 ## follow-ups.md sections
 
-1. **Issues (draft)** — `/issues-it` ready bullets
+1. **Issues (draft)** — bullets ready for `/issues-it` ([audit-to-issues.md](../setup-internal-skills/audit-to-issues.md)); after filing, note `Tracked: docs/issues/<slug>.md`
 2. **Docs to review** — ADRs, `CONTEXT.md`, stale reference pages
 3. **Next steps** — map finding IDs (`1`, `2`), debt IDs (`TD-1`), and test IDs (`TR-1`) to skills
 

@@ -54,7 +54,11 @@ Create **`docs/reference-audit/`** per [REFERENCE-AUDIT-LAYOUT.md](REFERENCE-AUD
 | `follow-ups.md` | Draft issues, docs to review, next skills |
 | `README.md` | Executive summary + index (write last) |
 
-Re-explore code where the reference pass is thin. Do not create `docs/issues/` unless asked.
+Re-explore code where the reference pass is thin.
+
+### Track findings (optional)
+
+After `follow-ups.md` exists, offer to file selected items as inbox issues per [audit-to-issues.md](../setup-internal-skills/audit-to-issues.md) (`source: doc-it`). Pull from **Issues (draft)** in `follow-ups.md` and actionable TD-*/TR-*/architecture IDs. User picks which rows — do not file the whole audit automatically.
 
 ## Handoff
 
@@ -64,6 +68,6 @@ Re-explore code where the reference pass is thin. Do not create `docs/issues/` u
 
 **Both phases:**
 
-> `docs/reference/` + `docs/reference-audit/`. **Next:** `/issues-it`, `/plan-it`, `/improve-codebase-architecture`, `/grill-with-docs`.
+> `docs/reference/` + `docs/reference-audit/`. **Next:** optional `/issues-it` from `follow-ups.md`, then `/plan-it --from-issues`, `/improve-codebase-architecture`, or `/grill-with-docs`.
 
 Examples: [EXAMPLES.md](EXAMPLES.md).

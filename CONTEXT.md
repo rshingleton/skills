@@ -7,11 +7,11 @@ Canonical repo: [ai-skills](https://github.com/rshingleton/skills.git) on Bitbuc
 ## Language
 
 **Issue tracker**:
-Pre-plan intake under `docs/issues/` (local markdown) plus optional Jira for published plans. Intake via `/issues-it`; plans and Jira maps via `/plan-it`; execution via `/implement-it` / `/verify-it` per `docs/agents/issue-tracker.md`.
+Pre-plan **inbox** under `docs/issues/` (local markdown); optional Jira for published plans in `jira.md`. Capture: `/issues-it`, `/triage`, or [audit-to-issues](skills/engineering/setup-internal-skills/audit-to-issues.md). Plan: `/plan-it` (always grills; `--from-issues` moves intake to `sources/`). Execution: `/implement-it` / `/verify-it` per `docs/agents/issue-tracker.md`.
 _Avoid_: backlog manager, backlog backend, issue host
 
 **Issue (intake)**:
-A single pre-plan item — bug, defer, todo, or feature request in `docs/issues/<slug>.md`. Captured from review, grill, doc-it, or user report. Becomes a **Plan** via `/plan-it --from-issues`.
+A single pre-plan item — bug, defer, todo, or feature request as one `docs/issues/<slug>.md` file. `/plan-it --from-issues` **moves** it to `docs/planning/<id>/sources/` so the inbox stays unplanned-only.
 _Avoid_: using "issue" for a plan phase or Jira task
 
 **Plan**:
@@ -22,14 +22,15 @@ Jira Epic issue linking phase Tasks. Referenced in `jira.md` as `epic_key`. Not 
 _Avoid_: PRD, product requirements document
 
 **Triage role**:
-Canonical state on **intake** issues (`intake`, `ready-for-plan`, `planned`, …) and Jira labels when using `/triage`. See `docs/agents/triage-labels.md`.
+Canonical role (`needs-triage`, `ready-for-agent`, …) mapped to local inbox `status:` or Jira labels by `/triage`. See `docs/agents/triage-labels.md`.
 
 ## Relationships
 
 - **Issue tracker** holds intake **Issues** until planned
-- A **Plan** may list intake paths in `## Sources` and owns **`jira.md`** when published to Jira
+- A **Plan** holds moved intake under **`sources/`**, lists them in README `## Sources`, and owns **`jira.md`** when published to Jira
 - **implement-it** / **verify-it** read phase Jira keys from **`jira.md`** (`_jira_phase_key` helper in [issue-tracker-jira.md](skills/engineering/setup-internal-skills/issue-tracker-jira.md)), not from intake files
 - **plan-it** `--jira --sync-only` re-pulls Epic Task keys into `jira.md` without re-grilling
+- **triage** grooms intake; **plan-it** grill decides the plan (triage does not replace the grill)
 
 ## Flagged ambiguities
 

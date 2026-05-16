@@ -1,15 +1,17 @@
 # Triage Labels
 
-The skills speak in terms of five canonical triage roles. This file maps those roles to the actual label strings used in this repo's issue tracker.
+Five **canonical roles** used by `/triage`. Map them to your tracker in the columns below.
 
-| Label in mattpocock/skills | Label in our tracker | Meaning                                  |
-| -------------------------- | -------------------- | ---------------------------------------- |
-| `needs-triage`             | `needs-triage`       | Maintainer needs to evaluate this issue  |
-| `needs-info`               | `needs-info`         | Waiting on reporter for more information |
-| `ready-for-agent`          | `ready-for-agent`    | Fully specified, ready for an AFK agent  |
-| `ready-for-human`          | `ready-for-human`    | Requires human implementation            |
-| `wontfix`                  | `wontfix`            | Will not be actioned                     |
+| Canonical role | Local inbox `status:` | Jira label | Meaning |
+|----------------|----------------------|------------|---------|
+| `needs-triage` | `intake` | `needs-triage` | Maintainer needs to evaluate |
+| `needs-info` | `triaged` | `needs-info` | Waiting on reporter (document questions in `## Comments` locally) |
+| `ready-for-agent` | `ready-for-plan` | `ready-for-agent` | Ready for `/plan-it` or AFK agent |
+| `ready-for-human` | `triaged` | `ready-for-human` | Human implementation (note why in `## Comments` locally) |
+| `wontfix` | `wontfix` | `wontfix` | Will not be actioned |
 
-When a skill mentions a role (e.g. "apply the AFK-ready triage label"), use the corresponding label string from this table.
+**Local tracker:** edit the **Local inbox `status:`** column if your repo uses different status strings.
 
-Edit the right-hand column to match whatever vocabulary you actually use.
+**Jira:** edit **Jira label** if labels differ; status transitions stay in [issue-tracker-jira.md](issue-tracker-jira.md#triage-state-mapping).
+
+When a skill says "apply the `ready-for-agent` role", set local `status: ready-for-plan` or Jira label `ready-for-agent` per this table.
