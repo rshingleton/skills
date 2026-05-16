@@ -2,6 +2,8 @@
 
 **Parent Epic:** Before creating Tasks, resolve `EPIC_KEY` with `resolve_jira_parent_epic` ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#resolving-the-parent-epic-agents)) — pass `--parent` if the user gave one, else `<feature-slug>` when known. If `EPIC_KEY` is set, link Tasks with `customfield_10880` and skip creating a new Epic in the large-plan flow unless the user asked for a new Epic.
 
+**Descriptions:** dense structured style on all `summary` / `description` fields — [jira-description-style.md](../setup-internal-skills/jira-description-style.md).
+
 After **every** create below: apply watcher policy per [jira-notifications.md](../setup-internal-skills/jira-notifications.md) (`JIRA_WATCHER_IGNORE`, `JIRA_WATCHER_USERNAME`, `JIRA_EMAIL`). Copy `_jira_apply_watcher_policy` and related helpers from that file.
 
 ## Small Plan — Single Task
@@ -16,7 +18,7 @@ KEY=$(curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
   -d "$(jq -n \
     --arg project "$JIRA_PROJECT_KEY" \
     --arg summary "<plan title>" \
-    --arg body "<phase list as bullets>" \
+    --arg body "<dense structured phase bullets>" \
     '{
       fields: {
         project: {key: $project},

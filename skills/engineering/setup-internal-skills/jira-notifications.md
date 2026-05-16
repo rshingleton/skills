@@ -1,6 +1,6 @@
 # Jira notification suppression
 
-Required for **every Jira write** from agent skills (`/to-epic`, `/to-jiras`, `/plan-it`, `/promote-to-jira`, `/triage`, `/implement-it`, `/verify-it`). Same approach as **doc-manager** (`notifyUsers=false` + watcher policy after writes).
+Required for **every Jira write** from agent skills (`/to-epic`, `/to-jiras`, `/plan-it`, `/promote-to-jira`, `/triage`, `/implement-it`, `/verify-it`). Same approach as **doc-manager** (`notifyUsers=false` + watcher policy after writes). **Creates:** also follow [jira-description-style.md](jira-description-style.md) (dense structured summaries/descriptions).
 
 ## 1. `notifyUsers=false` on all writes
 

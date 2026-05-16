@@ -51,7 +51,7 @@ Present breakdown: title, type (HITL/AFK), blocked-by, user stories covered. Ite
 
 **Local:** Follow [LOCAL-PUBLISH.md](LOCAL-PUBLISH.md).
 
-**Jira:** For each approved slice, POST Task with `?notifyUsers=false` (link Epic via `customfield_10880` when a parent Epic was resolved). Apply watcher policy on each new key — [jira-notifications.md](../setup-internal-skills/jira-notifications.md). See curl templates below.
+**Jira:** For each approved slice, POST Task with `?notifyUsers=false` (link Epic via `customfield_10880` when a parent Epic was resolved). **Summary + description:** [jira-description-style.md](../setup-internal-skills/jira-description-style.md) (dense structured — no verbose paste). Apply watcher policy — [jira-notifications.md](../setup-internal-skills/jira-notifications.md). See curl templates below.
 
 Publish in dependency order so blockers can reference real keys (Jira keys or local task paths).
 

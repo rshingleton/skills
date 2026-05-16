@@ -63,6 +63,10 @@ Follow [jira-notifications.md](jira-notifications.md) on **every** create, updat
 
 Skips cause watcher email noise to service accounts and shared inboxes.
 
+## Description style (required on create)
+
+All **`summary`** and **`description`** fields on `POST /issue` must follow [jira-description-style.md](jira-description-style.md): **structured and detailed**, no AI essay prose. Edit local `docs/issues/` for Jira — preserve implementable detail, cut filler only.
+
 ## Epic custom fields
 
 These standard Jira custom fields are used when creating or linking Epics:

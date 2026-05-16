@@ -72,7 +72,7 @@ Then use engineering skills (`/plan-it`, `/implement-it`, `/audit-it`, `/verify-
 
 ```text
 AGENTS.md                 # Human + agent entry (## Agent skills block)
-docs/agents/              # issue-tracker, jira-notifications (Jira), triage-labels, domain, compliance
+docs/agents/              # issue-tracker, jira-notifications, jira-description-style (Jira), triage-labels, domain, compliance
 docs/issues/              # local Epics + tasks (default)
 docs/planning/            # Doc Cycle plans
 docs/reference/           # baseline maps (/doc-it Phase 1)

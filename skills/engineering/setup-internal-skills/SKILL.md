@@ -133,7 +133,7 @@ For **Jira** tracker, say "Jira REST API" instead and omit promote line unless t
 Seed files:
 
 - Local → copy [issue-tracker-local.md](./issue-tracker-local.md) to `docs/agents/issue-tracker.md`
-- Jira → copy [issue-tracker-jira.md](./issue-tracker-jira.md) to `docs/agents/issue-tracker.md` and [jira-notifications.md](./jira-notifications.md) to `docs/agents/jira-notifications.md`
+- Jira → copy [issue-tracker-jira.md](./issue-tracker-jira.md) to `docs/agents/issue-tracker.md`, [jira-notifications.md](./jira-notifications.md) to `docs/agents/jira-notifications.md`, and [jira-description-style.md](./jira-description-style.md) to `docs/agents/jira-description-style.md`
 - [triage-labels.md](./triage-labels.md), [domain.md](./domain.md)
 
 When choosing local, create `docs/issues/` if missing and seed [docs-issues-README.md](./docs-issues-README.md) as `docs/issues/README.md`.
