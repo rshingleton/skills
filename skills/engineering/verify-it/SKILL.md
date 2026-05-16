@@ -43,13 +43,13 @@ See [EXAMPLES.md](EXAMPLES.md) for purge/archive examples.
 
 ### 4. Tracker update
 
-`docs/agents/issue-tracker.md` should have been provided — run `/setup-internal-skills` if missing.
+**Load the issue tracker** — read `docs/agents/issue-tracker.md` (run `/setup-internal-skills` if missing). Source the Jira env via `load-jira-env.sh` before any API calls. See [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md) for helper functions and conventions (mirrored to `docs/agents/issue-tracker.md` at setup).
 
 **Jira** — for each phase row with a key in `docs/planning/{ID}/jira.md`:
 
-- If `JIRA_ASSIGNEE` is set, `_jira_set_assignee "$KEY"` before other writes ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#assignee-jira_assignee)).
-- **Prompt for resolution comment:** draft a concise Jira resolution comment from the phase summary (2-4 sentences covering what was delivered). Present it to the user as a suggestion: *"Post this resolution comment to {KEY}? (y/edit/skip)"*. If they edit, use their text. If y, post via `POST /issue/{KEY}/comment?notifyUsers=false` ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#helper-functions-copy-into-shell-before-jira-work)).
-- **Resolve:** ask *"Resolve {KEY}? (y/n)"* per key. If yes, transition to the `Resolved` or `Done` status (`POST /issue/{KEY}/transitions?notifyUsers=false`). Apply `_jira_apply_watcher_policy "$KEY" update` after each write ([jira-notifications.md](../setup-internal-skills/jira-notifications.md)).
+- If `JIRA_ASSIGNEE` is set, `_jira_set_assignee "$KEY"` before other writes.
+- **Prompt for resolution comment:** draft a concise Jira resolution comment from the phase summary (2-4 sentences covering what was delivered). Present it to the user as a suggestion: *"Post this resolution comment to {KEY}? (y/edit/skip)"*. If they edit, use their text. If y, post via `POST /issue/{KEY}/comment?notifyUsers=false`.
+- **Resolve:** ask *"Resolve {KEY}? (y/n)"* per key. If yes, transition to the `Resolved` or `Done` status (`POST /issue/{KEY}/transitions?notifyUsers=false`). Apply `_jira_apply_watcher_policy "$KEY" update` after each write.
 
 If any phase row lacks a Jira key, report it — run `/plan-it --jira {ID} --sync-only` before closing Jira.
 
