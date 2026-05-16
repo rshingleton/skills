@@ -43,7 +43,7 @@ See [EXAMPLES.md](EXAMPLES.md) for purge/archive examples.
 
 ### 4. Tracker update
 
-**Load the issue tracker** — read `docs/agents/issue-tracker.md` (run `/setup-internal-skills` if missing). Source the Jira env via `load-jira-env.sh` before any API calls. See [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md) for helper functions and conventions (mirrored to `docs/agents/issue-tracker.md` at setup).
+**Load the issue tracker** — read `docs/agents/issue-tracker.md` (run `/setup-internal-skills` if missing). **Source Jira env before any API calls:** first check if `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` are already exported; if not, try `source scripts/load-jira-env.sh`, then `source ~/.local/share/ai-skills/scripts/load-jira-env.sh`. If still unset, read `.env` directly and export vars. Do not ask the user for credentials — the env file is the configured source. See [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md) for helper functions and conventions (mirrored to `docs/agents/issue-tracker.md` at setup).
 
 **Jira** — for each phase row with a key in `docs/planning/{ID}/jira.md`:
 

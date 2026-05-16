@@ -124,7 +124,7 @@ Design deep interfaces; update `CONTEXT.md` terminology.
 
 If user wants Jira (or passed `--jira`):
 
-1. **Read `docs/agents/issue-tracker.md`** — it tells you the tracker type (Local vs Jira), `JIRA_*` env vars, and provides helper functions. Source the env via `load-jira-env.sh` before any API calls.
+1. **Read `docs/agents/issue-tracker.md`** — it tells you the tracker type (Local vs Jira), `JIRA_*` env vars, and provides helper functions. **Source Jira env before any API calls:** first check if `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` are already exported; if not, try `source scripts/load-jira-env.sh`, then `source ~/.local/share/ai-skills/scripts/load-jira-env.sh`. If still unset, read `.env` directly and export vars. Do not ask the user for credentials — the env file is the configured source.
 2. **Follow [JIRA.md](JIRA.md):** publish phase Tasks (with **time estimates** per phase), fill **`docs/planning/{ID}/jira.md`**. Sync-from-Epic first when `JIRA_DEFAULT_EPIC` may already have phase tasks. If `estimate_hours` is missing on a phase, ask for hours before POST or use `JIRA_DEFAULT_ESTIMATE_HOURS`.
 
 When `JIRA_DEFAULT_EPIC` is set but this plan belongs elsewhere, require or confirm **`--parent EPIC-KEY`** — do not silently use the env default if the user named a different Epic.
