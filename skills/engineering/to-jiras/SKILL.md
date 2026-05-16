@@ -4,7 +4,8 @@ description: >
   Break a plan, spec, or Epic into independently-grabbable issues using
   tracer-bullet vertical slices. Publishes to docs/issues/ when using
   local tracking (default), or Jira when configured. Use to-jiras,
-  --parent EPIC-123 for Jira, or after local planning to create tasks.
+  --parent EPIC-123 for Jira, JIRA_DEFAULT_EPIC in .env, or after local
+  planning to create tasks.
   Run promote-to-jira to move local issues to Jira later.
 ---
 
@@ -23,13 +24,15 @@ Run `/setup-internal-skills` if `docs/agents/issue-tracker.md` is missing.
 
 Accepts optional `--parent EPIC-123` (Jira) or a path to a local epic (`docs/issues/<slug>/epic.md`) when publishing locally.
 
+Without `--parent`, Jira mode resolves a parent Epic per [issue-tracker-jira.md § Default Epic](../setup-internal-skills/issue-tracker-jira.md#default-epic-optional): feature `jira_key` in `docs/issues/<slug>/epic.md`, then `JIRA_DEFAULT_EPIC`, then `default_epic` in `docs/agents/issue-tracker.md`.
+
 ## Process
 
 ### 1. Gather context
 
-Work from conversation context. If the user passes a parent:
+Work from conversation context. Resolve parent:
 
-- **Jira:** `EPIC-123` — fetch via API (see [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md))
+- **Jira:** `--parent` if given; else `resolve_jira_parent_epic` with optional `<feature-slug>` ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#resolving-the-parent-epic-agents)). If a key is resolved, fetch the Epic via API before drafting slices.
 - **Local:** path to `epic.md` or feature slug under `docs/issues/`
 
 ### 2. Explore the codebase (optional)
@@ -48,7 +51,7 @@ Present breakdown: title, type (HITL/AFK), blocked-by, user stories covered. Ite
 
 **Local:** Follow [LOCAL-PUBLISH.md](LOCAL-PUBLISH.md).
 
-**Jira:** For each approved slice, POST Task with `?notifyUsers=false` (link Epic via `customfield_10880` when `--parent` set). Remove API user from watchers on each new key — [jira-notifications.md](../setup-internal-skills/jira-notifications.md). See curl templates below.
+**Jira:** For each approved slice, POST Task with `?notifyUsers=false` (link Epic via `customfield_10880` when a parent Epic was resolved). Apply watcher policy on each new key — [jira-notifications.md](../setup-internal-skills/jira-notifications.md). See curl templates below.
 
 Publish in dependency order so blockers can reference real keys (Jira keys or local task paths).
 
@@ -90,10 +93,10 @@ KEY=$(curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
         labels: ["vertical-slice", "ai-generated"]
       }
     }')" | jq -r '.key')
-# _remove_jira_watcher "$KEY" — see jira-notifications.md
+# _jira_apply_watcher_policy "$KEY" create — jira-notifications.md
 ```
 
-**Jira with parent Epic:** add `customfield_10880: $epic` — see prior skill revision / [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md).
+**Jira with parent Epic:** set `EPIC_KEY` from resolution above; add `customfield_10880: $EPIC_KEY` in `jq` fields — [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md).
 
 ### 6. Next skill
 

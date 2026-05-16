@@ -46,9 +46,11 @@ Tell the user:
 
 ### Jira
 
-POST Epic (`issuetype: "Epic"`, `customfield_10881`, `?notifyUsers=false`) — [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md). Then [jira-notifications.md](../setup-internal-skills/jira-notifications.md) watcher removal on the new key.
+POST Epic (`issuetype: "Epic"`, `customfield_10881`, `?notifyUsers=false`) — [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md). Then [jira-notifications.md](../setup-internal-skills/jira-notifications.md) `_jira_apply_watcher_policy "$EPIC_KEY" create` on the new key.
 
-Tell the user the Epic key and suggest: *"Run /to-jiras --parent $EPIC_KEY to break this into Tasks."*
+Tell the user the Epic key and suggest:
+
+> Run `/to-jiras --parent $EPIC_KEY` to break this into Tasks, or set `JIRA_DEFAULT_EPIC=$EPIC_KEY` in the project `.env` (or `default_epic` in `docs/agents/issue-tracker.md`) so `/to-jiras` links Tasks without `--parent`.
 
 <epic-template>
 

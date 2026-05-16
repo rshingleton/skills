@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Load Jira credentials into the current shell.
+# Load Jira env into the current shell (JIRA_BASE_URL, JIRA_API_TOKEN, JIRA_PROJECT_KEY,
+# and optional JIRA_DEFAULT_EPIC, JIRA_WATCHER_IGNORE, JIRA_WATCHER_USERNAME, JIRA_EMAIL — see .env.example).
 #
 # Usage (must source, not execute):
 #   source scripts/load-jira-env.sh

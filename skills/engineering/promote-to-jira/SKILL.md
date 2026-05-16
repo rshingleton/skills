@@ -11,7 +11,7 @@ description: >
 
 Move **local** planning and issue tracking into Jira. Does not replace `/to-jiras` for initial slice breakdown — use this when issues already exist under `docs/issues/` or you want to publish a completed plan.
 
-Requires `JIRA_BASE_URL`, `JIRA_API_TOKEN`, and `JIRA_PROJECT_KEY` (shell export or `.env`; see [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md)). On every create: [jira-notifications.md](../setup-internal-skills/jira-notifications.md) (`notifyUsers=false` + remove API user from watchers).
+Requires `JIRA_BASE_URL`, `JIRA_API_TOKEN`, and `JIRA_PROJECT_KEY` (shell export or `.env`; see [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md)). On every create: [jira-notifications.md](../setup-internal-skills/jira-notifications.md) (`notifyUsers=false` + watcher policy).
 
 Read `docs/agents/issue-tracker.md` first. If the repo is already Jira-only, tell the user promotion is unnecessary.
 
@@ -21,7 +21,7 @@ Read `docs/agents/issue-tracker.md` first. If the repo is already Jira-only, tel
 |----------|---------|
 | `<feature-slug>` | Promote `docs/issues/<feature-slug>/` (epic + tasks) |
 | `--plan <plan-id>` | Also read `docs/planning/<plan-id>/` for phase list / context |
-| `--parent EPIC-123` | Skip Epic creation; link new Tasks to existing Epic |
+| `--parent EPIC-123` | Skip Epic creation; link new Tasks to this Epic (overrides `jira_key` / `JIRA_DEFAULT_EPIC`) |
 | `--dry-run` | List what would be created; do not call Jira |
 
 ## Process
@@ -42,24 +42,32 @@ Show the user:
 
 - Epic title (from epic frontmatter or plan README)
 - Each task title, type (HITL/AFK if noted), blocked-by
-- Whether a new Epic will be created or `--parent` will be used
+- Whether a new Epic will be created, `--parent` will be used, or an existing `jira_key` / default Epic applies
 
 Get confirmation before calling Jira.
 
-### 3. Create Epic (unless `--parent`)
+### 3. Create Epic (unless `--parent` or existing key)
 
-If `epic.md` exists and no `jira_key`:
+If `--parent` is set, use that Epic key for Task linking and skip Epic creation.
+
+Else if `epic.md` has `jira_key`, use it for Task linking and skip Epic creation.
+
+Else if `epic.md` exists and no `jira_key`:
 
 ```bash
 # issue-tracker-jira.md — POST .../issue?notifyUsers=false, issuetype Epic, customfield_10881
-# Then DELETE .../issue/{KEY}/watchers?username=... per jira-notifications.md
+# Then _jira_apply_watcher_policy "$KEY" create per jira-notifications.md
 ```
 
 Write returned key into `epic.md` frontmatter: `jira_key: MT-…`
 
+If the user wants this Epic as the project default for future `/to-jiras`, suggest `JIRA_DEFAULT_EPIC=MT-…` in `.env` ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#default-epic-optional)).
+
 ### 4. Create Tasks
 
-For each `tasks/*.md` without `jira_key`, POST Task to Jira with `?notifyUsers=false` (link Epic via `customfield_10880` when Epic exists). Remove API user from watchers on each new key. Use task file body as Jira description. Preserve acceptance criteria and blocked-by; rewrite `blocked_by` to Jira keys where local blockers were already promoted.
+Epic key for linking: from step 3 (`--parent`, new Epic, or `epic.md` `jira_key`), or if there is no local epic file, `resolve_jira_parent_epic "" "<slug>"` ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#resolving-the-parent-epic-agents)).
+
+For each `tasks/*.md` without `jira_key`, POST Task to Jira with `?notifyUsers=false` (link Epic via `customfield_10880` when an Epic key is available). Remove API user from watchers on each new key. Use task file body as Jira description. Preserve acceptance criteria and blocked-by; rewrite `blocked_by` to Jira keys where local blockers were already promoted.
 
 Write each `jira_key` back into the task file frontmatter.
 

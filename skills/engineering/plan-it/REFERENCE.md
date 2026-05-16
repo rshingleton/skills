@@ -1,19 +1,12 @@
 # plan-it: Jira Publish Reference
 
-After **every** create below: remove the API user from watchers per [jira-notifications.md](../setup-internal-skills/jira-notifications.md) (`JIRA_WATCHER_USERNAME` or `${JIRA_EMAIL%%@*}`).
+**Parent Epic:** Before creating Tasks, resolve `EPIC_KEY` with `resolve_jira_parent_epic` ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#resolving-the-parent-epic-agents)) — pass `--parent` if the user gave one, else `<feature-slug>` when known. If `EPIC_KEY` is set, link Tasks with `customfield_10880` and skip creating a new Epic in the large-plan flow unless the user asked for a new Epic.
 
-```bash
-_remove_jira_watcher() {
-  local key="$1"
-  local user="${JIRA_WATCHER_USERNAME:-${JIRA_EMAIL%%@*}}"
-  [ -z "$key" ] || [ -z "$user" ] && return 0
-  curl -s -o /dev/null -X DELETE \
-    -H "Authorization: Bearer $JIRA_API_TOKEN" \
-    "$JIRA_BASE_URL/rest/api/2/issue/${key}/watchers?username=${user}" 2>/dev/null || true
-}
-```
+After **every** create below: apply watcher policy per [jira-notifications.md](../setup-internal-skills/jira-notifications.md) (`JIRA_WATCHER_IGNORE`, `JIRA_WATCHER_USERNAME`, `JIRA_EMAIL`). Copy `_jira_apply_watcher_policy` and related helpers from that file.
 
 ## Small Plan — Single Task
+
+If `EPIC_KEY` is resolved, add `customfield_10880: $EPIC_KEY` to fields (same as large-plan Tasks).
 
 ```bash
 KEY=$(curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
@@ -33,10 +26,12 @@ KEY=$(curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
         labels: ["plan", "ai-generated"]
       }
     }')" | jq -r '.key')
-_remove_jira_watcher "$KEY"
+_jira_apply_watcher_policy "$KEY" create
 ```
 
 ## Large Plan — Epic + Tasks per Phase
+
+If `EPIC_KEY` is already resolved (default or `--parent`), skip the Epic POST below and use it in the phase loop. Otherwise create a new Epic:
 
 ```bash
 EPIC_KEY=$(curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
@@ -57,7 +52,7 @@ EPIC_KEY=$(curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
         labels: ["plan", "epic", "ai-generated"]
       }
     }')" | jq -r '.key')
-_remove_jira_watcher "$EPIC_KEY"
+_jira_apply_watcher_policy "$EPIC_KEY" create
 
 for phase in phase-1 phase-2 phase-3; do
   TASK_KEY=$(curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
@@ -79,6 +74,6 @@ for phase in phase-1 phase-2 phase-3; do
           labels: ["vertical-slice", "ai-generated"]
         }
       }')" | jq -r '.key')
-  _remove_jira_watcher "$TASK_KEY"
+  _jira_apply_watcher_policy "$TASK_KEY" create
 done
 ```

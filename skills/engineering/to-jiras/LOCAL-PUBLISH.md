@@ -34,7 +34,7 @@ Body uses the same sections as the Jira issue template in [SKILL.md](SKILL.md) (
 
 ## Parent epic (local)
 
-If slicing under an existing local epic, set in each task body:
+If slicing under an existing local epic, set in each task body (or rely on `jira_key` in `epic.md` when promoting — Jira mode uses that key as the parent per [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#default-epic-optional)):
 
 ```markdown
 ## Parent Epic

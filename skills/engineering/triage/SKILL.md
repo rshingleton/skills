@@ -19,7 +19,7 @@ Every comment or issue posted to the issue tracker during triage **must** start 
 - [OUT-OF-SCOPE.md](OUT-OF-SCOPE.md) — how the `.out-of-scope/` knowledge base works
 - `docs/agents/issue-tracker.md` — Jira API reference (created by `/setup-internal-skills`)
 - [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md) — Jira credentials (export or `.env`; `source` loader before `curl`)
-- [jira-notifications.md](../setup-internal-skills/jira-notifications.md) — `notifyUsers=false` + watcher removal on every write (doc-manager pattern)
+- [jira-notifications.md](../setup-internal-skills/jira-notifications.md) — `notifyUsers=false` + watcher policy (`JIRA_WATCHER_IGNORE`, `JIRA_WATCHER_USERNAME`, `JIRA_EMAIL`)
 
 ## Roles
 

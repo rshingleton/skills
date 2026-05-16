@@ -1,6 +1,6 @@
 # Jira notification suppression
 
-Required for **every Jira write** from agent skills (`/to-epic`, `/to-jiras`, `/plan-it`, `/promote-to-jira`, `/triage`, `/implement-it`, `/verify-it`). Same approach as **doc-manager** (`notifyUsers=false` + remove API user from watchers).
+Required for **every Jira write** from agent skills (`/to-epic`, `/to-jiras`, `/plan-it`, `/promote-to-jira`, `/triage`, `/implement-it`, `/verify-it`). Same approach as **doc-manager** (`notifyUsers=false` + watcher policy after writes).
 
 ## 1. `notifyUsers=false` on all writes
 
@@ -15,34 +15,76 @@ Append the query parameter to **every** mutating request. Do not skip on Epic vs
 
 GET and search JQL do not use this parameter.
 
-## 2. Remove the API user from watchers (after writes)
+## 2. Watcher policy (after writes)
 
-Jira adds the **PAT owner** (not the email in any header — skills use `Authorization: Bearer` only) as a **watcher** on create/update. `notifyUsers=false` only suppresses email for that request; the account still receives mail on later changes unless unwatched.
+Jira adds the **PAT owner** as a watcher on create/update. `notifyUsers=false` only suppresses email for that request. Use env vars to **remove** unwanted watchers and **add** intended ones.
 
-Set **`JIRA_WATCHER_USERNAME`** or **`JIRA_EMAIL`** in `.env` so agents know which username to pass to the DELETE endpoint. Example (doc-manager service account): `JIRA_EMAIL=dashboard@example.com` → watcher user `dashboard`. If you already know the Jira username, set `JIRA_WATCHER_USERNAME` alone.
+| Variable | API | Purpose |
+|----------|-----|---------|
+| `JIRA_WATCHER_IGNORE` | `DELETE .../watchers?username=` | Comma-separated Jira usernames to **remove** after each write (e.g. service account). |
+| `JIRA_WATCHER_USERNAME` | `POST .../watchers` | Comma-separated Jira usernames to **add** as watchers after each **create** (optional). |
+| `JIRA_EMAIL` | (fallback for IGNORE) | If `JIRA_WATCHER_IGNORE` is unset, remove `${JIRA_EMAIL%%@*}` (PAT owner; doc-manager default). |
 
-Immediately after a successful **create**, or any **PUT** / **transition** that changes the issue:
+- If **`JIRA_WATCHER_IGNORE`** is set, only those usernames are removed (`JIRA_EMAIL` is not auto-added unless listed).
+- If **`JIRA_WATCHER_IGNORE`** is unset and **`JIRA_EMAIL`** is set, remove the email local-part once (PAT self-unwatch).
+- **`JIRA_WATCHER_USERNAME`** is independent — use for humans/teams who should watch agent-created issues.
+
+### Helpers (agents)
 
 ```bash
-# Username: JIRA_WATCHER_USERNAME, or local-part of JIRA_EMAIL (doc-manager default)
-WATCHER_USER="${JIRA_WATCHER_USERNAME:-${JIRA_EMAIL%%@*}}"
+# Comma- or space-separated list → words
+_jira_split_usernames() { echo "${1//,/ }"; }
 
-curl -s -o /dev/null -w "%{http_code}" -X DELETE \
-  -H "Authorization: Bearer $JIRA_API_TOKEN" \
-  "$JIRA_BASE_URL/rest/api/2/issue/<KEY>/watchers?username=${WATCHER_USER}"
+_jira_remove_ignored_watchers() {
+  local key="$1" users="" u
+  if [ -n "${JIRA_WATCHER_IGNORE:-}" ]; then
+    users="$(_jira_split_usernames "$JIRA_WATCHER_IGNORE")"
+  elif [ -n "${JIRA_EMAIL:-}" ]; then
+    users="${JIRA_EMAIL%%@*}"
+  fi
+  for u in $users; do
+    [ -z "$u" ] && continue
+    curl -s -o /dev/null -X DELETE \
+      -H "Authorization: Bearer $JIRA_API_TOKEN" \
+      "$JIRA_BASE_URL/rest/api/2/issue/${key}/watchers?username=${u}" 2>/dev/null || true
+  done
+}
+
+_jira_add_watchers() {
+  local key="$1" u
+  [ -z "${JIRA_WATCHER_USERNAME:-}" ] && return 0
+  for u in $(_jira_split_usernames "$JIRA_WATCHER_USERNAME"); do
+    [ -z "$u" ] && continue
+    curl -s -o /dev/null -X POST \
+      -H "Authorization: Bearer $JIRA_API_TOKEN" \
+      -H "Content-Type: application/json" \
+      -d "$(jq -n --arg u "$u" '$u')" \
+      "$JIRA_BASE_URL/rest/api/2/issue/${key}/watchers" 2>/dev/null || true
+  done
+}
+
+# After create: remove ignored, then add watchers. After update/transition: remove only.
+_jira_apply_watcher_policy() {
+  local key="$1" mode="${2:-create}"
+  _jira_remove_ignored_watchers "$key"
+  [ "$mode" = "create" ] && _jira_add_watchers "$key"
+}
+
+# Legacy alias used in skill examples
+_remove_jira_watcher() { _jira_apply_watcher_policy "$1" "update"; }
 ```
 
-- **Best-effort:** 404 is fine (not watching). Do not fail the parent operation if DELETE errors.
-- Set `JIRA_WATCHER_USERNAME` when the Jira username is not the email prefix (e.g. email `svc-doc@example.com` but Jira user `svc-doc-manager`).
+Call `_jira_apply_watcher_policy "$KEY" create` after **POST** create; `_jira_apply_watcher_policy "$KEY" update` after PUT, transition, or comment.
 
 ## Checklist (agents)
 
 After each Jira write batch:
 
 1. Every POST/PUT used `?notifyUsers=false`.
-2. Each new or touched issue key got a watcher DELETE for the API user.
-3. Tokens and watcher usernames were not printed in chat.
+2. Ignored usernames removed per `JIRA_WATCHER_IGNORE` / `JIRA_EMAIL`.
+3. On creates, `JIRA_WATCHER_USERNAME` users added when set.
+4. Tokens and usernames were not printed in chat.
 
 ## Reference
 
-doc-manager: `JiraClient.create_issue` / `update_issue` in `doc-manager` (`POST /issue?notifyUsers=false`, then `DELETE .../watchers?username=...`).
+doc-manager: `POST /issue?notifyUsers=false`, then `DELETE .../watchers?username=...` for the PAT owner.

@@ -152,7 +152,7 @@ Tell the user setup is complete.
 >
 > Unfamiliar codebase: `/doc-it` → `docs/reference/` + `docs/reference-audit/`.
 
-**If Jira chosen:** remind them to set `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` (shell export or `.env` per [issue-tracker-jira.md](./issue-tracker-jira.md#loading-credentials)), plus optional `JIRA_EMAIL` or `JIRA_WATCHER_USERNAME` for watcher suppression ([jira-notifications.md](./jira-notifications.md)).
+**If Jira chosen:** remind them to set `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` (shell export or `.env` per [issue-tracker-jira.md](./issue-tracker-jira.md#loading-credentials)), plus optional `JIRA_DEFAULT_EPIC` or `default_epic` in `docs/agents/issue-tracker.md` for ongoing work, and optional `JIRA_WATCHER_IGNORE` (remove), `JIRA_WATCHER_USERNAME` (add on create), `JIRA_EMAIL` (PAT fallback) ([jira-notifications.md](./jira-notifications.md)).
 
 They can edit `docs/agents/*.md` and `AGENTS.md` later; re-run setup to switch trackers.
 

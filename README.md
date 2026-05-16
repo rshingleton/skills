@@ -76,7 +76,18 @@ bash /path/to/ai-skills/scripts/link-skills.sh
 
 ### Jira credentials (when using Jira skills)
 
-Skills that call the Jira API need `JIRA_BASE_URL`, `JIRA_API_TOKEN`, and `JIRA_PROJECT_KEY`. For notification suppression on creates/updates (same as doc-manager), also set `JIRA_EMAIL` or `JIRA_WATCHER_USERNAME` in `.env` — not used for Bearer auth, only watcher cleanup. Use either exports or a `.env` file (see [.env.example](./.env.example)).
+Skills that call the Jira API need `JIRA_BASE_URL`, `JIRA_API_TOKEN`, and `JIRA_PROJECT_KEY`. Use either exports or a `.env` file (see [.env.example](./.env.example)).
+
+**Optional variables** (loaded by [load-jira-env.sh](./scripts/load-jira-env.sh); not used for Bearer auth except where noted):
+
+| Variable | Purpose |
+|----------|---------|
+| `JIRA_DEFAULT_EPIC` | Parent Epic for new Tasks when `/to-jiras` or `/plan-it` omit `--parent` ([details](./skills/engineering/setup-internal-skills/issue-tracker-jira.md#default-epic-optional)) |
+| `JIRA_WATCHER_IGNORE` | Comma-separated usernames to **remove** from watchers after each write (`DELETE`) |
+| `JIRA_WATCHER_USERNAME` | Comma-separated usernames to **add** as watchers after each create (`POST`) |
+| `JIRA_EMAIL` | If `JIRA_WATCHER_IGNORE` is unset, remove the PAT owner (`${JIRA_EMAIL%%@*}`) after writes — doc-manager pattern |
+
+Watcher policy and `notifyUsers=false`: [jira-notifications.md](./skills/engineering/setup-internal-skills/jira-notifications.md).
 
 **Option 1: `.env` file (recommended)**
 

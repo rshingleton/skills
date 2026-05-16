@@ -28,7 +28,7 @@ Run when onboarding or before large work on an unfamiliar repo (not part of the 
 - **[setup-internal-skills](./setup-internal-skills/SKILL.md)** — Scaffold `AGENTS.md`, `docs/agents/`, and optional OpenCode/Copilot/Cursor config. **Default:** local issues in `docs/issues/`. Jira setup seeds `issue-tracker.md` + [jira-notifications.md](./setup-internal-skills/jira-notifications.md).
 - **[tdd](./tdd/SKILL.md)** — Test-driven development with red-green-refactor loop.
 - **[to-epic](./to-epic/SKILL.md)** — Epic as local `docs/issues/…/epic.md` or Jira Epic.
-- **[to-jiras](./to-jiras/SKILL.md)** — Vertical-slice tasks under `docs/issues/` (default) or Jira.
+- **[to-jiras](./to-jiras/SKILL.md)** — Vertical-slice tasks under `docs/issues/` (default) or Jira; optional `JIRA_DEFAULT_EPIC` / `--parent` for Epic link.
 - **[promote-to-jira](./promote-to-jira/SKILL.md)** — Push local `docs/issues/` (and optional `docs/planning/`) to Jira; backfill `jira_key`.
 - **[triage](./triage/SKILL.md)** — Triage issues through a state machine (Jira issue tracker).
 - **[zoom-out](./zoom-out/SKILL.md)** — Get broader context on unfamiliar code.
