@@ -122,7 +122,10 @@ Design deep interfaces; update `CONTEXT.md` terminology.
 
 ### 5. Jira (optional)
 
-If user wants Jira (or passed `--jira`), follow [JIRA.md](JIRA.md): publish phase Tasks (with **time estimates** per phase), fill **`docs/planning/{ID}/jira.md`**. Sync-from-Epic first when `JIRA_DEFAULT_EPIC` may already have phase tasks. If `estimate_hours` is missing on a phase, ask for hours before POST or use `JIRA_DEFAULT_ESTIMATE_HOURS`.
+If user wants Jira (or passed `--jira`):
+
+1. **Read `docs/agents/issue-tracker.md`** — it tells you the tracker type (Local vs Jira), `JIRA_*` env vars, and provides helper functions. Source the env via `load-jira-env.sh` before any API calls.
+2. **Follow [JIRA.md](JIRA.md):** publish phase Tasks (with **time estimates** per phase), fill **`docs/planning/{ID}/jira.md`**. Sync-from-Epic first when `JIRA_DEFAULT_EPIC` may already have phase tasks. If `estimate_hours` is missing on a phase, ask for hours before POST or use `JIRA_DEFAULT_ESTIMATE_HOURS`.
 
 When `JIRA_DEFAULT_EPIC` is set but this plan belongs elsewhere, require or confirm **`--parent EPIC-KEY`** — do not silently use the env default if the user named a different Epic.
 

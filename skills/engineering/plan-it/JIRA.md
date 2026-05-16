@@ -2,6 +2,8 @@
 
 Jira keys for a Doc Cycle plan live in **`docs/planning/<plan-id>/jira.md`** only — not in `docs/issues/` task trees or scattered phase frontmatter.
 
+Before any Jira API calls, **read `docs/agents/issue-tracker.md`** — it contains the tracker type, `JIRA_*` env vars, helper functions, and conventions. Run `/setup-internal-skills` if missing.
+
 ## Re-sync existing Jira (keys only)
 
 On an **existing** plan (no re-grill):
