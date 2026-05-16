@@ -35,6 +35,18 @@ bash <(curl -fsSL 'https://raw.githubusercontent.com/rshingleton/skills/main/scr
 
 Re-run the same command anytime to pull `main` and refresh symlinks.
 
+**Migrating from Matt Pocock / custom `implement`, `verify`, `audit-engineering`?** Preview removals, then install with cleanup:
+
+```bash
+# Preview what will be deleted from ~/.agents/skills
+bash <(curl -fsSL 'https://raw.githubusercontent.com/rshingleton/skills/main/scripts/cleanup-legacy-skills.sh')
+
+# Remove legacy folders, then install internal skills
+CLEANUP_LEGACY=1 bash <(curl -fsSL 'https://raw.githubusercontent.com/rshingleton/skills/main/scripts/skills.sh')
+```
+
+Or from a clone: `bash scripts/cleanup-legacy-skills.sh` (dry-run) / `bash scripts/cleanup-legacy-skills.sh --yes`.
+
 ### Option B — from a git clone
 
 ```bash

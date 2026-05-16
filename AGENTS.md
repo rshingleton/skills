@@ -64,6 +64,7 @@ On **existing repos**, setup audits Copilot and Cursor files (see `PLATFORM-AUDI
 | Script | Role |
 |--------|------|
 | [scripts/skills.sh](scripts/skills.sh) | Clone to `~/.local/share/ai-skills`, link to `~/.agents/skills` (curl one-liner in README) |
+| [scripts/cleanup-legacy-skills.sh](scripts/cleanup-legacy-skills.sh) | Remove Matt Pocock / pre-`-it` skill folders from `~/.agents/skills` |
 | [scripts/link-skills.sh](scripts/link-skills.sh) | Link from this repo without clone |
 
 ## What not to do

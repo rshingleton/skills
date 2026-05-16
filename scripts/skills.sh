@@ -22,6 +22,13 @@ RAW_INSTALL_URL="https://raw.githubusercontent.com/rshingleton/skills/main/scrip
 DEFAULT_BRANCH="${DEFAULT_BRANCH:-main}"
 SKILLS_DEST="${SKILLS_DEST:-$HOME/.agents/skills}"
 CLONE_DIR="${SKILLS_CLONE_DIR:-$HOME/.local/share/ai-skills}"
+CLEANUP_LEGACY="${CLEANUP_LEGACY:-0}"
+
+for arg in "$@"; do
+  case "$arg" in
+    --cleanup-legacy) CLEANUP_LEGACY=1 ;;
+  esac
+done
 
 echo "==> Internal Skills Installer"
 echo "    Install target: $SKILLS_DEST"
@@ -37,6 +44,12 @@ if [ -d "$CLONE_DIR/.git" ]; then
 else
   echo "==> Cloning $REPO_URL (branch: $DEFAULT_BRANCH)..."
   git clone --depth 1 -b "$DEFAULT_BRANCH" "$REPO_URL" "$CLONE_DIR"
+fi
+
+if [ "$CLEANUP_LEGACY" = "1" ]; then
+  echo "==> Removing legacy skill folders..."
+  bash "$CLONE_DIR/scripts/cleanup-legacy-skills.sh" --yes
+  echo ""
 fi
 
 mkdir -p "$SKILLS_DEST"
