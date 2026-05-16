@@ -274,7 +274,7 @@ General workflow tools, not code-specific.
 
 This repository is an **internal adaptation** of [mattpocock/skills](https://github.com/mattpocock/skills) (MIT License), originally created by [Matt Pocock](https://github.com/mattpocock). Canonical home: [ai-skills on Bitbucket](https://github.com/rshingleton/skills.git).
 
-We are grateful for the original work and have adapted it for our internal workflow. The core skills, design philosophy, and documentation structure remain largely based on Matt's original repository.
+The core skills, design philosophy, and documentation structure remain largely based on Matt's original repository.
 
 **All support requests should be directed to the internal Tools Team** — please do not file issues against the upstream repository for fork-specific modifications.
 
