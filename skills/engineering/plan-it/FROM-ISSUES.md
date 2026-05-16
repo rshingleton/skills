@@ -53,7 +53,7 @@ jira_key:
 
 1. **Read** each inbox file. Summarize scope for the user.
 2. **Readiness** — if `status: intake`, offer `/triage` or brief inline questions; do **not** skip [plan-it § The Grill](../SKILL.md#1-the-grill) because triage was skipped or because `status: ready-for-plan`.
-3. **Hand off to The Grill** — plan-it **always** grills next: questionable items, overlaps, one plan vs multiple plans, vertical slice, ADRs. Triage grooms the queue; the grill decides the plan.
+3. **Hand off to The Grill** — plan-it **always** grills next: questionable items, overlaps, one plan vs multiple plans, vertical slice, ADRs. Triage refines the inbox; the grill decides the plan.
 4. After The Grill resolves branches, **scaffold** `docs/planning/{ID}/` (phases, `jira.md` stub, ADR as usual).
 5. **Move intake** — for each source file:
 

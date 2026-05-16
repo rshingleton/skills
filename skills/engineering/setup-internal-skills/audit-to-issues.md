@@ -67,7 +67,7 @@ Use [INTAKE-TEMPLATE.md](../../issues-it/INTAKE-TEMPLATE.md). In **Notes**, alwa
 
 4. Handoff:
 
-> Created {N} intake issue(s) under `docs/issues/`. **Next:** `/plan-it --from-issues` when ready to plan, or groom more items with `/issues-it`.
+> Created {N} intake issue(s) under `docs/issues/`. **Next:** `/plan-it --from-issues` when ready to plan, or capture more items with `/issues-it`.
 
 ## Do not
 

@@ -60,7 +60,7 @@ Does **not** rewrite Jira descriptions on existing issues — only keys in `jira
 
 If the user passes an inbox path without `--from-issues`, ask: *"Start planning from `docs/issues/<slug>.md`?"*
 
-**Triage is optional pre-work.** `/triage` grooms the queue (`intake` → `ready-for-plan`). It does **not** replace plan-it's grill. Do **not** invoke `/triage` automatically when `--from-issues` is set.
+**Triage is optional pre-work.** `/triage` moves items through inbox states (`intake` → `ready-for-plan`). It does **not** replace plan-it's grill. Do **not** invoke `/triage` automatically when `--from-issues` is set.
 
 | Inbox `status:` | Before The Grill |
 |-----------------|------------------|

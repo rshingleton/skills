@@ -2,7 +2,7 @@
 name: triage
 description: >
   Triage issues through a state machine (local docs/issues/ inbox or Jira).
-  Create intake, groom status, prepare ready-for-agent. Use for triage,
+  Create intake, apply triage roles (ready-for-plan locally). Use for triage,
   create issue, bug report, or issue workflow — not plan-it or issues-it
   replacement for planning.
 ---
@@ -75,7 +75,7 @@ Full org flow: [SCENARIO-EMAIL-SERVICENOW.md](../setup-internal-skills/SCENARIO-
 
 Handoff:
 
-> Created `docs/issues/<slug>.md` from pasted request. **Next:** review the file, `/triage` to groom, then `/plan-it --from-issues docs/issues/<slug>.md`.
+> Created `docs/issues/<slug>.md` from pasted request. **Next:** review the file, `/triage` to refine, then `/plan-it --from-issues docs/issues/<slug>.md`.
 
 ## Local workflow
 

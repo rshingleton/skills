@@ -117,7 +117,7 @@ Draft for user review:
 
 ### Issue tracker
 
-Intake under `docs/issues/`. Plans under `docs/planning/`. Jira: `/plan-it --jira` → `jira.md`.
+Intake: `docs/issues/` (`/issues-it`, `/triage`). Plans: `docs/planning/` (`/plan-it` grills; `--from-issues` → `sources/`). Phase Jira: `/plan-it --jira` → `jira.md` only (`--parent` overrides `JIRA_DEFAULT_EPIC`).
 
 ### Triage labels
 
@@ -146,13 +146,13 @@ Tell the user setup is complete.
 
 **Local default:**
 
-> Intake goes in `docs/issues/` (`/issues-it`). Plans in `docs/planning/` (`/plan-it`). Jira map in `jira.md` (`/plan-it --jira`).
+> Intake: `docs/issues/` (`/issues-it`, `/triage`). Plan: `/plan-it` (always grills). Phase Jira: `/plan-it --jira` → `jira.md`.
 >
-> Doc Cycle: `/plan-it` → `/implement-it` (each phase) → `/audit-it` → `/verify-it`.
+> Doc Cycle: `/plan-it` → `/implement-it` → `/audit-it` → `/verify-it`.
 >
-> Unfamiliar codebase: `/doc-it` → `docs/reference/` + `docs/reference-audit/`.
+> Email/ServiceNow: [SCENARIO-EMAIL-SERVICENOW.md](./SCENARIO-EMAIL-SERVICENOW.md). Unfamiliar codebase: `/doc-it`.
 
-**If Jira chosen:** remind them to set `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` (shell export or `.env` per [issue-tracker-jira.md](./issue-tracker-jira.md#loading-credentials)), plus optional `JIRA_DEFAULT_EPIC`, `JIRA_ASSIGNEE`, or `default_epic` in `docs/agents/issue-tracker.md`, and optional watcher env vars ([jira-notifications.md](./jira-notifications.md)).
+**If Jira chosen:** remind them to set `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` (shell export or `.env` per [issue-tracker-jira.md](./issue-tracker-jira.md#loading-credentials)), plus optional `JIRA_DEFAULT_EPIC`, `JIRA_ASSIGNEE`, `JIRA_DEFAULT_ESTIMATE_HOURS`, or `default_epic` in `docs/agents/issue-tracker.md`, and optional watcher env vars ([jira-notifications.md](./jira-notifications.md)).
 
 They can edit `docs/agents/*.md` and `AGENTS.md` later; re-run setup to switch trackers.
 

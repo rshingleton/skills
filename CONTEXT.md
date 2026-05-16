@@ -30,7 +30,7 @@ Canonical role (`needs-triage`, `ready-for-agent`, …) mapped to local inbox `s
 - A **Plan** holds moved intake under **`sources/`**, lists them in README `## Sources`, and owns **`jira.md`** when published to Jira
 - **implement-it** / **verify-it** read phase Jira keys from **`jira.md`** (`_jira_phase_key` helper in [issue-tracker-jira.md](skills/engineering/setup-internal-skills/issue-tracker-jira.md)), not from intake files
 - **plan-it** `--jira --sync-only` re-pulls Epic Task keys into `jira.md` without re-grilling
-- **triage** grooms intake; **plan-it** grill decides the plan (triage does not replace the grill)
+- **triage** refines intake; **plan-it** grill decides the plan (triage does not replace the grill)
 
 ## Flagged ambiguities
 

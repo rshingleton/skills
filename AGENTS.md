@@ -57,7 +57,7 @@ After installing skills, run **`/setup-internal-skills`** once per repo. It writ
 
 On **existing repos**, setup audits Copilot and Cursor files (see `PLATFORM-AUDIT.md` in the setup skill): patches `.github/copilot-instructions.md` in place, lists `.cursor/rules/` without requiring new Cursor config.
 
-**Intake:** `/issues-it` (capture) · `/triage` (groom/create, local or Jira) · audit skills → [audit-to-issues.md](skills/engineering/setup-internal-skills/audit-to-issues.md).
+**Intake:** `/issues-it` (capture) · `/triage` (triage or create, local or Jira) · audit skills → [audit-to-issues.md](skills/engineering/setup-internal-skills/audit-to-issues.md).
 
 **Plan:** `/plan-it` (ad-hoc or `--from-issues`) — **always grills** before scaffold; optional triage pre-work does not replace the grill.
 

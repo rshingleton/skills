@@ -11,7 +11,7 @@ Email / ServiceNow request
         ↓
 docs/issues/<slug>.md   (review in repo)
         ↓
-/triage  (groom → ready-for-plan)  OR  direct if already clear
+/triage  (refine → ready-for-plan)  OR  direct if already clear
         ↓
 /plan-it --from-issues …  (always grills)
         ↓
@@ -49,11 +49,11 @@ requester: name@org.com     # optional
 ```
 
 4. Puts **verbatim pasted text** under `## Context` (blockquote or fenced block). Fills **Problem / request** and minimal **Acceptance** from the paste.
-5. Hands off: *"Review `docs/issues/<slug>.md`. When ready: `/triage` to groom or `/plan-it --from-issues`."*
+5. Hands off: *"Review `docs/issues/<slug>.md`. When ready: `/triage` to refine or `/plan-it --from-issues`."*
 
 **Do not** POST Jira or create `docs/planning/` in this step.
 
-## Step 2 — Review & groom
+## Step 2 — Review and triage
 
 Maintainer reads the file in git/IDE.
 

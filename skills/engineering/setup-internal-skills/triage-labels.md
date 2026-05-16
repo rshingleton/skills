@@ -2,6 +2,8 @@
 
 Five **canonical roles** used by `/triage`. Map them to your tracker in the columns below.
 
+**Vocabulary:** use **triage** (verb) for `/triage` work — not "groom". **Capture** = `/issues-it`. **Grill** = `/plan-it` planning session only.
+
 | Canonical role | Local inbox `status:` | Jira label | Meaning |
 |----------------|----------------------|------------|---------|
 | `needs-triage` | `intake` | `needs-triage` | Maintainer needs to evaluate |

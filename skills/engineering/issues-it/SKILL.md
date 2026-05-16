@@ -13,7 +13,7 @@ description: >
 | Use | Skill |
 |-----|--------|
 | Bug, defer, todo, feature request, review follow-up | **`/issues-it`** |
-| Groom inbox status / triage notes | **`/triage`** (local) — same files, updates `status` + `## Comments` |
+| Triage inbox items (status, notes) | **`/triage`** (local) — same files, updates `status` + `## Comments` |
 | Grill → plan → optional Jira | **`/plan-it`** ([FROM-ISSUES.md](../plan-it/FROM-ISSUES.md), [JIRA.md](../plan-it/JIRA.md)) |
 | Implement a plan phase | **`/implement-it`** |
 
@@ -52,7 +52,7 @@ jira_key:
 
 Body: [INTAKE-TEMPLATE.md](INTAKE-TEMPLATE.md).
 
-3. Set `status: triaged` or `ready-for-plan` when groomed.
+3. Set `status: triaged` or `ready-for-plan` after triage.
 4. Tell user:
 
 > Saved `docs/issues/<slug>.md`. **Next:** `/plan-it --from-issues docs/issues/<slug>.md` when ready to plan.

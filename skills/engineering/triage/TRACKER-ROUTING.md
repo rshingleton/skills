@@ -5,7 +5,9 @@ Read **`docs/agents/issue-tracker.md`** (from `/setup-internal-skills`) before a
 | Tracker doc | Use |
 |-------------|-----|
 | [issue-tracker-local.md](../setup-internal-skills/issue-tracker-local.md) | Inbox `docs/issues/*.md` — default |
-| [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md) | Jira REST — when project uses Jira as primary tracker |
+| [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md) | Jira REST — intake tickets and Doc Cycle transitions |
+
+**Phase Tasks and `jira.md`:** `/plan-it --jira` only — not `/triage` or `/issues-it`.
 
 ## Canonical roles → tracker fields
 

@@ -9,7 +9,7 @@ Pre-plan work lives in **`docs/issues/`** (inbox only). At plan creation, files 
 | Skill | Role |
 |-------|------|
 | [issues-it](./issues-it/SKILL.md) | Capture one inbox file |
-| [triage](./triage/SKILL.md) | Groom or create (local or Jira); paste email/ServiceNow — [SCENARIO-EMAIL-SERVICENOW](./setup-internal-skills/SCENARIO-EMAIL-SERVICENOW.md) |
+| [triage](./triage/SKILL.md) | Triage or create (local or Jira); paste email/ServiceNow — [SCENARIO-EMAIL-SERVICENOW](./setup-internal-skills/SCENARIO-EMAIL-SERVICENOW.md) |
 | [audit-to-issues](./setup-internal-skills/audit-to-issues.md) | File selected audit findings into inbox |
 
 **Plan:** [plan-it](./plan-it/SKILL.md) — **always grills** (ad-hoc or `--from-issues`); optional `/triage` beforehand does not skip the grill.
@@ -39,5 +39,5 @@ Run when onboarding or before large work on an unfamiliar repo (not part of the 
 - **[setup-internal-skills](./setup-internal-skills/SKILL.md)** — Scaffold `AGENTS.md`, `docs/agents/`, and optional OpenCode/Copilot/Cursor config. **Default:** local issues in `docs/issues/`. Jira setup seeds `issue-tracker.md`, [jira-notifications.md](./setup-internal-skills/jira-notifications.md), [jira-description-style.md](./setup-internal-skills/jira-description-style.md).
 - **[tdd](./tdd/SKILL.md)** — Test-driven development with red-green-refactor loop.
 - **[issues-it](./issues-it/SKILL.md)** — Pre-plan intake (`docs/issues/*.md`): bugs, defers, todos, features.
-- **[triage](./triage/SKILL.md)** — Triage local inbox or Jira ([TRACKER-ROUTING](./triage/TRACKER-ROUTING.md)); create intake, groom status. Phase Jira → `/plan-it --jira`.
+- **[triage](./triage/SKILL.md)** — Triage inbox or intake Jira ([TRACKER-ROUTING](./triage/TRACKER-ROUTING.md)); paste email/ServiceNow. Phase Jira → `/plan-it --jira` only.
 - **[zoom-out](./zoom-out/SKILL.md)** — Get broader context on unfamiliar code.

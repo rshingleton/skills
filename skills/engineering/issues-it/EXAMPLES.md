@@ -18,7 +18,7 @@
 
 → inbox files moved to `docs/planning/auth-v2/sources/`; `jira.md` with phase ↔ CDS-* keys.
 
-## Groom via triage
+## Triage intake
 
 ```text
 /triage docs/issues/auth-bug.md
@@ -26,7 +26,7 @@
 
 → updates `status` + `## Comments` per triage roles; when `ready-for-plan`, hand off to plan-it.
 
-## Groom backlog
+## Mark backlog ready for plan
 
 Mark files `status: ready-for-plan`, then:
 
