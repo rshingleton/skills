@@ -4,8 +4,8 @@ description: >
   Scaffold AGENTS.md (open format), docs/agents/, and optional tool configs
   (opencode.json, copilot-instructions, cursor rules) so engineering skills
   know issue tracker (local docs/issues/ by default), triage, and domain docs.
-  Run before to-epic, to-jiras, plan-it, implement-it, verify-it,
-  promote-to-jira, triage, or when issue-tracker context is missing.
+  Run before issues-it, plan-it, implement-it, verify-it, triage, or
+  when issue-tracker context is missing.
 disable-model-invocation: true
 ---
 
@@ -13,7 +13,7 @@ disable-model-invocation: true
 
 Scaffold per-repo configuration the engineering skills assume:
 
-- **Issue tracker** — **local markdown in `docs/issues/`** (default); Jira when you promote or opt in
+- **Issue tracker** — intake in `docs/issues/` (default); Jira via `docs/planning/<id>/jira.md` when opted in
 - **Triage labels** — canonical triage role strings
 - **Domain docs** — `CONTEXT.md`, ADRs, consumer rules
 - **Compliance policies** — paths for `/internal-compliance`
@@ -38,7 +38,7 @@ Read whatever exists; don't assume:
 - `docs/planning/` — Doc Cycle plans
 - `CONTRIBUTING.md`, `SECURITY_POLICY.md`, `.compliance-rules/`
 - Default branch — expect `main` (override if your team uses another)
-- `JIRA_*` env vars — only required if user chooses Jira or uses `/promote-to-jira`
+- `JIRA_*` env vars — only required if user chooses Jira or uses `/plan-it --jira`
 
 ### 2. Present findings and ask
 
@@ -52,7 +52,7 @@ Summarise present vs missing. Walk **one section at a time** with explainer + de
 
 Choices:
 
-- **Local markdown** (recommended) — `docs/issues/`. Publish with `/to-epic`, `/to-jiras`. Push to Jira later with `/promote-to-jira`.
+- **Local markdown** (recommended) — `docs/issues/` for intake; `docs/planning/` for plans. `/issues-it` captures intake; `/plan-it --from-issues` + optional `--jira`.
 - **Jira** — issues in Jira API ([issue-tracker-jira.md](./issue-tracker-jira.md)). Requires `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` (export or `.env`; see issue-tracker doc).
 - **Other** — user describes workflow; record as prose in `issue-tracker.md`.
 
@@ -117,7 +117,7 @@ Draft for user review:
 
 ### Issue tracker
 
-Local markdown under `docs/issues/`. See `docs/agents/issue-tracker.md`. Promote to Jira with `/promote-to-jira`.
+Intake under `docs/issues/`. Plans under `docs/planning/`. Jira: `/plan-it --jira` → `jira.md`.
 
 ### Triage labels
 
@@ -128,12 +128,12 @@ Five canonical roles. See `docs/agents/triage-labels.md`.
 [single-context | multi-context]. See `docs/agents/domain.md`.
 ```
 
-For **Jira** tracker, say "Jira REST API" instead and omit promote line unless they use both.
+For **Jira** tracker, say "Jira REST API"; plans use `docs/planning/<id>/jira.md` via `/plan-it --jira`.
 
 Seed files:
 
 - Local → copy [issue-tracker-local.md](./issue-tracker-local.md) to `docs/agents/issue-tracker.md`
-- Jira → copy [issue-tracker-jira.md](./issue-tracker-jira.md) to `docs/agents/issue-tracker.md`, [jira-notifications.md](./jira-notifications.md) to `docs/agents/jira-notifications.md`, and [jira-description-style.md](./jira-description-style.md) to `docs/agents/jira-description-style.md`
+- Jira → copy [issue-tracker-jira.md](./issue-tracker-jira.md) to `docs/agents/issue-tracker.md`, [jira-notifications.md](./jira-notifications.md) to `docs/agents/jira-notifications.md`, and [jira-description-style.md](./jira-description-style.md) to `docs/agents/jira-description-style.md`. Point users at [scripts/load-jira-env.sh](./scripts/load-jira-env.sh) (or repo `scripts/load-jira-env.sh` shim) for credentials.
 - [triage-labels.md](./triage-labels.md), [domain.md](./domain.md)
 
 When choosing local, create `docs/issues/` if missing and seed [docs-issues-README.md](./docs-issues-README.md) as `docs/issues/README.md`.
@@ -146,7 +146,7 @@ Tell the user setup is complete.
 
 **Local default:**
 
-> Issues go in `docs/issues/`. Use `/to-epic` and `/to-jiras` while planning; `/promote-to-jira` when ready for Jira.
+> Intake goes in `docs/issues/` (`/issues-it`). Plans in `docs/planning/` (`/plan-it`). Jira map in `jira.md` (`/plan-it --jira`).
 >
 > Doc Cycle: `/plan-it` → `/implement-it` (each phase) → `/audit-it` → `/verify-it`.
 >

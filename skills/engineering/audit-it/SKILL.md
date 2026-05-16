@@ -24,6 +24,8 @@ For **baseline reference maps** and a sliced audit (`docs/reference-audit/`: `te
 
 Run [PHASE-AUDIT.md](PHASE-AUDIT.md) end-to-end across **all implemented phases**. This is the independent gate on implement-it output.
 
+**Optional cross-check:** Compare phase verification criteria in `ai-prompt.md` to plan README and intake `## Sources` (if any). Spot-check `jira.md` rows exist when the team uses Jira. Do **not** call Jira or change intake/plan status — `/verify-it` owns closure.
+
 On **FAIL**: report blocking findings; stop — user returns to `/implement-it`. Do not suggest `/verify-it`.
 
 On **PASS**: see **Next skill** below.

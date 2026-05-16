@@ -12,7 +12,7 @@ User: `/doc-it` on a legacy service.
    - `docs/reference-audit/architecture.md` — findings 1–4, core value, accretion
    - `docs/reference-audit/follow-ups.md` — three draft issues
    - `docs/reference-audit/README.md` — summary + links
-4. Handoff: `/to-jiras` from `follow-ups.md`.
+4. Handoff: `/issues-it` from `follow-ups.md`.
 
 ## Audit only
 

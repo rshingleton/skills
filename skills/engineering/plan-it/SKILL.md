@@ -1,10 +1,9 @@
 ---
 name: plan-it
 description: >
-  Doc Cycle — plan phase. Scaffold ephemeral planning structures, define phase
-  lists, grill user to find smallest vertical slice, draft ADRs, and design
-  deep modules. Use when starting new work, scoping a feature, breaking down
-  an epic, or when user says plan-it, plan it.
+  Doc Cycle — plan phase. Grill, scaffold phases, draft ADRs, optional Jira
+  (jira.md), start from intake (--from-issues), re-sync Jira keys
+  (--jira --sync-only). Use plan-it, plan it, --jira, --from-issues.
 ---
 
 ## Role
@@ -15,70 +14,108 @@ If `docs/reference/` is missing or stale on an unfamiliar repo, suggest `/doc-it
 
 **Issue tracker:** `docs/agents/issue-tracker.md` should have been provided — run `/setup-internal-skills` if missing.
 
+## Three layers (do not mix)
+
+| Layer | Path | Purpose |
+|-------|------|---------|
+| **Intake** | `docs/issues/*.md` | Pre-plan: bugs, defers, todos, feature requests ([issues-it](../issues-it/SKILL.md)) |
+| **Plan** | `docs/planning/<id>/` | Phases, `ai-prompt.md`, ADR draft, orchestration README |
+| **Jira map** | `docs/planning/<id>/jira.md` | Phase ↔ Jira keys only ([JIRA.md](JIRA.md)) |
+
+Execution specs live in **phase prompts**. Jira keys live in **`jira.md`**. Intake issues are **sources**, not phase copies.
+
+## Arguments
+
+| Argument | Meaning |
+|----------|---------|
+| `--from-issues <path>…` | Start plan from intake files ([FROM-ISSUES.md](FROM-ISSUES.md)) |
+| `--from-issues ready` | All `docs/issues/*.md` with `status: ready-for-plan` |
+| `--jira` | After scaffold: create/sync Jira + write `jira.md` ([JIRA.md](JIRA.md)) |
+| `--jira --sync-only` | Re-sync: pull Epic children into `jira.md` only — **no new POSTs** |
+| `--parent EPIC-123` | Link new Tasks to this Epic (with `--jira`) |
+
+### Re-sync an existing plan (no re-grill)
+
+When `docs/planning/{ID}/` already exists and Jira issues were created earlier:
+
+```text
+/plan-it {ID} --jira --sync-only
+```
+
+1. Read existing `phase-N/ai-prompt.md` files and `jira.md` (create stub if missing).
+2. Run [jira-epic-sync.md](../setup-internal-skills/jira-epic-sync.md) — JQL Tasks under Epic → fill phase rows in `jira.md`.
+3. Report matched / unmatched phases; **do not** re-run the grill or rescaffold.
+
+Full publish (sync, then create missing Tasks): `/plan-it {ID} --jira`.
+
+Does **not** rewrite Jira descriptions on existing issues — only keys in `jira.md`. To fix bad descriptions, edit in Jira or re-POST (manual).
+
 ## Workflow
+
+### 0. Intake (optional)
+
+If `--from-issues`, follow [FROM-ISSUES.md](FROM-ISSUES.md) first, then continue at step 2 with merged scope.
+
+If user has intake but no flag, ask: *"Start from `docs/issues/` files?"*
 
 ### 1. The Grill
 
-Interview me relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer. 
+Interview relentlessly until shared understanding. One question at a time; recommend an answer each time.
 
-Ask the questions one at a time:
+- Domain language vs `CONTEXT.md`
+- Shallow modules / mixed concerns
+- Smallest vertical slice + verification strategy
+- Deferred decisions and risk
 
-- Does the proposal map cleanly onto existing domain language in `CONTEXT.md`? If not, which terms need refinement?
-- Are there "shallow modules" in the design — interfaces that leak internal complexity, or components that mix concerns?
-- What is the smallest vertical slice that delivers user-visible value?
-- **Verification Strategy:** How will we prove this vertical slice works? (e.g., specific integration test path or CLI result).
-- What decisions are being deferred, and what risk does that deferral carry?
-
-If a question can be answered by exploring the codebase, explore the codebase instead. Update `CONTEXT.md` and any relevant ADRs inline as each answer crystallizes. Do not proceed until all branches are resolved.
+Explore the codebase when that answers faster than asking. Update `CONTEXT.md` and ADRs inline. Do not proceed until branches are resolved.
 
 ### 2. Scaffold
 
-Create `docs/planning/{ID}/` structure:
+Create `docs/planning/{ID}/`:
 
-- **README.md:** The Orchestration Map. Include:
-  - Phase list with dependency order.
-  - **Hand-off protocol:** `/implement-it` for each phase in order → `/audit-it` after all phases → `/verify-it`.
-  - **Non-Goals:** Explicitly what we are NOT building in this plan to prevent scope creep.
-- **phase-N/ai-prompt.md for every phase:** Verbose instructions for each implementation cycle. Each prompt must include:
-  - **Scope & Boundaries:** What to build vs. what to ignore.
-  - **Verification Criteria:** Measurable test cases or behaviors that must be "Green" to pass.
-  - **Relevant Files:** A pruned list of files for the Implementation Agent to load.
+- **README.md** — phase list, dependency order, hand-off (`/implement-it` → `/audit-it` → `/verify-it`), non-goals.
+  - If from intake: **`## Sources`** with paths to `docs/issues/*.md` ([FROM-ISSUES.md](FROM-ISSUES.md)).
+- **phase-N/ai-prompt.md** (every phase) — scope & boundaries, verification criteria, relevant files. **No** duplicate of intake issue bodies; **no** `jira_key` in frontmatter (use `jira.md`).
+- **jira.md** — stub when user may use Jira later:
 
-  Write all phase prompts before any implementation begins. Later phases may reference "TBD — refine after Phase N-1 is verified" only for unknowns that are genuinely blocked on prior phase output; all known design decisions must be captured now.
+```markdown
+---
+epic_key:
+---
+
+# Jira map
+
+| Phase | Jira | Summary |
+|-------|------|---------|
+| phase-1 | | |
+```
+
+Write all phase prompts before implementation begins.
 
 ### 3. ADR
 
-Draft `docs/adr/{ID}-description.md` with status `Proposed`. Capture the architectural decision, context, options considered, trade-offs, and rationale.
+Draft `docs/adr/{ID}-description.md` with status `Proposed`.
 
 ### 4. Deep Modules
 
-Design interfaces that hide implementation complexity to prevent "Shallow Module" leakage. Update `CONTEXT.md` with any refined Ubiquitous Language or new domain concepts.
+Design deep interfaces; update `CONTEXT.md` terminology.
 
-### 5. Optional: Link issues
+### 5. Jira (optional)
 
-After scaffolding, add to the plan `README.md`:
+If user wants Jira (or passed `--jira`), follow [JIRA.md](JIRA.md): publish phase Tasks, fill **`docs/planning/{ID}/jira.md`**. Sync-from-Epic first when `JIRA_DEFAULT_EPIC` may already have phase tasks.
 
-```markdown
-## Issues
-Local: `docs/issues/<feature-slug>/` (create with `/to-epic` or `/to-jiras`)
-```
-
-Ask the user:
-
-- *"Create local issues under `docs/issues/` now?"* → `/to-jiras` or `/to-epic` (per `docs/agents/issue-tracker.md` — local by default).
-- *"Publish to Jira?"* → only if they want Jira now: small plan = one Task; large plan = Epic + Tasks per phase ([REFERENCE.md](REFERENCE.md)), **or** plan locally first and run `/promote-to-jira <slug> --plan {ID}` later.
+Do **not** create `docs/issues/<slug>/tasks/` for plan phases.
 
 ### 6. Next skill
 
-When scaffolding is complete, end with:
-
-> Plan `{ID}` is ready — {N} phase(s): {phase list from orchestration README}.
+> Plan `{ID}` ready — {N} phase(s): {list}.
 >
-> **Next:** Run `/implement-it` starting with `docs/planning/{ID}/phase-1/ai-prompt.md`.
+> Jira: `docs/planning/{ID}/jira.md` (if published).
 >
-> Run `/implement-it` for each phase in order. After **all** phases are implemented, run `/audit-it`, then `/verify-it`.
+> **Next:** `/implement-it` on `docs/planning/{ID}/phase-1/ai-prompt.md` → … → `/audit-it` → `/verify-it`.
 
 ## Core Tenets
 
-- **Read-Only Code:** No production code changes. Read access only for understanding context.
-- **Full Phase Coverage:** Scaffold `ai-prompt.md` for every phase before any implementation begins. Do not defer phase prompts to after prior phases are verified — capture all known design decisions upfront.
+- **Read-only code** during planning.
+- **Full phase coverage** before any implement-it.
+- **One Jira map per plan** — `jira.md`, not parallel tracker trees.

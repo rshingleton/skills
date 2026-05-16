@@ -21,10 +21,10 @@ Discover repo standards per [STANDARDS.md](STANDARDS.md) §1 before the first ed
 
 Flag ambiguities to the Planning Agent (Architect) via the user — do not guess past the prompt.
 
-**Issue tracker** — `docs/agents/issue-tracker.md` should have been provided — run `/setup-internal-skills` if missing. Then:
+**Jira (optional)** — infer plan `{ID}` from `ai-prompt.md` path. Resolve key from **`docs/planning/{ID}/jira.md`** (phase row or `_jira_phase_key "{ID}" "phase-N"`) — [issue-tracker-local.md § Resolving Jira](../setup-internal-skills/issue-tracker-local.md#resolving-jira-for-implement-it--verify-it):
 
-- **Local:** If this phase maps to `docs/issues/...`, set frontmatter `status: in-progress` and append a dated note under `## Comments`.
-- **Jira:** If `JIRA_ASSIGNEE` is set, `_jira_set_assignee "$KEY"` ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#assignee-jira_assignee)). Transition to "In Progress" with `?notifyUsers=false`, then `_jira_apply_watcher_policy "$KEY" update` ([jira-notifications.md](../setup-internal-skills/jira-notifications.md)). Ask for the key if unknown.
+- **Jira:** When the phase row has a key — if `JIRA_ASSIGNEE` is set, `_jira_set_assignee "$KEY"` ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#assignee-jira_assignee)). Transition to "In Progress" with `?notifyUsers=false`, then `_jira_apply_watcher_policy "$KEY" update` ([jira-notifications.md](../setup-internal-skills/jira-notifications.md)). If the row is empty, tell the user to run `/plan-it --jira {ID}` or `--sync-only` — do not guess keys.
+- **Intake sources** — if plan README lists `## Sources`, optional note under those `docs/issues/*.md` files that implementation started; do not use intake files for Jira keys.
 
 ### 2. TDD Loop
 

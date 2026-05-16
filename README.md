@@ -10,13 +10,13 @@ Developing real applications is hard. Approaches like GSD, BMAD, and Spec-Kit tr
 
 ### Purpose
 
-Each skill is a focused workflow in `SKILL.md` that an agent loads when invoked by name (for example `/plan-it` or `/triage`). Together they cover alignment and shared vocabulary (`/grill-with-docs`, `/grill-me`), planning and issue breakdown (`/plan-it`, `/to-epic`, `/to-jiras`), implementation with tests (`/implement-it`, `/tdd`, `/diagnose`), independent audit (`/audit-it`), durable documentation after a plan (`/verify-it`), and **baseline codebase reference** (`/doc-it` → `docs/reference/` and `docs/reference-audit/`). Engineering skills target day-to-day code work; productivity skills cover general workflow. The [skill map](#skill-map--planning-slicing-executing) and [reference](#reference) sections list everything that ships in this repo.
+Each skill is a focused workflow in `SKILL.md` that an agent loads when invoked by name (for example `/plan-it` or `/triage`). Together they cover alignment and shared vocabulary (`/grill-with-docs`, `/grill-me`), intake and planning (`/issues-it`, `/plan-it`), implementation with tests (`/implement-it`, `/tdd`, `/diagnose`), independent audit (`/audit-it`), durable documentation after a plan (`/verify-it`), and **baseline codebase reference** (`/doc-it` → `docs/reference/` and `docs/reference-audit/`). Engineering skills target day-to-day code work; productivity skills cover general workflow. The [skill map](#skill-map--planning-slicing-executing) and [reference](#reference) sections list everything that ships in this repo.
 
 ### Usage guidelines
 
 1. **Install once** on your machine using the [quickstart](#quickstart-30-second-setup) below. Skills land in `~/.agents/skills` and work across Cursor, Copilot, OpenCode, and Claude Code.
 2. **Configure each application repo** with `/setup-internal-skills`. That seeds `AGENTS.md`, `docs/agents/`, and (by default) local issues under `docs/issues/` so skills know your tracker, labels, and domain language.
-3. **Compose skills for the task.** You are not required to run a fixed pipeline. For multi-phase feature work, the recommended **Doc Cycle** is `/plan-it` → `/implement-it` (each phase) → `/audit-it` → `/verify-it`, then a human commit. Smaller changes might use `/to-jiras` and `/implement-it` alone.
+3. **Compose skills for the task.** You are not required to run a fixed pipeline. For multi-phase feature work, the recommended **Doc Cycle** is `/plan-it` → `/implement-it` (each phase) → `/audit-it` → `/verify-it`, then a human commit. Smaller changes might use `/issues-it` → `/plan-it --from-issues` → `/implement-it`, or `/plan-it` alone for tiny scope.
 4. **Keep humans in the loop.** Treat agent output as a draft. Read diffs, run tests, and check spec fit before merge. Skills like `/audit-it` and `/internal-compliance` support review; they do not replace it.
 
 ## Agent platforms
@@ -82,13 +82,13 @@ Skills that call the Jira API need `JIRA_BASE_URL`, `JIRA_API_TOKEN`, and `JIRA_
 
 | Variable | Purpose |
 |----------|---------|
-| `JIRA_DEFAULT_EPIC` | Parent Epic for new Tasks when `/to-jiras` or `/plan-it` omit `--parent` ([details](./skills/engineering/setup-internal-skills/issue-tracker-jira.md#default-epic-optional)) |
+| `JIRA_DEFAULT_EPIC` | Parent Epic for `/plan-it --jira` when `--parent` is omitted ([details](./skills/engineering/setup-internal-skills/issue-tracker-jira.md#default-epic-optional)) |
 | `JIRA_WATCHER_IGNORE` | Comma-separated usernames to **remove** from watchers after each write (`DELETE`) |
 | `JIRA_WATCHER_USERNAME` | Comma-separated usernames to **add** as watchers after each create (`POST`) |
 | `JIRA_EMAIL` | If `JIRA_WATCHER_IGNORE` is unset, remove the PAT owner (`${JIRA_EMAIL%%@*}`) after writes — doc-manager pattern |
 | `JIRA_ASSIGNEE` | Jira username for `assignee` on agent creates and Doc Cycle updates (`/implement-it`, `/verify-it`) |
 
-Watcher policy and `notifyUsers=false`: [jira-notifications.md](./skills/engineering/setup-internal-skills/jira-notifications.md). Jira create text: [jira-description-style.md](./skills/engineering/setup-internal-skills/jira-description-style.md) (dense structured issues; anti-verbose, not fragment-caveman).
+Watcher policy and `notifyUsers=false`: [jira-notifications.md](./skills/engineering/setup-internal-skills/jira-notifications.md). Jira descriptions: [jira-description-style.md](./skills/engineering/setup-internal-skills/jira-description-style.md) (**wiki markup**, not markdown). Re-sync phase ↔ keys: `/plan-it <plan-id> --jira --sync-only` ([jira-epic-sync.md](./skills/engineering/setup-internal-skills/jira-epic-sync.md)).
 
 **Option 1: `.env` file (recommended)**
 
@@ -115,7 +115,7 @@ Agents running Jira `curl` commands should `source` the loader (or read the `.en
 ### Configure application repos
 
 Run `/setup-internal-skills` in your **application repo** (in Cursor, Copilot, or OpenCode). It will:
-   - Write **`AGENTS.md`** and `docs/agents/` (open format; local issues in `docs/issues/` by default)
+   - Write **`AGENTS.md`** and `docs/agents/` (open format; intake in `docs/issues/`, plans in `docs/planning/`)
    - Optionally add `opencode.json`, Copilot instructions, or Cursor rules
    - Ask about triage labels and domain doc layout
    - Check for `CONTRIBUTING.md` and `SECURITY_POLICY.md`
@@ -215,7 +215,7 @@ For debugging, I've also built a **[`/diagnose`](./skills/engineering/diagnose/S
 This is built in to every layer of these skills:
 
 - [`/plan-it`](./skills/engineering/plan-it/SKILL.md) quizzes you about which modules you're touching before creating a plan
-- [`/to-epic`](./skills/engineering/to-epic/SKILL.md) saves an Epic under `docs/issues/` (or Jira if configured)
+- [`/issues-it`](./skills/engineering/issues-it/SKILL.md) captures pre-plan intake; [`/plan-it`](./skills/engineering/plan-it/SKILL.md) scaffolds phases and optional `jira.md`
 - [`/zoom-out`](./skills/engineering/zoom-out/SKILL.md) gives a quick chat map of unfamiliar code
 - [`/doc-it`](./skills/engineering/doc-it/SKILL.md) writes durable `docs/reference/` and a sliced `docs/reference-audit/` (tech debt, testing, architecture) when you need a real baseline
 
@@ -227,12 +227,12 @@ Software engineering fundamentals matter more than ever. These skills are my bes
 
 ## Skill map — planning, slicing, executing
 
-| | `/plan-it` | `/to-epic` | `/to-jiras` |
-|---|---|---|---|
-| **Purpose** | Grill, design, scaffold phases | Synthesize conversation → Epic | Break into implementable Tasks |
-| **Jira output** | Optional: Task (≤3 phases) or Epic+Tasks (larger) | Epic with full Epic body | Tasks (standalone or `--parent EPIC-123`) |
-| **Interview?** | Yes, deeply | No — synthesizes | Yes, on granularity |
-| **When** | Exploring design, need architecture | Spec is clear, need formal Epic | Ready to assign work |
+| | `/issues-it` | `/plan-it` |
+|---|---|---|
+| **Purpose** | Capture pre-plan intake | Grill, scaffold phases, optional Jira |
+| **Output** | `docs/issues/<slug>.md` | `docs/planning/<id>/` + `jira.md` |
+| **When** | Bug, defer, review todo, feature request | Ready to design & execute Doc Cycle |
+| **Flags** | — | `--from-issues`, `--jira`, `--jira --sync-only` (re-sync keys), `--parent` |
 
 **Execution & close:**
 
@@ -255,10 +255,10 @@ Software engineering fundamentals matter more than ever. These skills are my bes
 **Typical flows:**
 
 ```
-Small change:  /to-jiras → /implement-it → /audit-it → /verify-it
-Feature:       /grill-with-docs → /to-epic → /to-jiras --parent EPIC-123 → /implement-it → /audit-it → /verify-it
-Large plan:    /grill-with-docs → /plan-it → (publish to Jira) → /implement-it (each phase) → /audit-it → /verify-it
-Unfamiliar repo: /doc-it → /to-jiras or /plan-it (from reference-audit follow-ups)
+Intake:        /issues-it → /plan-it --from-issues → /implement-it → /audit-it → /verify-it
+Large plan:    /plan-it [--from-issues] [--jira] → /implement-it (each phase) → /audit-it → /verify-it
+Feature:       /grill-with-docs → /issues-it (feature intake) → /plan-it --from-issues --jira → implement …
+Unfamiliar repo: /doc-it → /issues-it or /plan-it (from reference-audit follow-ups)
 ```
 
 ## Reference
@@ -274,13 +274,11 @@ Skills I use daily for code work.
 - **[implement-it](./skills/engineering/implement-it/SKILL.md)** — Doc Cycle implement phase. TDD with repo standards. Transitions Jira to "In Progress" on start.
 - **[improve-codebase-architecture](./skills/engineering/improve-codebase-architecture/SKILL.md)** — Find deepening opportunities in a codebase, informed by the domain language in `CONTEXT.md` and the decisions in `docs/adr/`.
 - **[internal-compliance](./skills/engineering/internal-compliance/SKILL.md)** — Pre-flight compliance check against internal security linting rules before finalizing any PR.
-- **[plan-it](./skills/engineering/plan-it/SKILL.md)** — Doc Cycle plan phase. Grill, scaffold planning structure, draft ADRs. Optionally publish phases to Jira.
+- **[plan-it](./skills/engineering/plan-it/SKILL.md)** — Doc Cycle plan phase. Grill, phases, ADRs, `--from-issues`, optional Jira → `jira.md`.
 - **[prototype](./skills/engineering/prototype/SKILL.md)** — Build a throwaway prototype to flesh out a design.
 - **[setup-internal-skills](./skills/engineering/setup-internal-skills/SKILL.md)** — Per-repo config; **default** local issues in `docs/issues/`. Run once per repo.
 - **[tdd](./skills/engineering/tdd/SKILL.md)** — Test-driven development with red-green-refactor loop.
-- **[to-epic](./skills/engineering/to-epic/SKILL.md)** — Epic as local `epic.md` or Jira Epic.
-- **[to-jiras](./skills/engineering/to-jiras/SKILL.md)** — Vertical-slice tasks in `docs/issues/` or Jira.
-- **[promote-to-jira](./skills/engineering/promote-to-jira/SKILL.md)** — Push local issues and optional plans to Jira.
+- **[issues-it](./skills/engineering/issues-it/SKILL.md)** — Pre-plan intake under `docs/issues/`.
 - **[triage](./skills/engineering/triage/SKILL.md)** — Triage issues through a state machine (Jira issue tracker).
 - **[verify-it](./skills/engineering/verify-it/SKILL.md)** — Doc Cycle verify phase. Finalizes ADRs, CONTEXT.md, changelog, and planning cleanup. Optionally close Jira issues.
 - **[zoom-out](./skills/engineering/zoom-out/SKILL.md)** — Get broader context on unfamiliar code.

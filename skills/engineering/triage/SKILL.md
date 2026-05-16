@@ -23,7 +23,7 @@ Run `/setup-internal-skills` if `docs/agents/issue-tracker.md` or `docs/agents/t
 - `docs/agents/triage-labels.md` — role → status/label mapping for this repo
 - [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md) — Jira credentials (export or `.env`; `source` loader before `curl`)
 - [jira-notifications.md](../setup-internal-skills/jira-notifications.md) — `notifyUsers=false` + watcher policy (`JIRA_WATCHER_IGNORE`, `JIRA_WATCHER_USERNAME`, `JIRA_EMAIL`)
-- [jira-description-style.md](../setup-internal-skills/jira-description-style.md) — dense structured `summary` / `description` on Jira **create**
+- [jira-description-style.md](../setup-internal-skills/jira-description-style.md) — wiki markup (`h2.`, `*` bullets) for Jira **create** — not markdown `##` / `- [ ]`
 
 ## Roles
 

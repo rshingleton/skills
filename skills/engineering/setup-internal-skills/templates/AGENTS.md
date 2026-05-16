@@ -10,7 +10,7 @@ See `docs/agents/` for machine-readable skill configuration (issue tracker, tria
 
 ### Issue tracker
 
-Local markdown under `docs/issues/`. See `docs/agents/issue-tracker.md`. Promote to Jira with `/promote-to-jira`.
+Intake: `docs/issues/`. Plans: `docs/planning/<id>/`. Jira map: `jira.md` via `/plan-it --jira`.
 
 ### Triage labels
 

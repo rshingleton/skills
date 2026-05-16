@@ -32,10 +32,14 @@ Set `JIRA_PROJECT_KEY` to your Jira project key and `JIRA_API_TOKEN` in that fil
 Before Jira `curl` in a shell, run from the application repo (so its `.env` wins):
 
 ```bash
+# Canonical (bundled with this skill):
+source skills/engineering/setup-internal-skills/scripts/load-jira-env.sh
+
+# Installed clone — same script via repo-root shim:
 source ~/.local/share/ai-skills/scripts/load-jira-env.sh
 ```
 
-The loader checks: `JIRA_ENV_FILE` (if set), then `./.env`, then `~/.agents/.env`, then `~/.config/ai-skills/.env`. From an ai-skills clone: `source scripts/load-jira-env.sh`.
+The loader checks: `JIRA_ENV_FILE` (if set), then `./.env`, then `~/.agents/.env`, then `~/.config/ai-skills/.env`.
 
 **Shell exports.** Alternatively `export JIRA_BASE_URL=...` etc. in your profile.
 
@@ -55,6 +59,16 @@ $JIRA_BASE_URL/rest/api/2
 
 All calls use `Authorization: Bearer $JIRA_API_TOKEN` and `Content-Type: application/json`.
 
+## Helper functions (copy into shell before Jira work)
+
+| Function | Defined in | Use |
+|----------|------------|-----|
+| `_jira_apply_watcher_policy` | [jira-notifications.md](jira-notifications.md) | After every create / PUT / transition / comment |
+| `_jira_set_assignee` | Below | Before implement / verify transitions when `JIRA_ASSIGNEE` set |
+| `resolve_jira_parent_epic` | [Default Epic](#default-epic-optional) | Before `/plan-it --jira` creates |
+| `_jira_phase_key` | Below | Read Jira key for current phase from `jira.md` |
+| `_jira_wiki_body` | [jira-description-style.md](jira-description-style.md) | Optional markdown → wiki sed helper |
+
 ## Notification suppression (required on writes)
 
 Follow [jira-notifications.md](jira-notifications.md) on **every** create, update, transition, and comment (same as doc-manager):
@@ -66,7 +80,7 @@ Skips cause watcher email noise to service accounts and shared inboxes.
 
 ## Description style (required on create)
 
-All **`summary`** and **`description`** fields on `POST /issue` must follow [jira-description-style.md](jira-description-style.md): **structured and detailed**, no AI essay prose. Edit local `docs/issues/` for Jira — preserve implementable detail, cut filler only.
+All **`summary`** and **`description`** fields on `POST /issue` must follow [jira-description-style.md](jira-description-style.md): **Jira wiki markup** (`h2.`, `*` bullets) — **never** markdown `##` or `- [ ]` in the POST body. Structured and detailed; no AI essay prose.
 
 ## Assignee (`JIRA_ASSIGNEE`)
 
@@ -76,10 +90,27 @@ When `JIRA_ASSIGNEE` is set (e.g. `alice`), include assignee on **creates** and 
 |-------|------|
 | `/implement-it` | Before transitioning linked issue to In Progress |
 | `/verify-it` | Before comment/transition when closing or updating linked issue |
-| `/to-jiras`, `/to-epic`, `/promote-to-jira`, `/plan-it` | Optional on `POST` create (`fields.assignee.name`) |
+| `/plan-it --jira` | Optional on `POST` create (`fields.assignee.name`) |
 | `/triage` | Optional on `PUT` when taking ownership of triage |
 
 `/audit-it` does not call Jira.
+
+**Phase key from plan** (implement-it / verify-it):
+
+```bash
+# Usage: _jira_phase_key "<plan-id>" "phase-1"
+_jira_phase_key() {
+  local plan="$1" phase="$2" f="docs/planning/${plan}/jira.md"
+  [ -f "$f" ] || return 1
+  awk -F'|' -v p="$phase" '
+    $0 ~ "\\| *" p " *\\|" {
+      gsub(/^[ \t]+|[ \t]+$/, "", $3)
+      if ($3 != "" && $3 !~ /^Jira$/) print $3
+      exit
+    }
+  ' "$f"
+}
+```
 
 **Assign existing issue** (after any PUT, run watcher policy):
 
@@ -109,21 +140,22 @@ These standard Jira custom fields are used when creating or linking Epics:
 
 | Field | Customfield ID | Used by |
 |---|---|---|
-| **Epic Name** | `customfield_10881` | `/to-epic` and `/plan-it` when creating an Epic. Set to the Epic's summary/title. |
-| **Epic Link** | `customfield_10880` | `/to-jiras --parent EPIC-123` and `/plan-it` when creating Tasks under an Epic. Links the Task to the parent Epic. |
+| **Epic Name** | `customfield_10881` | `/plan-it --jira` when creating an Epic. Set to the Epic's summary/title. |
+| **Epic Link** | `customfield_10880` | `/plan-it --jira` with `--parent` or default Epic. Links the Task to the parent Epic. |
 
 If your Jira instance uses different customfield IDs, update them in the skill files or at `docs/agents/issue-tracker.md`.
 
 ## Default Epic (optional)
 
-Use a default parent Epic so `/to-jiras` and `/plan-it` can link new Tasks without passing `--parent` every time.
+Use a default parent Epic so `/plan-it --jira` can link phase Tasks without passing `--parent` every time.
 
 | Priority | Source | Example |
 |----------|--------|---------|
-| 1 | `--parent` on the skill invocation | `/to-jiras --parent MT-100` |
-| 2 | Feature epic file | `jira_key: MT-100` in `docs/issues/<slug>/epic.md` (set by `/to-epic`, `/promote-to-jira`, or manually) |
-| 3 | Project `.env` | `JIRA_DEFAULT_EPIC=MT-100` |
-| 4 | This file | **default_epic:** `MT-100` below |
+| 1 | `--parent` on the skill invocation | `/plan-it --jira my-plan --parent MT-100` |
+| 2 | Plan Jira map | `epic_key:` in `docs/planning/<plan-id>/jira.md` |
+| 3 | Intake file | `jira_key:` on `docs/issues/<slug>.md` (feature intake from Jira) |
+| 4 | Project `.env` | `JIRA_DEFAULT_EPIC=MT-100` |
+| 5 | This file | **default_epic:** `MT-100` below |
 
 **default_epic:** ``
 
@@ -134,12 +166,20 @@ When all are empty, Tasks are created without Epic Link unless the user passes `
 Before POSTing Tasks, resolve the Epic key (equivalent logic in any language):
 
 ```bash
-# Usage: resolve_jira_parent_epic "<--parent value or empty>" "<feature-slug or empty>"
+# Usage: resolve_jira_parent_epic "<--parent or empty>" "<plan-id or slug or empty>"
 resolve_jira_parent_epic() {
-  local flag_parent="$1" slug="$2" k=""
+  local flag_parent="$1" id="$2" k=""
   if [ -n "$flag_parent" ]; then echo "$flag_parent"; return; fi
-  if [ -n "$slug" ] && [ -f "docs/issues/${slug}/epic.md" ]; then
-    k=$(awk -F': *' '/^jira_key:/{gsub(/[" \t]/,"",$2); print $2; exit}' "docs/issues/${slug}/epic.md")
+  if [ -n "$id" ] && [ -f "docs/planning/${id}/jira.md" ]; then
+    k=$(awk -F': *' '/^epic_key:/{gsub(/[" \t]/,"",$2); print $2; exit}' "docs/planning/${id}/jira.md")
+    [ -n "$k" ] && echo "$k" && return
+  fi
+  if [ -n "$id" ] && [ -f "docs/issues/${id}.md" ]; then
+    k=$(awk -F': *' '/^jira_key:/{gsub(/[" \t]/,"",$2); print $2; exit}' "docs/issues/${id}.md")
+    [ -n "$k" ] && echo "$k" && return
+  fi
+  if [ -n "$id" ] && [ -f "docs/issues/${id}/epic.md" ]; then
+    k=$(awk -F': *' '/^jira_key:/{gsub(/[" \t]/,"",$2); print $2; exit}' "docs/issues/${id}/epic.md")
     [ -n "$k" ] && echo "$k" && return
   fi
   if [ -n "${JIRA_DEFAULT_EPIC:-}" ]; then echo "$JIRA_DEFAULT_EPIC"; return; fi
@@ -153,7 +193,7 @@ resolve_jira_parent_epic() {
 
 When a resolved Epic exists, set `customfield_10880` on Task creates. Tell the user which Epic was used when it was not passed explicitly.
 
-After `/to-epic` or `/promote-to-jira` creates an Epic, suggest adding `JIRA_DEFAULT_EPIC=<key>` to the project `.env` if the team wants that Epic as the ongoing default.
+After `/plan-it --jira` creates an Epic, suggest adding `JIRA_DEFAULT_EPIC=<key>` to the project `.env` if the team wants that Epic as the ongoing default.
 
 ## Conventions
 
@@ -184,9 +224,17 @@ After `/to-epic` or `/promote-to-jira` creates an Epic, suggest adding `JIRA_DEF
 - **Create an issue with multi-line body** (use `jq` to build JSON safely):
   ```bash
   BODY=$(cat <<'ISSUEBODY'
-  Multi-line
-  description
-  here
+  h2. What
+
+  * Concrete behavior here
+
+  h2. Done when
+
+  * Testable outcome
+
+  h2. Blocked
+
+  None
   ISSUEBODY
   )
   curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
@@ -246,6 +294,15 @@ After `/to-epic` or `/promote-to-jira` creates an Epic, suggest adding `JIRA_DEF
   ```bash
   curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
     "$JIRA_BASE_URL/rest/api/2/search?jql=project+%3D+$JIRA_PROJECT_KEY+AND+status+%3D+%22Open%22&maxResults=20"
+  ```
+
+- **List Tasks under an Epic** (sync back to local — full flow in [jira-epic-sync.md](jira-epic-sync.md)):
+  ```bash
+  curl -s -G -H "Authorization: Bearer $JIRA_API_TOKEN" \
+    --data-urlencode "jql=cf[10880] = EPIC-123 AND issuetype = Task ORDER BY created ASC" \
+    --data-urlencode "maxResults=100" \
+    --data-urlencode "fields=summary,key" \
+    "$JIRA_BASE_URL/rest/api/2/search"
   ```
 
 - **Comment on an issue**:

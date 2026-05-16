@@ -41,13 +41,19 @@ See [EXAMPLES.md](EXAMPLES.md) for concrete before/after diffs.
 
 See [EXAMPLES.md](EXAMPLES.md) for purge/archive examples.
 
-### 4. Issue tracker update
+### 4. Tracker update
 
 `docs/agents/issue-tracker.md` should have been provided — run `/setup-internal-skills` if missing.
 
-**Local:** On linked `docs/issues/...` files, set `status: done` (or appropriate triage role) and append under `## Comments` that verify-it completed the Doc Cycle.
+**Jira** — for each phase row in `docs/planning/{ID}/jira.md` ([issue-tracker-local.md](../setup-internal-skills/issue-tracker-local.md#resolving-jira-for-implement-it--verify-it)):
 
-**Jira:** If `JIRA_ASSIGNEE` is set, `_jira_set_assignee "$KEY"` before other writes ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#assignee-jira_assignee)). Post summary comment and any transition with `?notifyUsers=false`; `_jira_apply_watcher_policy` after each write ([jira-notifications.md](../setup-internal-skills/jira-notifications.md)). Ask *"Close this Jira? (y/n)"* before transitioning to Resolved.
+- If `JIRA_ASSIGNEE` is set, `_jira_set_assignee "$KEY"` before other writes ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#assignee-jira_assignee)).
+- Post summary comment and transition with `?notifyUsers=false`; `_jira_apply_watcher_policy` after each write ([jira-notifications.md](../setup-internal-skills/jira-notifications.md)).
+- Ask *"Close this Jira? (y/n)"* per key before Resolved.
+
+If any phase row lacks a Jira key, report it — run `/plan-it --jira {ID} --sync-only` before closing Jira.
+
+**Intake** — for paths in plan README `## Sources`, append under `docs/issues/*.md` that verify-it completed the Doc Cycle (intake files stay the historical record).
 
 ### 5. Conclusion
 

@@ -12,8 +12,8 @@ This repo is the **internal ai-skills monorepo**. When editing here:
 
 Install skills into `~/.agents/skills` with [scripts/skills.sh](../scripts/skills.sh) or [scripts/link-skills.sh](../scripts/link-skills.sh). In application repos, run `/setup-internal-skills` once.
 
-**Doc Cycle:** `plan-it` → `implement-it` → `audit-it` → `verify-it`.
+**Doc Cycle:** `plan-it` → `implement-it` → `audit-it` → `verify-it`. Intake: `docs/issues/` (`issues-it`). Jira map: `docs/planning/<id>/jira.md` (`plan-it --jira`; re-sync keys: `plan-it <id> --jira --sync-only`).
 
-**Codebase reference:** `doc-it` writes `docs/reference/` and `docs/reference-audit/` (tech debt, testing, architecture, follow-ups).
+**Codebase reference:** `doc-it` → `docs/reference/` + `docs/reference-audit/`.
 
-**Jira:** copy [`.env.example`](../.env.example) to `~/.config/ai-skills/.env` or the app repo `.env`; `source` [load-jira-env.sh](../scripts/load-jira-env.sh) before API calls. Optional `JIRA_ASSIGNEE`, `JIRA_WATCHER_IGNORE` (remove) / `JIRA_WATCHER_USERNAME` (add) / `JIRA_EMAIL` (PAT fallback); all writes use [jira-notifications.md](../skills/engineering/setup-internal-skills/jira-notifications.md). Creates use [jira-description-style.md](../skills/engineering/setup-internal-skills/jira-description-style.md).
+**Jira:** [`.env.example`](../.env.example) + [load-jira-env.sh](../scripts/load-jira-env.sh). Watcher policy: [jira-notifications.md](../skills/engineering/setup-internal-skills/jira-notifications.md). Descriptions: wiki markup per [jira-description-style.md](../skills/engineering/setup-internal-skills/jira-description-style.md). Helpers: [issue-tracker-jira.md](../skills/engineering/setup-internal-skills/issue-tracker-jira.md#helper-functions-copy-into-shell-before-jira-work).

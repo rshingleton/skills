@@ -60,11 +60,11 @@ Run once per application repository:
 /setup-internal-skills
 ```
 
-Then use engineering skills (`/plan-it`, `/implement-it`, `/audit-it`, `/verify-it`, …). Issue tracker defaults to `docs/issues/`; Jira via `/promote-to-jira`.
+Then use engineering skills (`/plan-it`, `/implement-it`, `/audit-it`, `/verify-it`, …). Intake: `docs/issues/`; Jira map: `docs/planning/<id>/jira.md` via `/plan-it --jira`.
 
 **Unfamiliar codebase:** run `/doc-it` to create `docs/reference/` and `docs/reference-audit/` before heavy feature work.
 
-**Jira API skills:** set `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` via [`.env.example`](../.env.example) and [scripts/load-jira-env.sh](../scripts/load-jira-env.sh) (project `.env` takes precedence when sourced from the app repo). Optional `JIRA_DEFAULT_EPIC`, `JIRA_ASSIGNEE`, or `default_epic` in `docs/agents/issue-tracker.md` ([default Epic](../skills/engineering/setup-internal-skills/issue-tracker-jira.md#default-epic-optional)). Optional `JIRA_WATCHER_IGNORE` / `JIRA_WATCHER_USERNAME` / `JIRA_EMAIL` for watcher policy after writes ([jira-notifications.md](../skills/engineering/setup-internal-skills/jira-notifications.md); doc-manager pattern).
+**Jira API skills:** set `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` via [`.env.example`](../.env.example) and [scripts/load-jira-env.sh](../scripts/load-jira-env.sh) (project `.env` takes precedence when sourced from the app repo). Optional `JIRA_DEFAULT_EPIC`, `JIRA_ASSIGNEE`, or `default_epic` in `docs/agents/issue-tracker.md` ([default Epic](../skills/engineering/setup-internal-skills/issue-tracker-jira.md#default-epic-optional)). Descriptions: [wiki markup](../skills/engineering/setup-internal-skills/jira-description-style.md) on create. Re-sync keys: `/plan-it <id> --jira --sync-only`. Watcher policy: [jira-notifications.md](../skills/engineering/setup-internal-skills/jira-notifications.md).
 
 ---
 
@@ -73,7 +73,8 @@ Then use engineering skills (`/plan-it`, `/implement-it`, `/audit-it`, `/verify-
 ```text
 AGENTS.md                 # Human + agent entry (## Agent skills block)
 docs/agents/              # issue-tracker, jira-notifications, jira-description-style (Jira), triage-labels, domain, compliance
-docs/issues/              # local Epics + tasks (default)
+docs/issues/              # pre-plan intake (default)
+docs/planning/<id>/jira.md  # phase ↔ Jira (optional)
 docs/planning/            # Doc Cycle plans
 docs/reference/           # baseline maps (/doc-it Phase 1)
 docs/reference-audit/     # sliced review (/doc-it Phase 2)

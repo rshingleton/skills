@@ -1,93 +1,131 @@
 # Jira description style
 
-**Required** for every Jira **create** (`POST /issue`): `summary`, `description`, and triage **create** text that becomes issue body.
+**Required** for every Jira **create** (`POST /issue`): `summary`, `description`, and triage **create** body.
 
-**Goal:** Detailed enough that a human or AFK agent can implement without re-reading chat. **Not** chat-caveman fragments. **Not** AI essay prose.
+**Renderer:** Jira Server / Data Center **wiki markup** in the `description` field — **not** GitHub Markdown. Markdown headings and `- [ ]` checkboxes produce broken output (e.g. `1. 1. What`, literal `[ ]` text).
 
-Local `docs/issues/*.md` may stay expansive; **edit for Jira** when posting (`/to-epic`, `/to-jiras`, `/promote-to-jira`, `/plan-it` Jira publish, `/triage` create).
+Intake `docs/issues/*.md` may use Markdown locally; **convert** before POST ([format rules](#markdown--wiki-conversion)).
 
-Use [caveman](../../productivity/caveman/SKILL.md) only as a **cut list** (drop filler, hedging, pleasantries) — not as the target voice for Jira.
+Use [caveman](../../productivity/caveman/SKILL.md) only to cut filler — not as the target voice.
 
-## What to cut (anti-patterns)
+## Wiki template (Task)
 
-- Openers: "This issue will…", "We need to ensure…", "Please refer to…"
-- Restating the summary in the description
-- Paragraph walls where bullets work
-- Vague AC: "works correctly", "handles errors appropriately"
-- Scope creep and design essays in Tasks (put deep design in Epic or `docs/planning/`)
+Post the body exactly in this shape (blank line after each heading line):
 
-## What to keep (required detail)
+```text
+h2. What
 
-- **Concrete behavior** — inputs, outputs, edge cases, error handling
-- **Exact names** — APIs, env vars, types, modules (no code dumps unless a short schema/snippet is the spec)
-- **Testable acceptance criteria** — `- [ ]` one observable outcome per line
-- **Dependencies** — `## Blocked` with keys or "None"
-- **Epics:** numbered user stories (one line each is fine); **Implementation decisions** as bullets, not prose chapters
+* First concrete behavior or change
+* Second item
 
-## Summary (title)
+h2. Done when
 
-- One clear line; prefer &lt; ~100 chars.
-- Specific verb + object: `Add OAuth callback handler` not `Implement comprehensive OAuth solution`.
-- Articles OK when they aid clarity.
+* Observable outcome one (test or behavior)
+* Observable outcome two
 
-## Description structure
+h2. Blocked
 
-Use these sections when they apply (omit empty ones):
-
-```markdown
-## What
-…
-
-## Done when
-- [ ] …
-
-## Notes
-…optional constraints, links to ADR/plan…
-
-## Blocked
-…
-```
-
-**Tasks:** `What` + `Done when` usually enough.  
-**Epics:** add `## User stories`, `## Decisions`, `## Out of scope` as needed — still bullets, still dense.
-
-### Example (Task) — good
-
-```
-## What
-Login form validates email + password client-side, posts to POST /api/login, maps 401/422 to inline field errors.
-
-## Done when
-- [ ] Invalid email format shows error under email field
-- [ ] Wrong password shows generic "Invalid credentials" (no account enumeration)
-- [ ] Success redirects to /dashboard
-- [ ] Unit tests cover validator + error mapping
-
-## Blocked
 None
 ```
 
-### Example (Task) — bad (verbose, low signal)
+**Epics:** add `h2. User stories`, `h2. Decisions`, `h2. Out of scope` as needed — still `*` bullets, no prose walls.
 
-> This task implements the vertical slice for user authentication. We will need to ensure that the login form validates input correctly and that errors are displayed to the user in a friendly manner. Please refer to the epic for additional context.
+## Formatting rules
 
-### Example (Task) — bad (too thin)
+| Use | Do not use |
+|-----|------------|
+| `h2. Section` | `## Section`, `# Section`, `**bold headers**` |
+| `*` bullet lines | Markdown `-` lists mixed with headings |
+| Plain `*` AC lines under Done when | `- [ ]`, `- [x]`, GFM task lists |
+| `*monospace*` via `{{code}}` for identifiers | Triple-backtick fences |
+| `None` on its own line under Blocked | Empty section omitted without saying None |
 
-```
+**Numbered lists:** avoid `#` at line start in descriptions — in wiki markup `#` starts a *numbered* list and causes double numbering when combined with exported markdown.
+
+**One blank line** after each `h2.` line before bullets; **no** indent before `*`.
+
+## Markdown → wiki conversion
+
+When source is plan `ai-prompt.md`, phase notes, or intake markdown:
+
+1. Replace `## Title` / `### Title` → `h2. Title` / `h3. Title` (strip `#` characters only).
+2. Replace leading `- ` / `* ` list markers with `* ` (single asterisk + space).
+3. Strip `- [ ]` / `- [x]` → bullet text only: `* ConfigServiceTest covers GET /api/health returns 200 UP`
+4. Remove duplicate summary paragraph at top.
+5. Do **not** paste markdown through unchanged.
+
+### Example — broken (what the UI shows wrong)
+
+```markdown
 ## What
-Fix login.
+* Fill ConfigServiceTest.java…
 
 ## Done when
-- [ ] Works
+- [ ] ConfigServiceTest covers GET /api/health
 ```
 
-## Agent rule
+→ Renders as `1. 1. What`, literal `[ ]`.
 
-Before `jq --arg body` or heredoc `description`:
+### Example — correct (same content)
 
-1. Start from local task/epic/plan content.
-2. **Compress** fluff (caveman cut list).
-3. **Preserve** every decision and criterion needed to implement.
-4. Do not paste local markdown verbatim if it contains chat tone or duplicate sections.
+```text
+h2. What
 
-If local `docs/issues/` is already dense, light edit is enough. If local is a long epic, **summarize into structured Jira sections** — do not drop decisions, do not add filler.
+* Fill {{ConfigServiceTest.java}} with mock-based tests for admin HTTP API
+* Add {{@Deprecated}} on {{cds.backend.type}} fallback in {{CdsConfig.java}}
+* Move {{GreptimeCodecBackendE2eTest}} to {{@Category(RemoteBackendIntegrationTest.class)}}
+
+h2. Done when
+
+* {{ConfigServiceTest}} covers {{GET /api/health}} — returns 200 UP
+* Config CRUD PUT/GET/DELETE with correct statuses
+* Auth guard returns 401 without API key
+* 404 for missing keys, 400 for invalid format
+* Admin UI returns 200 HTML
+* Mock repository only — no live backend in unit tests
+* Runs in default {{./gradlew}} suite
+* {{@Deprecated}} on fallback as specified
+* {{GreptimeCodecBackendE2eTest}} categorized without {{Assume.assumeTrue()}}
+* All tests green, no regressions
+
+h2. Blocked
+
+None
+```
+
+## Summary (title field)
+
+- One line, &lt; ~100 chars, verb + object.
+- Do not repeat the summary as the first line of the description.
+
+## What to cut
+
+- "This issue will…", "Please refer to…", paragraph walls, vague AC ("works correctly").
+
+## What to keep
+
+- Concrete behavior, exact API/type/module names, testable outcomes, Blocked keys or `None`.
+
+## Agent checklist (before POST)
+
+1. Body uses **`h2.`** sections and **`*`** bullets only.
+2. No `##`, no `- [ ]`, no lines starting with `#` (except `h2.` / `h3.`).
+3. Every AC is one `*` line under `h2. Done when`.
+4. `jq --arg body` or heredoc contains wiki text, not markdown.
+
+Optional helper when converting in shell — strip common markdown mistakes:
+
+```bash
+# Illustrative; prefer deliberate edit for plan content
+_jira_wiki_body() {
+  sed -e 's/^## /h2. /' -e 's/^### /h3. /' \
+      -e 's/^- \[[ xX]\] /* /' -e 's/^- /* /' "$1"
+}
+```
+
+## Local vs Jira
+
+| Location | Format |
+|----------|--------|
+| `docs/issues/*.md`, `docs/planning/` | Markdown OK |
+| `POST .../issue` `description` | **Wiki only** ([issue-tracker-jira.md](issue-tracker-jira.md)) |

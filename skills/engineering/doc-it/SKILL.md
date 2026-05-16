@@ -64,6 +64,6 @@ Re-explore code where the reference pass is thin. Do not create `docs/issues/` u
 
 **Both phases:**
 
-> `docs/reference/` + `docs/reference-audit/`. **Next:** `/to-jiras`, `/plan-it`, `/improve-codebase-architecture`, `/grill-with-docs`.
+> `docs/reference/` + `docs/reference-audit/`. **Next:** `/issues-it`, `/plan-it`, `/improve-codebase-architecture`, `/grill-with-docs`.
 
 Examples: [EXAMPLES.md](EXAMPLES.md).
