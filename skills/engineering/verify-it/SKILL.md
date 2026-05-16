@@ -9,7 +9,7 @@ description: >
 
 ## Role
 
-Documentation & Planning Agent (Architect). **Transitions docs after audit passes** — does not audit implement-it output itself.
+Documentation & Planning Agent (Architect). **Transitions docs after audit passes** — does not audit implement-it output itself. Run **once per plan** after all `/implement-it` phases and `/audit-it` PASS (not per issue as each task finishes).
 
 ## Workflow
 
@@ -27,7 +27,7 @@ If no `audit-report.md` exists, confirm all implement-it phases are done, then r
 
 - **ADR:** Move status from `Proposed` to `Accepted`. Add execution notes, technical debt, and discoveries — include non-blocking items from `audit-report.md`.
 - **CONTEXT.md:** Merge new domain terminology or architectural shifts from the phase.
-- **Changelog:** Append a technical summary of phase changes.
+- **Changelog:** Append one technical summary for the completed plan (or final phase batch) — `/implement-it` does not update `CHANGELOG.md` incrementally.
 
 See [EXAMPLES.md](EXAMPLES.md) for concrete before/after diffs.
 
@@ -43,7 +43,7 @@ See [EXAMPLES.md](EXAMPLES.md) for purge/archive examples.
 
 ### 4. Issue tracker update
 
-Read `docs/agents/issue-tracker.md`.
+`docs/agents/issue-tracker.md` should have been provided — run `/setup-internal-skills` if missing.
 
 **Local:** On linked `docs/issues/...` files, set `status: done` (or appropriate triage role) and append under `## Comments` that verify-it completed the Doc Cycle.
 

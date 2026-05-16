@@ -15,9 +15,12 @@ Every comment or issue posted to the issue tracker during triage **must** start 
 
 ## Reference docs
 
+Run `/setup-internal-skills` if `docs/agents/issue-tracker.md` or `docs/agents/triage-labels.md` is missing.
+
 - [AGENT-BRIEF.md](AGENT-BRIEF.md) — how to write durable agent briefs
 - [OUT-OF-SCOPE.md](OUT-OF-SCOPE.md) — how the `.out-of-scope/` knowledge base works
-- `docs/agents/issue-tracker.md` — Jira API reference (created by `/setup-internal-skills`)
+- `docs/agents/issue-tracker.md` — tracker workflow (local or Jira; seeded by setup)
+- `docs/agents/triage-labels.md` — role → status/label mapping for this repo
 - [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md) — Jira credentials (export or `.env`; `source` loader before `curl`)
 - [jira-notifications.md](../setup-internal-skills/jira-notifications.md) — `notifyUsers=false` + watcher policy (`JIRA_WATCHER_IGNORE`, `JIRA_WATCHER_USERNAME`, `JIRA_EMAIL`)
 - [jira-description-style.md](../setup-internal-skills/jira-description-style.md) — dense structured `summary` / `description` on Jira **create**
@@ -39,7 +42,7 @@ Five **state** roles:
 
 Every triaged issue should carry exactly one category role and one state role. If state roles conflict, flag it and ask the maintainer before doing anything else.
 
-These are canonical role names — the actual label strings or issue statuses used in the issue tracker may differ. The mapping should have been provided to you — run `/setup-internal-skills` if not.
+These are canonical role names — the actual label strings or issue statuses used in the issue tracker come from `docs/agents/triage-labels.md` (not hardcoded in this skill).
 
 State transitions: an unlabeled issue normally goes to `needs-triage` first; from there it moves to `needs-info`, `ready-for-agent`, `ready-for-human`, or `wontfix`. `needs-info` returns to `needs-triage` once the reporter replies. The maintainer can override at any time — flag transitions that look unusual and ask before proceeding.
 

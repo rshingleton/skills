@@ -13,6 +13,8 @@ Documentation & Planning Agent (Architect). Opens the **Doc Cycle**: `/plan-it` 
 
 If `docs/reference/` is missing or stale on an unfamiliar repo, suggest `/doc-it` first unless the user declines.
 
+**Issue tracker:** `docs/agents/issue-tracker.md` should have been provided — run `/setup-internal-skills` if missing.
+
 ## Workflow
 
 ### 1. The Grill

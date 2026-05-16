@@ -55,7 +55,7 @@ After installing skills, run **`/setup-internal-skills`** once per repo. It writ
 
 On **existing repos**, setup audits Copilot and Cursor files (see `PLATFORM-AUDIT.md` in the setup skill): patches `.github/copilot-instructions.md` in place, lists `.cursor/rules/` without requiring new Cursor config.
 
-**Doc Cycle:** `/plan-it` → `/implement-it` (each phase) → `/audit-it` → `/verify-it`.
+**Doc Cycle:** `/plan-it` → `/implement-it` (each phase) → `/audit-it` (once) → `/verify-it` (once: ADR, CONTEXT, changelog, issues).
 
 **Codebase reference:** `/doc-it` → `docs/reference/` + `docs/reference-audit/` (`tech-debt.md`, `testing.md`, `architecture.md`, `follow-ups.md`). Onboarding or unfamiliar repos; not `/verify-it` (post-plan finalize).
 

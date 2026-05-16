@@ -21,7 +21,7 @@ Discover repo standards per [STANDARDS.md](STANDARDS.md) §1 before the first ed
 
 Flag ambiguities to the Planning Agent (Architect) via the user — do not guess past the prompt.
 
-**Issue tracker** — read `docs/agents/issue-tracker.md`:
+**Issue tracker** — `docs/agents/issue-tracker.md` should have been provided — run `/setup-internal-skills` if missing. Then:
 
 - **Local:** If this phase maps to `docs/issues/...`, set frontmatter `status: in-progress` and append a dated note under `## Comments`.
 - **Jira:** Transition linked issue to "In Progress" with `?notifyUsers=false`, then apply watcher policy (`_jira_apply_watcher_policy "$KEY" update`) ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md), [jira-notifications.md](../setup-internal-skills/jira-notifications.md)). Ask for the key if unknown.

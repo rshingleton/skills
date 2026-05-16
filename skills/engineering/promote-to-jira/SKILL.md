@@ -11,81 +11,125 @@ description: >
 
 Move **local** planning and issue tracking into Jira. Does not replace `/to-jiras` for initial slice breakdown — use this when issues already exist under `docs/issues/` or you want to publish a completed plan.
 
-Requires `JIRA_BASE_URL`, `JIRA_API_TOKEN`, and `JIRA_PROJECT_KEY` (shell export or `.env`; see [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md)). On every create: [jira-description-style.md](../setup-internal-skills/jira-description-style.md) + [jira-notifications.md](../setup-internal-skills/jira-notifications.md) (`notifyUsers=false` + watcher policy).
+**Read `docs/agents/issue-tracker.md` first** — Jira API patterns and env vars. Run `/setup-internal-skills` if that file is missing.
 
-Read `docs/agents/issue-tracker.md` first. If the repo is already Jira-only, tell the user promotion is unnecessary.
+## Bundled references (in skills repo)
+
+| Doc | Path from this skill |
+|-----|----------------------|
+| Jira API + env | [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md) |
+| Watcher policy | [jira-notifications.md](../setup-internal-skills/jira-notifications.md) |
+| Description style | [jira-description-style.md](../setup-internal-skills/jira-description-style.md) |
+| Walkthrough | [EXAMPLES.md](EXAMPLES.md) |
+
+## Prerequisites (application repo)
+
+| Requirement | Required? | If missing |
+|-------------|-----------|------------|
+| `docs/agents/issue-tracker.md` | Yes (seed via setup) | Run `/setup-internal-skills` |
+| `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` in env | Yes | `source` [load-jira-env.sh](../../../scripts/load-jira-env.sh) from app repo root; see [.env.example](../../../.env.example). **`JIRA_PROJECT_KEY` = Jira project key** (e.g. `CDS` from `CDS-109`), **not** Bitbucket project slug (`MT`). |
+| `docs/issues/<feature-slug>/tasks/*.md` | Yes (≥1 task) | Stop — run `/to-jiras <slug>` first |
+| `docs/issues/<feature-slug>/epic.md` | No | OK if `--parent`, `jira_key` on epic, or `JIRA_DEFAULT_EPIC` / `default_epic` supplies Epic |
+| `docs/planning/<plan-id>/README.md` | Only if `--plan` passed | If absent: warn, promote tasks anyway, skip plan README update |
+
+### Preflight (before any POST)
+
+```bash
+source ~/.local/share/ai-skills/scripts/load-jira-env.sh   # or repo scripts/load-jira-env.sh
+# Fail fast if project key wrong (avoids misleading 400 "project is required"):
+curl -sf -H "Authorization: Bearer $JIRA_API_TOKEN" \
+  "$JIRA_BASE_URL/rest/api/2/project/$JIRA_PROJECT_KEY" >/dev/null \
+  || echo "JIRA_PROJECT_KEY=$JIRA_PROJECT_KEY not found — use Jira key from issue prefix (CDS-109 → CDS), not Bitbucket slug"
+```
+
+Copy `_jira_apply_watcher_policy` and helpers from [jira-notifications.md](../setup-internal-skills/jira-notifications.md) before creates.
 
 ## Arguments
 
 | Argument | Meaning |
 |----------|---------|
-| `<feature-slug>` | Promote `docs/issues/<feature-slug>/` (epic + tasks) |
-| `--plan <plan-id>` | Also read `docs/planning/<plan-id>/` for phase list / context |
-| `--parent EPIC-123` | Skip Epic creation; link new Tasks to this Epic (overrides `jira_key` / `JIRA_DEFAULT_EPIC`) |
+| `<feature-slug>` | Promote `docs/issues/<feature-slug>/` (tasks; optional epic) |
+| `--plan <plan-id>` | Optionally read `docs/planning/<plan-id>/` — **do not fail** if missing |
+| `--parent EPIC-123` | Skip Epic creation; link Tasks to this Epic |
 | `--dry-run` | List what would be created; do not call Jira |
 
 ## Process
 
 ### 1. Gather local artifacts
 
-For the feature slug (or derive slug from `--plan`):
+Resolve `<feature-slug>` from the argument (not from `--plan` alone).
 
-- `docs/issues/<slug>/epic.md` — Epic body (frontmatter `type: epic`)
-- `docs/issues/<slug>/tasks/*.md` — Tasks in dependency order
-- If `--plan`: `docs/planning/<plan-id>/README.md` and phase list
+**Must exist:**
 
-Skip any file whose frontmatter already has `jira_key` (already promoted) unless the user asks to re-sync.
+- `docs/issues/<slug>/tasks/*.md` — at least one file
+
+**Optional:**
+
+- `docs/issues/<slug>/epic.md` — Epic body (`type: epic` in frontmatter)
+- `docs/planning/<plan-id>/README.md` — only when `--plan` set; if missing, note it and continue
+
+Skip any file whose frontmatter already has `jira_key` unless the user asks to re-sync.
+
+If the repo is Jira-only (no local `docs/issues/`), tell the user promotion is unnecessary.
 
 ### 2. Present plan
 
 Show the user:
 
-- Epic title (from epic frontmatter or plan README)
+- Epic title (from `epic.md` frontmatter, plan README, or slug)
 - Each task title, type (HITL/AFK if noted), blocked-by
-- Whether a new Epic will be created, `--parent` will be used, or an existing `jira_key` / default Epic applies
+- Whether a new Epic will be created, `--parent` / `JIRA_DEFAULT_EPIC` / existing `jira_key` applies
 
-Get confirmation before calling Jira.
+Get confirmation before calling Jira (skip confirmation on `--dry-run`).
 
 ### 3. Create Epic (unless `--parent` or existing key)
 
 If `--parent` is set, use that Epic key for Task linking and skip Epic creation.
 
-Else if `epic.md` has `jira_key`, use it for Task linking and skip Epic creation.
+Else if `epic.md` exists and has `jira_key`, use it and skip Epic creation.
 
 Else if `epic.md` exists and no `jira_key`:
 
 ```bash
 # issue-tracker-jira.md — POST .../issue?notifyUsers=false, issuetype Epic, customfield_10881
 # Summary + description from epic.md — jira-description-style.md
-# Then _jira_apply_watcher_policy "$KEY" create per jira-notifications.md
+# Then _jira_apply_watcher_policy "$KEY" create
 ```
 
-Write returned key into `epic.md` frontmatter: `jira_key: MT-…`
+Write returned key into `epic.md` frontmatter: `jira_key: CDS-…` (use actual project prefix).
 
-If the user wants this Epic as the project default for future `/to-jiras`, suggest `JIRA_DEFAULT_EPIC=MT-…` in `.env` ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#default-epic-optional)).
+If no `epic.md`, skip Epic creation; resolve parent for Tasks in step 4.
 
 ### 4. Create Tasks
 
-Epic key for linking: from step 3 (`--parent`, new Epic, or `epic.md` `jira_key`), or if there is no local epic file, `resolve_jira_parent_epic "" "<slug>"` ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#resolving-the-parent-epic-agents)).
+Epic key for linking, first match:
 
-For each `tasks/*.md` without `jira_key`, POST Task to Jira with `?notifyUsers=false` (link Epic via `customfield_10880` when an Epic key is available). Edit task body for Jira per [jira-description-style.md](../setup-internal-skills/jira-description-style.md) — keep implementable detail, cut filler; do not paste local markdown verbatim. Preserve acceptance criteria and blocked-by; rewrite `blocked_by` to Jira keys where local blockers were already promoted.
+1. `--parent` value  
+2. New or existing `epic.md` `jira_key`  
+3. `resolve_jira_parent_epic "" "<slug>"` ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#resolving-the-parent-epic-agents))
 
-Write each `jira_key` back into the task file frontmatter.
+If no Epic key after resolution, stop and ask — Tasks need `customfield_10880` or user confirmation for standalone Tasks.
+
+For each `tasks/*.md` without `jira_key`, POST Task with `?notifyUsers=false` (link Epic via `customfield_10880` when Epic key set). Edit per [jira-description-style.md](../setup-internal-skills/jira-description-style.md). `_jira_apply_watcher_policy "$KEY" create` after each create.
+
+Write each `jira_key` back into task frontmatter.
 
 ### 5. Link planning (optional)
 
-If `--plan` was passed, append to `docs/planning/<plan-id>/README.md`:
+Only if `--plan` was passed **and** `docs/planning/<plan-id>/README.md` exists — append:
 
 ```markdown
 ## Jira
-- Epic: MT-… (docs/issues/<slug>/epic.md)
+- Epic: CDS-… (docs/issues/<slug>/epic.md)
 - Tasks: …
 ```
 
+If plan path missing, tell user promotion succeeded for issues; plan file not updated.
+
 ### 6. Next skill
 
-> Promotion complete. Epic **MT-…** and N tasks created; `jira_key` recorded in `docs/issues/<slug>/`.
+> Promotion complete. Epic **CDS-…** (or parent used) and N tasks created; `jira_key` recorded under `docs/issues/<slug>/`.
 >
-> **Next:** Continue the Doc Cycle with `/implement-it`, or triage incoming work in Jira via `/triage`.
+> **Next:** `/implement-it`, or `/triage` for incoming Jira work.
 
-See [EXAMPLES.md](EXAMPLES.md) for a full walkthrough.
+See [EXAMPLES.md](EXAMPLES.md).

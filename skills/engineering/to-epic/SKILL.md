@@ -8,7 +8,7 @@ description: >
 
 Synthesize a full Epic from conversation context. Do NOT interview the user.
 
-**Read `docs/agents/issue-tracker.md` first** — local (default) vs Jira. Run `/setup-internal-skills` if missing.
+**Read `docs/agents/issue-tracker.md` first** — local (default) vs Jira. Run `/setup-internal-skills` if that file is missing.
 
 ## Process
 
