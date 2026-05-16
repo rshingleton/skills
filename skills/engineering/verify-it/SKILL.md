@@ -48,7 +48,7 @@ See [EXAMPLES.md](EXAMPLES.md) for purge/archive examples.
 **Jira** — for each phase row with a key in `docs/planning/{ID}/jira.md`:
 
 - If `JIRA_ASSIGNEE` is set, `_jira_set_assignee "$KEY"` before other writes ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#assignee-jira_assignee)).
-- **Prompt for resolution comment:** ask *"What concise resolution comment should be posted to {KEY}? (press Enter to skip)"* or draft one from the phase summary and let the user edit. Post the comment via `POST /issue/{KEY}/comment?notifyUsers=false` ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#helper-functions-copy-into-shell-before-jira-work)).
+- **Prompt for resolution comment:** draft a concise Jira resolution comment from the phase summary (2-4 sentences covering what was delivered). Present it to the user as a suggestion: *"Post this resolution comment to {KEY}? (y/edit/skip)"*. If they edit, use their text. If y, post via `POST /issue/{KEY}/comment?notifyUsers=false` ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#helper-functions-copy-into-shell-before-jira-work)).
 - **Resolve:** ask *"Resolve {KEY}? (y/n)"* per key. If yes, transition to the `Resolved` or `Done` status (`POST /issue/{KEY}/transitions?notifyUsers=false`). Apply `_jira_apply_watcher_policy "$KEY" update` after each write ([jira-notifications.md](../setup-internal-skills/jira-notifications.md)).
 
 If any phase row lacks a Jira key, report it — run `/plan-it --jira {ID} --sync-only` before closing Jira.
