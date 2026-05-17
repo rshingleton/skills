@@ -14,14 +14,14 @@ Each skill is a focused workflow in `SKILL.md` that an agent loads when invoked 
 
 ### Usage guidelines
 
-1. **Install once** on your machine using the [quickstart](#quickstart-30-second-setup) below. Skills land in `~/.agents/skills` and work across Cursor, Copilot, OpenCode, and Claude Code.
+1. **Install once** on your machine using the [quickstart](#quickstart-30-second-setup) below. Skills land in `~/.agents/skills` and work across Cursor, Copilot, OpenCode, and other agents.
 2. **Configure each application repo** with `/setup-internal-skills`. That seeds `AGENTS.md`, `docs/agents/`, intake inbox `docs/issues/`, and plans under `docs/planning/`.
 3. **Compose skills for the task.** You are not required to run a fixed pipeline. Capture work in the **inbox** (`/issue-it` or audit skills → [audit-to-issues](./skills/engineering/setup-internal-skills/audit-to-issues.md)), then **`/plan-it --from-issues` evaluates and grills** before scaffolding. The **Doc Cycle** is `/plan-it` → `/implement-it` (each phase) → `/audit-it` → `/verify-it` → `/commit-it`. Optional Jira phase keys: `/plan-it --jira` → `jira.md`.
 4. **Keep humans in the loop.** Treat agent output as a draft. Read diffs, run tests, and check spec fit before merge. Skills like `/audit-it` and `/internal-compliance` support review; they do not replace it.
 
 ## Agent platforms
 
-Instructions use the open **`AGENTS.md`** format (OpenCode, Cursor, Copilot, Claude Code). See [AGENTS.md](./AGENTS.md) and [docs/AGENT-PLATFORMS.md](./docs/AGENT-PLATFORMS.md).
+Instructions use the open **`AGENTS.md`** format (OpenCode, Cursor, Copilot, and other agents). See [AGENTS.md](./AGENTS.md) and [docs/AGENT-PLATFORMS.md](./docs/AGENT-PLATFORMS.md).
 
 | Tool | Config |
 |------|--------|
@@ -125,7 +125,7 @@ You are ready to invoke skills in that repo.
 
 ## Why These Skills Exist
 
-I built these skills as a way to fix common failure modes I see with Claude Code, Codex, and other coding agents.
+These skills fix common failure modes I see with coding agents.
 
 ### #1: The Agent Didn't Do What I Want
 
