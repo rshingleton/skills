@@ -5,11 +5,32 @@ Self-contained examples for each workflow step. Replace placeholder values
 
 ---
 
-## Phase audit gate
+## Mode selection
 
-`/verify-it` requires `docs/planning/{key}/audit-report.md` with **Verdict: PASS** from `/audit-it` (after all implement-it phases are complete).
+| Invocation | Audit required | What it finalizes |
+|---|---|---|
+| `/verify-it` | `docs/planning/{key}/audit-report.md` (full) | ADR, CONTEXT, changelog, accordion compression, all Jira keys |
+| `/verify-it --phase phase-2` | `docs/planning/{key}/audit-report-phase-2.md` | ADR notes + CONTEXT for phase 2, resolves phase 2 Jira key only |
 
-Merge non-blocking architecture notes from the audit report into ADR execution notes (step below).
+---
+
+## Incremental close (`--phase`)
+
+After a single-phase audit passes, close that phase without waiting for the rest:
+
+```bash
+# Phase 2 implemented → audited → incrementally closed
+/audit-it --phase phase-2       # writes audit-report-phase-2.md
+/verify-it --phase phase-2      # ADR notes, CONTEXT, Jira for phase-2 only
+```
+
+Result: phase 2 verified. Remaining phases (1, 3) can proceed independently.
+
+---
+
+## Full close (all phases done)
+
+`/verify-it` without `--phase` runs the full existing pipeline after the full audit passes.
 
 ---
 
@@ -70,15 +91,15 @@ Append a dated section to the project changelog:
 
 ---
 
-## Accordion Compression — Purge
+## Accordion Compression — Archive
 
-All phases of a planning key are done. Remove the ephemeral directory:
+All phases of a planning key are done. Move the entire directory to preserve execution history:
 
 ```bash
-rm -rf docs/planning/{key}
+mv docs/planning/{key} docs/archive/planning/{key}
 ```
 
-Before removal:
+Before:
 ```
 docs/planning/{key}/
 ├── README.md
@@ -87,14 +108,13 @@ docs/planning/{key}/
 └── phase-3/
 ```
 
-After removal: directory gone.
-
----
-
-## Accordion Compression — Archive
-
-Move raw execution history instead of deleting:
-
-```bash
-mv docs/planning/{key} docs/archive/planning/{key}
+After:
 ```
+docs/archive/planning/{key}/
+├── README.md
+├── phase-1/
+├── phase-2/
+└── phase-3/
+```
+
+Always archive — never delete without a copy. The archive preserves `ai-prompt.md`, `execution-notes.md`, `audit-report.md`, and `sources/` for future reference.

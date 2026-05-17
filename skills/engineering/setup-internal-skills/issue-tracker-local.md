@@ -35,7 +35,7 @@ Do **not** leave `status: in-plan` files in `docs/issues/`. Do **not** mirror ph
 ---
 title: Short summary
 type: bug | defer | todo | feature
-status: intake | triaged | ready-for-plan | wontfix
+status: intake | ready-for-plan | wontfix
 source: user | email | servicenow | review | grill | doc-it | improve-codebase-architecture | audit-it | jira
 external_id:
 requester:
@@ -60,11 +60,13 @@ jira_key:
 ---
 ```
 
-Triage: **`/triage`** updates `status` and `## Comments` per [triage-labels.md](triage-labels.md). Capture new items with **`/issues-it`** (or `/triage` create — same file shape). See [TRACKER-ROUTING.md](../../triage/TRACKER-ROUTING.md).
+**Status flow (inbox only):** `intake` → `ready-for-plan` → (plan-it moves to `sources/`, status `in-plan`). See [issue-it](../../issue-it/SKILL.md).
+
+Intake evaluation: **`/plan-it --from-issues`** updates `status` and `## Comments` per [triage-labels.md](triage-labels.md). Capture new items with **`/issue-it`** (same file shape).
 
 ## Capture intake
 
-**`/issues-it`** — creates `docs/issues/<slug>.md` only. See [INTAKE-TEMPLATE.md](../../issues-it/INTAKE-TEMPLATE.md).
+**`/issue-it`** — creates `docs/issues/<slug>.md` only. See [INTAKE-TEMPLATE.md](../../issue-it/INTAKE-TEMPLATE.md).
 
 ## Plan from intake
 
@@ -86,7 +88,7 @@ Triage: **`/triage`** updates `status` and `## Comments` per [triage-labels.md](
 ## verify-it and archive
 
 - Append completion notes on `sources/*.md`; set `status: done`.
-- When purging planning, move whole `docs/planning/{ID}/` (including `sources/`) to `docs/archive/planning/{ID}/` if preserving history.
+- Verify-it archives `docs/planning/{ID}/` (including `sources/`) to `docs/archive/planning/{ID}/` by default.
 
 ## Legacy
 

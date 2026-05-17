@@ -3,40 +3,84 @@ name: audit-it
 description: >
   Doc Cycle — audit phase. Independent auditor for implement-it phases (spec,
   standards, compliance, architecture) and repo-wide tech-debt reviews. Use
-  after Phase N Complete, with verify-it, audit-it, or for architecture
-  reviews and tech debt analysis.
+  after Phase N Complete and implement-it, or for architecture
+  reviews and tech debt analysis. Use when user says audit-it,
+  audit, review, or compliance check.
 ---
 
 ## Role
 
 Analysis Agent (Architectural Reviewer). **Audits; does not implement or finalize durable docs.**
 
-Two modes — pick by trigger:
+Four modes — pick by trigger:
 
 | Mode | When | Output |
 |------|------|--------|
-| **Phase audit** | After **all** `/implement-it` phases are complete; required before `/verify-it` | `docs/planning/{ID}/audit-report.md` |
+| **Phase audit** | After **all** phases; holistic single pass | `docs/planning/{ID}/audit-report.md` |
+| **Multi-phase audit** | After **all** phases; cycle each phase individually (`--phases`) | `docs/planning/{ID}/audit-report.md` (compiled) |
+| **Single-phase audit** | After any one phase (`--phase phase-N`); early feedback | `docs/planning/{ID}/audit-report-{phase-N}.md` |
 | **Repo audit** | Ad-hoc tech-debt or sprint review | `docs/AUDIT.md` |
 
 For **baseline reference maps** and a sliced audit (`docs/reference-audit/`: `tech-debt.md`, `testing.md`, `architecture.md`, `follow-ups.md`), use `/doc-it`. Use repo audit mode here for a shorter pass to `docs/AUDIT.md` without building `docs/reference/`.
 
-## Phase audit (default in Doc Cycle)
+## Quick start
 
-Run [PHASE-AUDIT.md](PHASE-AUDIT.md) end-to-end across **all implemented phases**. This is the independent gate on implement-it output.
+```text
+/audit-it
+```
 
-**Optional cross-check:** Compare phase verification criteria in `ai-prompt.md` to `sources/*.md` and plan README. Spot-check `jira.md` rows when using Jira. Do **not** call Jira or change status — `/verify-it` owns closure.
+After all phases implemented (holistic): `/audit-it`
+Cycle each phase individually: `/audit-it --phases`
+Single phase: `/audit-it --phase phase-1`
+Repo audit: `/audit-it repo`
 
-On **FAIL**: report blocking findings; stop — user returns to `/implement-it`. Do not suggest `/verify-it`.
+## Phase audit
 
-On **PASS**: see **Next skill** below.
+Run [PHASE-AUDIT.md](PHASE-AUDIT.md) across **all implemented phases** in one holistic pass. This is the independent gate on verify-it.
+
+## Multi-phase audit
+
+Pass `--phases` to audit each phase individually, cycling through them one at a time. Each phase runs the same Mechanical → Spec → Standards → Compliance → Architecture checks as single-phase audit. Findings are compiled and presented together at the end.
+
+See [PHASE-AUDIT.md § Multi-phase audit](PHASE-AUDIT.md#multi-phase-audit) for the workflow.
+
+## Single-phase audit
+
+Pass `--phase phase-N` to audit one phase early (e.g. `--phase phase-2`). Runs [PHASE-AUDIT.md](PHASE-AUDIT.md) scoped to that phase only. Use for early feedback on multi-phase plans — does **not** replace the full audit gate.
+
+On **FAIL**: report blocking findings for that phase. Return to `/implement-it` on that phase; other phases unaffected.
+
+On **PASS**: suggest `/verify-it --phase phase-N` for incremental close, or continue implementing remaining phases.
+
+**Optional cross-check (both modes):** Compare phase verification criteria in `ai-prompt.md` to `sources/*.md` and plan README. Spot-check `jira.md` rows when using Jira. Do **not** call Jira or change status — `/verify-it` owns closure.
+
+### Next skill (multi-phase audit)
+
+**All phases PASS:**
+
+> Multi-phase audit passed ({N} phases).
+>
+> **Next:** Run `/verify-it` to finalize ADRs, CONTEXT.md, changelog, and planning cleanup.
+
+**Any phase FAIL:**
+
+> Multi-phase audit failed — {N} of {M} phases have blocking findings.
+>
+> **Next:** Return to `/implement-it` on failing phases listed above, or use `--phase` to re-audit specific phases after fixes.
 
 ### Next skill (phase audit)
 
-End with:
+**Full audit PASS:**
 
 > Audit passed ({scope: plan `{ID}`, phases audited}).
 >
 > **Next:** Run `/verify-it` to finalize ADRs, CONTEXT.md, changelog, and planning cleanup.
+
+**Single-phase PASS:**
+
+> Phase N audit passed.
+>
+> **Next:** Run `/verify-it --phase phase-N` to close this phase incrementally, or continue with `/implement-it` on remaining phases.
 
 ## Repo audit
 
@@ -52,11 +96,11 @@ Summarize the smallest vertical slice intended vs value-to-complexity ratio.
 
 Explore implementation. Classify abstractions:
 
-| Signal | Definition |
-|--------|------------|
-| **Shallow module** | Interface nearly as complex as implementation |
-| **Leaky seam** | Abstraction forces callers to know internals |
-| **Indirection tax** | Pass-through layer with no added behaviour |
+| Signal | Definition | Impact |
+|--------|------------|--------|
+| **Shallow module** | Interface nearly as complex as implementation | Low leverage — callers learn much for little behaviour |
+| **Leaky seam** | Callers must know internals | Poor locality — callers break when internals change |
+| **Indirection tax** | Pass-through with no added behaviour | Zero leverage — ceremony without behaviour |
 
 ### 3. Generate AUDIT.md
 

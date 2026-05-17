@@ -19,13 +19,13 @@ Flat single file: `docs/issues/<slug>.md`
 ---
 title: Short summary
 type: bug | defer | todo | feature
-status: intake | triaged | ready-for-plan | wontfix
+status: intake | ready-for-plan | wontfix
 source: user | email | servicenow | review | grill | doc-it | improve-codebase-architecture | audit-it | jira
 jira_key:              # only if filed from existing Jira
 ---
 ```
 
-Capture with **`/issues-it`**. `wontfix` may stay in the inbox or move to `docs/issues/wontfix/` (team choice).
+Capture with **`/issue-it`**. `wontfix` may stay in the inbox or move to `docs/issues/wontfix/` (team choice).
 
 ## After move (under plan)
 
@@ -52,8 +52,8 @@ jira_key:
 ## Process (before plan-it scaffold)
 
 1. **Read** each inbox file. Summarize scope for the user.
-2. **Readiness** — if `status: intake`, offer `/triage` or brief inline questions; do **not** skip [plan-it § The Grill](../SKILL.md#1-the-grill) because triage was skipped or because `status: ready-for-plan`.
-3. **Hand off to The Grill** — plan-it **always** grills next: questionable items, overlaps, one plan vs multiple plans, vertical slice, ADRs. Triage refines the inbox; the grill decides the plan.
+2. **Readiness** — if `status: intake`, run [intake evaluation](../SKILL.md#1-intake-evaluation-for-intake-items) (codebase exploration, reproduction, clarifying questions). If `status: ready-for-plan`, proceed. Do **not** skip The Grill.
+3. **Hand off to The Grill** — plan-it **always** grills next: questionable items, overlaps, one plan vs multiple plans, vertical slice, ADRs. Intake evaluation refines the inbox; the grill decides the plan.
 4. After The Grill resolves branches, **scaffold** `docs/planning/{ID}/` (phases, `jira.md` stub, ADR as usual).
 5. **Move intake** — for each source file:
 

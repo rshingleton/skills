@@ -1,4 +1,4 @@
-# Scenario — Email & ServiceNow → triage → plan → Jira
+# Scenario — Email & ServiceNow → issue-it → plan-it → Jira
 
 Org pattern: work arrives outside the repo (email, ServiceNow). The **application project** is the system of record for intake and planning; Jira is published at plan time.
 
@@ -7,25 +7,23 @@ Org pattern: work arrives outside the repo (email, ServiceNow). The **applicatio
 ```text
 Email / ServiceNow request
         ↓
-/triage  (paste body in chat — project repo)
+/issue-it  (paste body in chat — project repo)
         ↓
 docs/issues/<slug>.md   (review in repo)
         ↓
-/triage  (refine → ready-for-plan)  OR  direct if already clear
-        ↓
-/plan-it --from-issues …  (always grills)
+/plan-it --from-issues …  (intake evaluation + grill + scaffold)
         ↓
 /plan-it <id> --jira [--parent EPIC-123]
         ↓
-Doc Cycle (implement-it → audit-it → verify-it)
+Doc Cycle (implement-it → audit-it → verify-it → commit-it)
 ```
 
-## Step 1 — Triage from pasted text
+## Step 1 — Capture from pasted text
 
 In the **project repo** (after `/setup-internal-skills`):
 
 ```text
-/triage
+/issue-it
 
 <paste email thread or ServiceNow ticket text>
 ```
@@ -49,20 +47,13 @@ requester: name@org.com     # optional
 ```
 
 4. Puts **verbatim pasted text** under `## Context` (blockquote or fenced block). Fills **Problem / request** and minimal **Acceptance** from the paste.
-5. Hands off: *"Review `docs/issues/<slug>.md`. When ready: `/triage` to refine or `/plan-it --from-issues`."*
+5. Hands off: *"Created `docs/issues/<slug>.md`. Next: `/plan-it --from-issues` to evaluate and plan."*
 
 **Do not** POST Jira or create `docs/planning/` in this step.
 
-## Step 2 — Review and triage
+## Step 2 — Review
 
 Maintainer reads the file in git/IDE.
-
-```text
-/triage docs/issues/<slug>.md
-```
-
-- Reproduce (bugs), grill if vague, set `status: ready-for-plan` when spec is clear enough to plan.
-- Append triage notes under `## Comments` (with AI disclaimer).
 
 ## Step 3 — Plan
 
@@ -70,7 +61,8 @@ Maintainer reads the file in git/IDE.
 /plan-it --from-issues docs/issues/<slug>.md
 ```
 
-- **Always grills** (scope, phases, vertical slice) — even after triage.
+- **Intake evaluation first:** explores codebase, reproduces bugs, asks clarifying questions, sets `status: ready-for-plan`.
+- **Always grills** (scope, phases, vertical slice) — even after intake evaluation.
 - Moves file → `docs/planning/<id>/sources/<slug>.md`.
 
 ## Step 4 — Jira (optional)
@@ -98,4 +90,4 @@ See [issue-tracker-jira.md § Default Epic](issue-tracker-jira.md#default-epic-o
 
 ## Tracker choice
 
-This scenario assumes **local inbox** for intake. If the org uses **Jira as the only intake**, `/triage` POSTs a Jira issue instead — same paste step; review in Jira until `ready-for-agent`, then capture locally or plan from the Jira brief. Prefer **local inbox + plan-it --jira** when the repo is the planning source of truth.
+This scenario assumes **local inbox** for intake. If the org uses **Jira as the only intake**, `/plan-it` handles Jira issues during intake evaluation — review in Jira until `ready-for-agent`, then plan. Prefer **local inbox + plan-it --jira** when the repo is the planning source of truth.

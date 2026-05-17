@@ -1,6 +1,6 @@
 ---
 name: to-epic
-description: DEPRECATED — use /issues-it (feature intake) then /plan-it.
+description: DEPRECATED — use /issue-it (feature intake) then /plan-it.
 ---
 
 # Deprecated
@@ -8,6 +8,6 @@ description: DEPRECATED — use /issues-it (feature intake) then /plan-it.
 Large feature specs:
 
 ```text
-/issues-it          # type: feature intake
+/issue-it          # type: feature intake
 /plan-it --from-issues docs/issues/<slug>.md
 ```

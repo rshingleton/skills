@@ -4,7 +4,7 @@ description: >
   Scaffold AGENTS.md (open format), docs/agents/, and optional tool configs
   (opencode.json, copilot-instructions, cursor rules) so engineering skills
   know issue tracker (local docs/issues/ by default), triage, and domain docs.
-  Run before issues-it, plan-it, implement-it, verify-it, triage, or
+  Run before issue-it, plan-it, implement-it, verify-it, triage, or
   when issue-tracker context is missing.
 disable-model-invocation: true
 ---
@@ -52,7 +52,7 @@ Summarise present vs missing. Walk **one section at a time** with explainer + de
 
 Choices:
 
-- **Local markdown** (recommended) — `docs/issues/` for intake; `docs/planning/` for plans. `/issues-it` captures intake; `/plan-it --from-issues` + optional `--jira`.
+- **Local markdown** (recommended) — `docs/issues/` for intake; `docs/planning/` for plans. `/issue-it` captures intake; `/plan-it --from-issues` + optional `--jira`.
 - **Jira** — issues in Jira API ([issue-tracker-jira.md](./issue-tracker-jira.md)). Requires `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` (export or `.env`; see issue-tracker doc).
 - **Other** — user describes workflow; record as prose in `issue-tracker.md`.
 
@@ -117,7 +117,7 @@ Draft for user review:
 
 ### Issue tracker
 
-Intake: `docs/issues/` (`/issues-it`, `/triage`). Plans: `docs/planning/` (`/plan-it` grills; `--from-issues` → `sources/`). Phase Jira: `/plan-it --jira` → `jira.md` only (`--parent` overrides `JIRA_DEFAULT_EPIC`).
+Intake: `docs/issues/` (`/issue-it`). Plans: `docs/planning/` (`/plan-it` evaluates + grills; `--from-issues` → `sources/`). Phase Jira: `/plan-it --jira` → `jira.md` only (`--parent` overrides `JIRA_DEFAULT_EPIC`).
 
 ### Triage labels
 
@@ -146,7 +146,7 @@ Tell the user setup is complete.
 
 **Local default:**
 
-> Intake: `docs/issues/` (`/issues-it`, `/triage`). Plan: `/plan-it` (always grills). Phase Jira: `/plan-it --jira` → `jira.md`.
+> Intake: `docs/issues/` (`/issue-it`). Plan: `/plan-it` (always grills; `--from-issues` evaluates intake). Phase Jira: `/plan-it --jira` → `jira.md`.
 >
 > Doc Cycle: `/plan-it` → `/implement-it` → `/audit-it` → `/verify-it`.
 >

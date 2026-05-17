@@ -1,9 +1,9 @@
-# Issues It — Examples
+# Issue It — Examples
 
 ## Review defer
 
 ```text
-/issues-it
+/issue-it
 ```
 
 > "Defer CSV edge-case handling until after auth ships."
@@ -18,15 +18,15 @@
 
 → inbox files moved to `docs/planning/auth-v2/sources/`; `jira.md` with phase ↔ CDS-* keys.
 
-## Triage intake
+## Evaluate intake during plan-it
 
 ```text
-/triage docs/issues/auth-bug.md
+/plan-it --from-issues docs/issues/auth-bug.md
 ```
 
-→ updates `status` + `## Comments` per triage roles; when `ready-for-plan`, hand off to plan-it.
+→ evaluates `status: intake` items, updates `## Comments`, recommends role; on `ready-for-plan` proceeds to The Grill. No separate `/triage` step.
 
-## Mark backlog ready for plan
+## Mark intake items ready for plan
 
 Mark files `status: ready-for-plan`, then:
 

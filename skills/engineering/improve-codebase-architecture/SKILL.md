@@ -76,4 +76,4 @@ Side effects happen inline as decisions crystallize:
 
 ### 4. After grilling (optional)
 
-If the user wants the chosen deepening tracked before `/plan-it`, offer **`/issues-it`** for that candidate (`type: feature` or `todo`, `source: improve-codebase-architecture`, link to architecture finding ID if from `docs/reference-audit/`).
+If the user wants the chosen deepening tracked before `/plan-it`, offer **`/issue-it`** for that candidate (`type: feature` or `todo`, `source: improve-codebase-architecture`, link to architecture finding ID if from `docs/reference-audit/`).

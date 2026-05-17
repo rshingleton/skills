@@ -4,6 +4,14 @@ Jira keys for a Doc Cycle plan live in **`docs/planning/<plan-id>/jira.md`** onl
 
 Before any Jira API calls, **read `docs/agents/issue-tracker.md`** — it contains the tracker type, `JIRA_*` env vars, helper functions, and conventions. Run `/setup-internal-skills` if missing.
 
+## Invocations
+
+| Command | Use |
+|---------|-----|
+| `/plan-it <id> --jira` | Publish phase Tasks to Jira (creates Epic + Tasks) |
+| `/plan-it <id> --jira --sync-only` | Re-sync keys from existing Epic, no re-grill |
+| `/plan-it <id> --jira --parent EPIC-KEY` | Override default parent Epic |
+
 ## Re-sync existing Jira (keys only)
 
 On an **existing** plan (no re-grill):
@@ -107,13 +115,29 @@ Do **not** create phase Tasks under `docs/issues/`.
 
 ## Small plan (≤3 phases)
 
-Optional single Jira Task for the whole plan instead of Epic+Tasks — one row in `jira.md`:
+When a plan has ≤3 phases, offer the option to use a single Jira Task for the
+whole plan instead of creating an Epic + per-phase Tasks:
+
+> This plan has {N} phase(s). Map to a single Jira Task instead of
+> Epic+Tasks? (Y/n)
+
+If yes, create one Task and write one row in `jira.md`:
 
 ```markdown
 | phase-1 | CDS-200 | <plan title> |
 ```
 
-(or one Task spanning all phases if user prefers a single ticket)
+The single key covers all phases. Phase-level reporting is lost, but setup
+overhead is lower. All phases still get individual `ai-prompt.md` files — the
+grouping is Jira-only.
+
+When to choose:
+
+| Small plan (single Task) | Epic + Tasks |
+|--------------------------|-------------|
+| ≤3 phases, all tightly coupled | 4+ phases, or phases with independent timelines |
+| Team prefers light Jira footprint | Team wants per-phase time tracking and Jira reporting |
+| Quick spike, straightforward scope | Complex work needing phase-level audit trail |
 
 ## curl reference
 

@@ -32,6 +32,12 @@ Also skim, when present: `SECURITY_POLICY.md`, `.compliance-rules/`, `docs/agent
 
 **Dependencies.** If manifests change: no `"*"` or unbounded `>=` ranges; no unofficial registries; cross-check `.dependency-audit.json` when it exists.
 
+**Module depth.** Each new module should earn its keep — imagine deleting it. If behaviour vanishes, the module is a pass-through (shallow). If behaviour redistributes across N callers, it's earning depth.
+
+**Seam discipline.** Every interface needs at least two adapters (production + test). A seam with one adapter is speculative indirection.
+
+**Test surface.** Tests exercise the module through its public interface. If a test must know internals to set up or assert, the interface is wrong.
+
 **File hygiene** (unless repo lint config overrides):
 
 - UTF-8; LF line endings (see `.gitattributes`)
@@ -51,6 +57,9 @@ Before signaling phase complete:
 [ ] No secrets, credential comments, or env files in the diff
 [ ] New dependencies (if any) comply with policy
 [ ] CONTEXT.md vocabulary and ADRs respected; conflicts surfaced to user
+[ ] Deletion test passed for each new module
+[ ] Every new seam has production + test adapters; no speculative single-adapter seams
+[ ] Tests exercise modules through their public interface, not internal knowledge
 ```
 
 Fix failures before handoff. After handoff, `/audit-it` re-audits independently; `/verify-it` finalizes docs only on audit PASS. For branch review or org PR gates, use `/review` or `/internal-compliance`.

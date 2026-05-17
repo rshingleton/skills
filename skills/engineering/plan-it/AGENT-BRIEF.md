@@ -20,7 +20,7 @@ Describe **what** the system should do, not **how** to implement it. The agent w
 
 - **Good:** "The `SkillConfig` type should accept an optional `schedule` field of type `CronExpression`"
 - **Bad:** "Open src/types/skill.ts and add a schedule field on line 42"
-- **Good:** "When a user runs `/triage` with no arguments, they should see a summary of issues needing attention"
+- **Good:** "When a user runs `/plan-it --from-issues` with no arguments, it should find all `status: intake` items and evaluate them"
 - **Bad:** "Add a switch statement in the main handler function"
 
 ### Complete acceptance criteria
@@ -155,7 +155,7 @@ The triage thing is broken. Look at the main file and fix it.
 The function around line 150 has the issue.
 
 **Files to change:**
-- src/triage/handler.ts (line 150)
+- plan-it intake evaluation step (handles both triage and planning in one session)
 - src/types.ts (line 42)
 ```
 

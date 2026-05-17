@@ -6,7 +6,7 @@ How to use this skills repo with **OpenCode**, **Cursor**, **GitHub Copilot**, a
 
 [AGENTS.md](../AGENTS.md) at the repo root is the **open format** project instructions file (same idea as OpenCode rules and Cursor’s `AGENTS.md` convention). Tool-specific files should **point here**, not duplicate maintenance rules.
 
-In **application repos** (after `/setup-internal-skills`), `AGENTS.md` also holds a `## Agent skills` block linking `docs/agents/issue-tracker.md`, triage labels, and domain layout.
+In **application repos** (after `/setup-internal-skills`), `AGENTS.md` also holds a `## Agent skills` block linking `docs/agents/issue-tracker.md`, intake status labels, and domain layout.
 
 ---
 
@@ -60,7 +60,7 @@ Run once per application repository:
 /setup-internal-skills
 ```
 
-Then use engineering skills (`/plan-it`, `/implement-it`, `/audit-it`, `/verify-it`, …). Intake: `docs/issues/`; Jira map: `docs/planning/<id>/jira.md` via `/plan-it --jira`.
+Then use engineering skills (`/plan-it`, `/implement-it`, `/audit-it`, `/verify-it`, `/commit-it`, …). Intake: `docs/issues/`; Jira map: `docs/planning/<id>/jira.md` via `/plan-it --jira`.
 
 **Unfamiliar codebase:** run `/doc-it` to create `docs/reference/` and `docs/reference-audit/` before heavy feature work.
 

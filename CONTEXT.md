@@ -7,7 +7,7 @@ Canonical repo: [ai-skills](https://github.com/rshingleton/skills.git) on Bitbuc
 ## Language
 
 **Issue tracker**:
-Pre-plan **inbox** under `docs/issues/` (local markdown); optional Jira for published plans in `jira.md`. Capture: `/issues-it`, `/triage`, or [audit-to-issues](skills/engineering/setup-internal-skills/audit-to-issues.md). Plan: `/plan-it` (always grills; `--from-issues` moves intake to `sources/`). Execution: `/implement-it` / `/verify-it` per `docs/agents/issue-tracker.md`.
+Pre-plan **inbox** under `docs/issues/` (local markdown); optional Jira for published plans in `jira.md`. Capture: `/issue-it` or [audit-to-issues](skills/engineering/setup-internal-skills/audit-to-issues.md). Plan: `/plan-it` (always grills; `--from-issues` moves intake to `sources/`). Execution: `/implement-it` / `/verify-it` per `docs/agents/issue-tracker.md`.
 _Avoid_: backlog manager, backlog backend, issue host
 
 **Issue (intake)**:
@@ -22,7 +22,7 @@ Jira Epic issue linking phase Tasks. Referenced in `jira.md` as `epic_key`. Not 
 _Avoid_: PRD, product requirements document
 
 **Triage role**:
-Canonical role (`needs-triage`, `ready-for-agent`, …) mapped to local inbox `status:` or Jira labels by `/triage`. See `docs/agents/triage-labels.md`.
+Canonical role (`needs-triage`, `ready-for-agent`, …) mapped to local inbox `status:` or Jira labels by `/plan-it` intake evaluation. See `docs/agents/triage-labels.md`.
 
 ## Relationships
 
@@ -30,7 +30,7 @@ Canonical role (`needs-triage`, `ready-for-agent`, …) mapped to local inbox `s
 - A **Plan** holds moved intake under **`sources/`**, lists them in README `## Sources`, and owns **`jira.md`** when published to Jira
 - **implement-it** / **verify-it** read phase Jira keys from **`jira.md`** (`_jira_phase_key` helper in [issue-tracker-jira.md](skills/engineering/setup-internal-skills/issue-tracker-jira.md)), not from intake files
 - **plan-it** `--jira --sync-only` re-pulls Epic Task keys into `jira.md` without re-grilling
-- **triage** refines intake; **plan-it** grill decides the plan (triage does not replace the grill)
+- **plan-it** handles intake evaluation and planning in one session — triage-style assessment then the grill
 
 ## Flagged ambiguities
 

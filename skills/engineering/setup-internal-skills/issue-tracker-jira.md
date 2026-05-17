@@ -102,7 +102,7 @@ On **Task** (and **Story** / **Bug**) **create**, set **Original** and **Remaini
 | Skill | When |
 |-------|------|
 | `/plan-it --jira` | Each new phase Task — hours from `phase-N/ai-prompt.md` `estimate_hours:` or ask during publish |
-| `/triage` | Only when **creating** a new Jira issue — ask maintainer for hours |
+| `/issue-it` + `/plan-it --from-issues` | Capture locally, then evaluate during intake; plan-it creates Jira phase Tasks on publish |
 
 **Duration format:** Jira duration strings — prefer **`{N}h`** for whole hours (`2h`, `8h`). Fractional hours: `30m`, `1h 30m`. Do not send raw numbers without a unit.
 
@@ -188,7 +188,7 @@ When `JIRA_ASSIGNEE` is set (e.g. `alice`), include assignee on **creates** and 
 | `/implement-it` | Before transitioning linked issue to In Progress |
 | `/verify-it` | Before comment/transition when closing or updating linked issue |
 | `/plan-it --jira` | Optional on `POST` create (`fields.assignee.name`) |
-| `/triage` | Optional on `PUT` when taking ownership of triage |
+| `/plan-it --from-issues` | During intake evaluation of Jira items (labels, transitions, comments) |
 
 `/audit-it` does not call Jira.
 
@@ -199,11 +199,15 @@ When `JIRA_ASSIGNEE` is set (e.g. `alice`), include assignee on **creates** and 
 _jira_phase_key() {
   local plan="$1" phase="$2" f="docs/planning/${plan}/jira.md"
   [ -f "$f" ] || return 1
+  # Match lines that start with | and have the phase name as the first column,
+  # then extract the Jira key from the second column.
   awk -F'|' -v p="$phase" '
-    $0 ~ "\\| *" p " *\\|" {
-      gsub(/^[ \t]+|[ \t]+$/, "", $3)
-      if ($3 != "" && $3 !~ /^Jira$/) print $3
-      exit
+    NF >= 4 {
+      gsub(/^[ \t]+|[ \t]+$/, "", $2)
+      if ($2 == p) {
+        gsub(/^[ \t]+|[ \t]+$/, "", $3)
+        if ($3 != "" && $3 !~ /^(Jira|Phase|Est\.?|)$/) { print $3; exit }
+      }
     }
   ' "$f"
 }

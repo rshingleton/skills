@@ -68,6 +68,6 @@ After `follow-ups.md` exists, offer to file selected items as inbox issues per [
 
 **Both phases:**
 
-> `docs/reference/` + `docs/reference-audit/`. **Next:** optional `/issues-it` from `follow-ups.md`, then `/plan-it --from-issues`, `/improve-codebase-architecture`, or `/grill-with-docs`.
+> `docs/reference/` + `docs/reference-audit/`. **Next:** optional `/issue-it` from `follow-ups.md`, then `/plan-it --from-issues`, `/improve-codebase-architecture`, or `/grill-with-docs`.
 
 Examples: [EXAMPLES.md](EXAMPLES.md).

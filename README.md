@@ -10,13 +10,13 @@ Developing real applications is hard. Approaches like GSD, BMAD, and Spec-Kit tr
 
 ### Purpose
 
-Each skill is a focused workflow in `SKILL.md` that an agent loads when invoked by name (for example `/plan-it` or `/triage`). Together they cover alignment and shared vocabulary (`/grill-with-docs`, `/grill-me`), intake and planning (`/issues-it`, `/plan-it`), implementation with tests (`/implement-it`, `/tdd`, `/diagnose`), independent audit (`/audit-it`), durable documentation after a plan (`/verify-it`), and **baseline codebase reference** (`/doc-it` → `docs/reference/` and `docs/reference-audit/`). Engineering skills target day-to-day code work; productivity skills cover general workflow. The [skill map](#skill-map--planning-slicing-executing) and [reference](#reference) sections list everything that ships in this repo.
+Each skill is a focused workflow in `SKILL.md` that an agent loads when invoked by name (for example `/plan-it` or `/commit-it`). Together they cover alignment and shared vocabulary (`/grill-with-docs`, `/grill-me`), intake and planning (`/issue-it`, `/plan-it`), implementation with tests (`/implement-it`, `/tdd`, `/diagnose`), independent audit (`/audit-it`), durable documentation after a plan (`/verify-it`), and **baseline codebase reference** (`/doc-it` → `docs/reference/` and `docs/reference-audit/`). Engineering skills target day-to-day code work; productivity skills cover general workflow. The [skill map](#skill-map--planning-slicing-executing) and [reference](#reference) sections list everything that ships in this repo.
 
 ### Usage guidelines
 
 1. **Install once** on your machine using the [quickstart](#quickstart-30-second-setup) below. Skills land in `~/.agents/skills` and work across Cursor, Copilot, OpenCode, and Claude Code.
 2. **Configure each application repo** with `/setup-internal-skills`. That seeds `AGENTS.md`, `docs/agents/`, intake inbox `docs/issues/`, and plans under `docs/planning/`.
-3. **Compose skills for the task.** You are not required to run a fixed pipeline. Capture work in the **inbox** (`/issues-it`, `/triage`, or audit skills → [audit-to-issues](./skills/engineering/setup-internal-skills/audit-to-issues.md)), optionally run `/triage` on the inbox, then **`/plan-it` always grills** before scaffolding. The **Doc Cycle** is `/plan-it` → `/implement-it` (each phase) → `/audit-it` → `/verify-it`. Optional Jira phase keys: `/plan-it --jira` → `jira.md`.
+3. **Compose skills for the task.** You are not required to run a fixed pipeline. Capture work in the **inbox** (`/issue-it` or audit skills → [audit-to-issues](./skills/engineering/setup-internal-skills/audit-to-issues.md)), then **`/plan-it --from-issues` evaluates and grills** before scaffolding. The **Doc Cycle** is `/plan-it` → `/implement-it` (each phase) → `/audit-it` → `/verify-it` → `/commit-it`. Optional Jira phase keys: `/plan-it --jira` → `jira.md`.
 4. **Keep humans in the loop.** Treat agent output as a draft. Read diffs, run tests, and check spec fit before merge. Skills like `/audit-it` and `/internal-compliance` support review; they do not replace it.
 
 ## Agent platforms
@@ -87,7 +87,7 @@ Skills that call the Jira API need `JIRA_BASE_URL`, `JIRA_API_TOKEN`, and `JIRA_
 | `JIRA_WATCHER_USERNAME` | Comma-separated usernames to **add** as watchers after each create (`POST`) |
 | `JIRA_EMAIL` | If `JIRA_WATCHER_IGNORE` is unset, remove the PAT owner (`${JIRA_EMAIL%%@*}`) after writes — doc-manager pattern |
 | `JIRA_ASSIGNEE` | Jira username for `assignee` on agent creates and Doc Cycle updates (`/implement-it`, `/verify-it`) |
-| `JIRA_DEFAULT_ESTIMATE_HOURS` | Default hours on Jira Task **create** (`/plan-it --jira`, `/triage` create) when no per-phase `estimate_hours` |
+| `JIRA_DEFAULT_ESTIMATE_HOURS` | Default hours on Jira Task **create** (`/plan-it --jira`) when no per-phase `estimate_hours` |
 
 Watcher policy and `notifyUsers=false`: [jira-notifications.md](./skills/engineering/setup-internal-skills/jira-notifications.md). Jira descriptions: [jira-description-style.md](./skills/engineering/setup-internal-skills/jira-description-style.md) (**wiki markup**, not markdown). Re-sync phase ↔ keys: `/plan-it <plan-id> --jira --sync-only` ([jira-epic-sync.md](./skills/engineering/setup-internal-skills/jira-epic-sync.md)).
 
@@ -216,7 +216,7 @@ For debugging, I've also built a **[`/diagnose`](./skills/engineering/diagnose/S
 This is built in to every layer of these skills:
 
 - [`/plan-it`](./skills/engineering/plan-it/SKILL.md) quizzes you about which modules you're touching before creating a plan
-- [`/issues-it`](./skills/engineering/issues-it/SKILL.md) and [`/triage`](./skills/engineering/triage/SKILL.md) handle inbox intake; [`/plan-it`](./skills/engineering/plan-it/SKILL.md) always grills, then scaffolds phases and optional `jira.md`
+- [`/issue-it`](./skills/engineering/issue-it/SKILL.md) captures inbox intake; [`/plan-it`](./skills/engineering/plan-it/SKILL.md) always grills, then scaffolds phases and optional `jira.md`
 - [`/zoom-out`](./skills/engineering/zoom-out/SKILL.md) gives a quick chat map of unfamiliar code
 - [`/doc-it`](./skills/engineering/doc-it/SKILL.md) writes durable `docs/reference/` and a sliced `docs/reference-audit/` (tech debt, testing, architecture) when you need a real baseline
 
@@ -230,31 +230,31 @@ Software engineering fundamentals matter more than ever. These skills are my bes
 
 | Layer | Path | Skills |
 |-------|------|--------|
-| **Inbox** | `docs/issues/*.md` | `/issues-it` (capture), `/triage` (triage or create), audit → [audit-to-issues](./skills/engineering/setup-internal-skills/audit-to-issues.md) |
+| **Inbox** | `docs/issues/*.md` | `/issue-it` (capture), audit → [audit-to-issues](./skills/engineering/setup-internal-skills/audit-to-issues.md) |
 | **Plan** | `docs/planning/<id>/` | `/plan-it` — **always grills**, then phases + `sources/` (moved intake) |
-| **Jira map** | `docs/planning/<id>/jira.md` | `/plan-it --jira` only — not triage or issues-it |
+| **Jira map** | `docs/planning/<id>/jira.md` | `/plan-it --jira` only — not issue-it |
 
 At plan creation, `--from-issues` **moves** inbox files to `docs/planning/<id>/sources/` so the inbox stays unplanned-only. Phase Tasks and time estimates (`estimate_hours`, `timetracking`) are set when publishing Jira.
 
-**Triage vs plan-it:** `/triage` works **intake** (local `docs/issues/` or, if configured, incoming Jira tickets — labels, repro, comments). It does **not** create phase Tasks or `jira.md`. **`/plan-it --jira`** publishes phase ↔ Jira keys after the grill and scaffold. `/plan-it` **always** grills for planning — even after `ready-for-plan` or prior triage.
+**Intake evaluation is built into plan-it.** `/plan-it --from-issues` handles both evaluation and planning in one session. Items at `status: intake` get triage-style assessment (codebase exploration, reproduction, clarifying questions) before the grill. Items at `ready-for-plan` go straight to the grill. No separate `/triage` step needed.
 
 ## Skill map — planning, slicing, executing
 
-| | `/issues-it` | `/triage` | `/plan-it` |
-|---|---|---|---|
-| **Purpose** | Capture intake only | Create + triage inbox (or intake Jira) | Grill, scaffold phases; publish Jira map |
-| **Output** | `docs/issues/<slug>.md` | Updated status / labels / comments | `docs/planning/<id>/` + `sources/` + `jira.md` |
-| **When** | New bug, defer, todo, feature | Unclear inbox items; or **intake** Jira tickets (labels/status only) | Plan design; **phase Jira** via `--jira` only |
-| **Flags** | — | — | `--from-issues`, `--jira`, `--jira --sync-only`, `--parent` |
+| | `/issue-it` | `/plan-it` |
+|---|---|---|
+| **Purpose** | Capture intake only | Evaluate intake + grill + scaffold phases; publish Jira map |
+| **Output** | `docs/issues/<slug>.md` | `docs/planning/<id>/` + `sources/` + `jira.md` |
+| **When** | New bug, defer, todo, feature | Plan design; **phase Jira** via `--jira` only |
+| **Flags** | — | `--from-issues`, `--jira`, `--jira --sync-only`, `--parent` |
 
 **Execution & close:**
 
-| | `/implement-it` | `/audit-it` | `/verify-it` |
-|---|---|---|---|
-| **Does** | TDD per plan phase | Phase audit (spec, standards, compliance, architecture) | Durable docs after audit PASS |
-| **Jira** | Assignee + In Progress when `JIRA_ASSIGNEE` set | — | Assignee + close (transition to "Resolved") |
+| | `/implement-it` | `/audit-it` | `/verify-it` | `/commit-it` |
+|---|---|---|---|---|
+| **Does** | TDD per plan phase | Phase audit (spec, standards, compliance, architecture) | Durable docs after audit PASS | Stage, commit, push after verify |
+| **Jira** | Assignee + In Progress when `JIRA_ASSIGNEE` set | — | Assignee + close (transition to "Resolved") | — |
 
-**Doc Cycle (plan-it–driven):** `/plan-it` → `/implement-it` (each phase) → `/audit-it` → `/verify-it`
+**Doc Cycle (plan-it–driven):** `/plan-it` → `/implement-it` (each phase) → `/audit-it` → `/verify-it` → `/commit-it`
 
 **Codebase reference (onboarding or unfamiliar repo):**
 
@@ -269,16 +269,17 @@ At plan creation, `--from-issues` **moves** inbox files to `docs/planning/<id>/s
 
 ```
 Ad-hoc plan:     /plan-it  →  grill  →  phases  →  Doc Cycle
-Intake → plan:   /issues-it  →  optional /triage  →  /plan-it --from-issues  →  grill  →  Doc Cycle
-With Jira:       …  →  /plan-it --from-issues --jira  →  implement-it  →  audit-it  →  verify-it
-Audit backlog:   /doc-it  →  audit-to-issues  →  optional /triage  →  /plan-it --from-issues
+Intake → plan:   /issue-it  →  /plan-it --from-issues  →  Doc Cycle
+With Jira:       …  →  /plan-it --from-issues --jira  →  implement-it  →  audit-it  →  verify-it  →  commit-it
+Incremental:     …  →  implement phase-N  →  audit-it --phase phase-N  →  verify-it --phase phase-N  →  …  →  full audit  →  full verify  →  commit-it
+Audit backlog:   /doc-it  →  audit-to-issues  →  /plan-it --from-issues
 Re-sync Jira:    /plan-it <id> --jira --sync-only   (keys in jira.md only)
-Unfamiliar repo: /doc-it  →  follow-ups  →  issues-it / plan-it --from-issues
+Unfamiliar repo: /doc-it  →  follow-ups  →  issue-it / plan-it --from-issues
 ```
 
-**Email / ServiceNow (org):** paste request in project repo → [`/triage`](./skills/engineering/triage/SKILL.md) → review `docs/issues/<slug>.md` → `/plan-it --from-issues` → `/plan-it <id> --jira [--parent EPIC]` (override `.env` default Epic). See [SCENARIO-EMAIL-SERVICENOW.md](./skills/engineering/setup-internal-skills/SCENARIO-EMAIL-SERVICENOW.md).
+**Email / ServiceNow (org):** paste request in project repo → `/issue-it` → review `docs/issues/<slug>.md` → `/plan-it --from-issues` → `/plan-it <id> --jira [--parent EPIC]` (override `.env` default Epic). See [SCENARIO-EMAIL-SERVICENOW.md](./skills/engineering/setup-internal-skills/SCENARIO-EMAIL-SERVICENOW.md).
 
-Deprecated: `/to-epic`, `/to-jiras`, `/promote-to-jira`, `/issues-it --jira` — see [issues-it](./skills/engineering/issues-it/SKILL.md).
+Deprecated: `/to-epic`, `/to-jiras`, `/promote-to-jira`, `/issue-it --jira` — see [issue-it](./skills/engineering/issue-it/SKILL.md).
 
 ## Reference
 
@@ -287,6 +288,7 @@ Deprecated: `/to-epic`, `/to-jiras`, `/promote-to-jira`, `/issues-it --jira` —
 Skills I use daily for code work.
 
 - **[audit-it](./skills/engineering/audit-it/SKILL.md)** — Doc Cycle audit phase; repo reviews write `docs/AUDIT.md`. Gates verify-it.
+- **[commit-it](./skills/engineering/commit-it/SKILL.md)** — Doc Cycle close phase; stage, commit, push after verify.
 - **[diagnose](./skills/engineering/diagnose/SKILL.md)** — Disciplined diagnosis loop for hard bugs and performance regressions.
 - **[doc-it](./skills/engineering/doc-it/SKILL.md)** — **Baseline codebase documentation:** Phase 1 writes `docs/reference/`. Phase 2 writes `docs/reference-audit/` (`tech-debt.md`, `testing.md`, `architecture.md`, `follow-ups.md`, index `README.md`). Not `/verify-it` or `/zoom-out`.
 - **[grill-with-docs](./skills/engineering/grill-with-docs/SKILL.md)** — Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates `CONTEXT.md` and ADRs inline.
@@ -297,8 +299,7 @@ Skills I use daily for code work.
 - **[prototype](./skills/engineering/prototype/SKILL.md)** — Build a throwaway prototype to flesh out a design.
 - **[setup-internal-skills](./skills/engineering/setup-internal-skills/SKILL.md)** — Per-repo config; **default** local issues in `docs/issues/`. Run once per repo.
 - **[tdd](./skills/engineering/tdd/SKILL.md)** — Test-driven development with red-green-refactor loop.
-- **[issues-it](./skills/engineering/issues-it/SKILL.md)** — Pre-plan intake under `docs/issues/`.
-- **[triage](./skills/engineering/triage/SKILL.md)** — Triage inbox or intake Jira tickets; create intake (paste email/ServiceNow). Phase Jira only via plan-it ([routing](./skills/engineering/triage/TRACKER-ROUTING.md)).
+- **[issue-it](./skills/engineering/issue-it/SKILL.md)** — Pre-plan intake under `docs/issues/`.
 - **[audit-to-issues](./skills/engineering/setup-internal-skills/audit-to-issues.md)** — File selected audit findings into the inbox (doc-it, audit-it, improve-codebase-architecture).
 - **[verify-it](./skills/engineering/verify-it/SKILL.md)** — Doc Cycle verify phase. Finalizes ADRs, CONTEXT.md, changelog, and planning cleanup. Optionally close Jira issues.
 - **[zoom-out](./skills/engineering/zoom-out/SKILL.md)** — Get broader context on unfamiliar code.

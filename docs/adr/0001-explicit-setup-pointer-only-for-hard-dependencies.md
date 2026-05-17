@@ -4,7 +4,7 @@ Engineering skills depend on per-repo config (issue tracker, triage label vocabu
 
 We split these into **hard-dependency** and **soft-dependency** skills:
 
-- **Hard dependency** (`plan-it`, `issues-it`, `implement-it`, `verify-it`, `triage`) — include an explicit one-liner: _"… should have been provided to you — run `/setup-internal-skills` if not."_ Without the mapping, output is wrong, not just fuzzy.
-- **Soft dependency** (`diagnose`, `tdd`, `doc-it`, `improve-codebase-architecture`, `zoom-out`, `audit-it`) — reference "the project's domain glossary" and "ADRs in the area you're touching" in vague prose only. If the docs aren't there, the skill still works; output is just less sharp.
+- **Hard dependency** (`plan-it`, `issue-it`, `implement-it`, `verify-it`, `audit-it`) — include an explicit one-liner: _"… should have been provided to you — run `/setup-internal-skills` if not."_ Without the mapping, output is wrong, not just fuzzy.
+- **Soft dependency** (`diagnose`, `tdd`, `doc-it`, `improve-codebase-architecture`, `zoom-out`, `commit-it`) — reference "the project's domain glossary" and "ADRs in the area you're touching" in vague prose only. If the docs aren't there, the skill still works; output is just less sharp.
 
 The split keeps soft-dependency skills token-light and avoids cargo-culting the setup pointer into places where it isn't load-bearing.

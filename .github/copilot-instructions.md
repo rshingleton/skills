@@ -12,9 +12,9 @@ This repo is the **internal ai-skills monorepo**. When editing here:
 
 Install skills into `~/.agents/skills` with [scripts/skills.sh](../scripts/skills.sh) or [scripts/link-skills.sh](../scripts/link-skills.sh). In application repos, run `/setup-internal-skills` once.
 
-**Intake:** `docs/issues/` — `issues-it`, `triage` (paste email/ServiceNow), or `audit-to-issues`. **Plan:** `plan-it` always grills; `--from-issues` → `sources/`.
+**Intake:** `docs/issues/` — `issue-it` (capture or paste email/ServiceNow), or `audit-to-issues`. **Plan:** `plan-it` always grills; `--from-issues` evaluates intake then → `sources/`.
 
-**Doc Cycle:** `plan-it` → `implement-it` → `audit-it` → `verify-it`. **Phase Jira:** `plan-it --jira` → `jira.md` only (not triage). `--parent EPIC` overrides `JIRA_DEFAULT_EPIC`. Re-sync: `plan-it <id> --jira --sync-only`.
+**Doc Cycle:** `plan-it` → `implement-it` → `audit-it` → `verify-it` → `commit-it`. **Phase audit modes:** `--phase phase-N` for incremental close, `--phases` for multi-phase cycle. **Phase Jira:** `plan-it --jira` → `jira.md` only. `--parent EPIC` overrides `JIRA_DEFAULT_EPIC`. Re-sync: `plan-it <id> --jira --sync-only`.
 
 **Codebase reference:** `doc-it` → `docs/reference/` + `docs/reference-audit/`.
 

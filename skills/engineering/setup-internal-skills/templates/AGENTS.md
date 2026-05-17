@@ -2,7 +2,7 @@
 
 Tool-neutral project instructions. Supported hosts: OpenCode, Cursor, GitHub Copilot, Claude Code.
 
-See `docs/agents/` for machine-readable skill configuration (issue tracker, triage, domain docs).
+See `docs/agents/` for machine-readable skill configuration (issue tracker, triage labels, domain docs).
 
 ## Agent skills
 
@@ -10,11 +10,11 @@ See `docs/agents/` for machine-readable skill configuration (issue tracker, tria
 
 ### Issue tracker
 
-Intake: `docs/issues/` (`/issues-it`, `/triage`, [audit-to-issues](../audit-to-issues.md)). Plans: `docs/planning/<id>/` (`/plan-it` always grills; `--from-issues` → `sources/`). Jira map: `jira.md` via `/plan-it --jira`.
+Intake: `docs/issues/` (`/issue-it`, [audit-to-issues](../audit-to-issues.md)). Plans: `docs/planning/<id>/` (`/plan-it` always grills; `--from-issues` → `sources/`). Jira map: `jira.md` via `/plan-it --jira`.
 
 ### Triage labels
 
-Five canonical roles — `/triage` on local inbox or Jira. See `docs/agents/triage-labels.md` and [TRACKER-ROUTING.md](../../triage/TRACKER-ROUTING.md).
+Five canonical roles — `/plan-it --from-issues` evaluates intake items. See `docs/agents/triage-labels.md`.
 
 ### Domain docs
 

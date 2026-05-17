@@ -2,7 +2,7 @@
 
 Use when **`/doc-it`**, **`/improve-codebase-architecture`**, or **`/audit-it`** (repo mode) produced actionable items and the user wants them in the **inbox** for planning — not lost in audit markdown only.
 
-Capture with **`/issues-it`** (one `docs/issues/<slug>.md` per item). Do **not** create plans or Jira here.
+Capture with **`/issue-it`** (one `docs/issues/<slug>.md` per item). Do **not** create plans or Jira here.
 
 ## When to offer
 
@@ -27,7 +27,7 @@ Skip if the user declines. Do not file everything automatically — **quiz** whi
 | Tech debt / refactor / deepening | `defer` or `todo` | `ready-for-plan` |
 | Missing tests / TR-* | `todo` | `ready-for-plan` |
 | Architecture finding worth a slice | `feature` | `ready-for-plan` |
-| Bug / incorrect behaviour | `bug` | `triaged` or `ready-for-plan` |
+| Bug / incorrect behaviour | `bug` | `intake` or `ready-for-plan` |
 | Revisit later / low priority | `defer` | `intake` |
 
 ## `source:` frontmatter
@@ -42,7 +42,7 @@ source: audit-it
 
 ## File content
 
-Use [INTAKE-TEMPLATE.md](../../issues-it/INTAKE-TEMPLATE.md). In **Notes**, always link the audit anchor:
+Use [INTAKE-TEMPLATE.md](../../issue-it/INTAKE-TEMPLATE.md). In **Notes**, always link the audit anchor:
 
 ```markdown
 ## Notes
@@ -67,7 +67,7 @@ Use [INTAKE-TEMPLATE.md](../../issues-it/INTAKE-TEMPLATE.md). In **Notes**, alwa
 
 4. Handoff:
 
-> Created {N} intake issue(s) under `docs/issues/`. **Next:** `/plan-it --from-issues` when ready to plan, or capture more items with `/issues-it`.
+> Created {N} intake issue(s) under `docs/issues/`. **Next:** `/plan-it --from-issues` when ready to plan, or capture more items with `/issue-it`.
 
 ## Do not
 
