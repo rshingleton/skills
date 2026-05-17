@@ -226,6 +226,10 @@ This is built in to every layer of these skills:
 
 Software engineering fundamentals matter more than ever. These skills are my best effort at condensing these fundamentals into repeatable practices, to help you ship the best apps of your career. Enjoy.
 
+## About this fork
+
+This repository is a fork tailored to my specific development workflow. After using the original skills for several weeks I found myself modifying and adding skills to match how I actually work — refactoring existing codebases, adding features, and addressing tech debt. Most requests come through Bitbucket, Jira, and a few other intake sources; the `issue-it` skill and the broader Doc Cycle (`plan-it` → `implement-it` → `audit-it` → `verify-it` → `commit-it`) grew out of that pattern. The introspective skills (`doc-it`, `zoom-out`, `improve-codebase-architecture`) are especially useful when picking up unfamiliar or legacy code — they build a map before you start changing things. Everything here works for me; it may or may not fit your setup, but the intent is to share a concrete, opinionated toolset rather than a generic framework.
+
 ## Issue tracking — three layers
 
 | Layer | Path | Skills |
@@ -300,7 +304,6 @@ Skills I use daily for code work.
 - **[setup-internal-skills](./skills/engineering/setup-internal-skills/SKILL.md)** — Per-repo config; **default** local issues in `docs/issues/`. Run once per repo.
 - **[tdd](./skills/engineering/tdd/SKILL.md)** — Test-driven development with red-green-refactor loop.
 - **[issue-it](./skills/engineering/issue-it/SKILL.md)** — Pre-plan intake under `docs/issues/`.
-- **[audit-to-issues](./skills/engineering/setup-internal-skills/audit-to-issues.md)** — File selected audit findings into the inbox (doc-it, audit-it, improve-codebase-architecture).
 - **[verify-it](./skills/engineering/verify-it/SKILL.md)** — Doc Cycle verify phase. Finalizes ADRs, CONTEXT.md, changelog, and planning cleanup. Optionally close Jira issues.
 - **[zoom-out](./skills/engineering/zoom-out/SKILL.md)** — Get broader context on unfamiliar code.
 

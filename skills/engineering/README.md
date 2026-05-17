@@ -9,7 +9,6 @@ Pre-plan work lives in **`docs/issues/`** (inbox only). At plan creation, files 
 | Skill | Role |
 |-------|------|
 | [issue-it](./issue-it/SKILL.md) | Capture one inbox file (also paste email/ServiceNow — [SCENARIO-EMAIL-SERVICENOW](./setup-internal-skills/SCENARIO-EMAIL-SERVICENOW.md)) |
-| [audit-to-issues](./setup-internal-skills/audit-to-issues.md) | File selected audit findings into inbox |
 
 **Plan:** [plan-it](./plan-it/SKILL.md) — **always grills** (ad-hoc or `--from-issues`); intake evaluation built-in for unclear items.
 
