@@ -2,7 +2,7 @@
 
 **Canonical repository:** [https://github.com/rshingleton/skills.git](https://github.com/rshingleton/skills.git)
 
-Agent skills tailored to my daily engineering workflow: refactoring existing codebases, adding features, and addressing tech debt across projects tracked in Bitbucket and Jira. The Doc Cycle (`plan-it` → `implement-it` → `audit-it` → `verify-it` → `commit-it`) and introspective skills (`doc-it`, `zoom-out`, `improve-codebase-architecture`) grew out of real needs I hit working with code I didn't always fully know.
+Agent skills tailored to my daily engineering workflow: refactoring existing codebases, adding features, and addressing tech debt across projects tracked in Bitbucket and Jira. The Doc Cycle (`plan-it` → `implement-it` → `audit-it` → `verify-it` → `commit-it`) and introspective skills (`doc-it`, `zoom-out`, `improve-codebase-architecture`) grew out of real needs I hit working with codebases I didn't have full architectural knowledge of.
 
 **Agent-assisted coding is becoming more mainstream.** Teams use coding agents for implementation, exploration, and documentation with growing acceptance in day-to-day engineering. These skills are not a substitute for engineering judgment. They are meant to **supplement** knowledge and practice, not replace it. The successful engineer uses agents to move faster on well-understood work, then applies **eyes-on** review: read the diff, run the tests, question the design. Manual auditing of agent-produced code is **always** recommended before anything ships.
 
