@@ -62,16 +62,6 @@ cd ai-skills
 bash scripts/skills.sh
 ```
 
-### Option C — symlink from your working copy
-
-If you develop skills locally and want live symlinks into your checkout:
-
-```bash
-bash /path/to/ai-skills/scripts/link-skills.sh
-```
-
-**Make sure you select `/setup-internal-skills`**.
-
 ### Jira credentials (when using Jira skills)
 
 Skills that call the Jira API need `JIRA_BASE_URL`, `JIRA_API_TOKEN`, and `JIRA_PROJECT_KEY`. Use either exports or a `.env` file (see [.env.example](./.env.example)).
