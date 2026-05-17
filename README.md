@@ -306,7 +306,9 @@ General workflow tools, not code-specific.
 
 ## Credits
 
-This repository is an **internal adaptation** of [mattpocock/skills](https://github.com/mattpocock/skills) (MIT License), originally created by [Matt Pocock](https://github.com/mattpocock). Canonical home: [ai-skills on Bitbucket](https://github.com/rshingleton/skills.git).
+This repository is a **fork** of [mattpocock/skills](https://github.com/mattpocock/skills) (MIT License), originally created by [Matt Pocock](https://github.com/mattpocock). Canonical home: [ai-skills on Bitbucket](https://github.com/rshingleton/skills.git).
+
+**Fork maintainer:** Russ Shingleton — you@example.com
 
 The core skills, design philosophy, and documentation structure remain largely based on Matt's original repository.
 
