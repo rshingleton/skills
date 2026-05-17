@@ -310,7 +310,7 @@ This is a **highly modified fork** of [mattpocock/skills](https://github.com/mat
 
 **Fork maintainer:** Russ Shingleton — you@example.com
 
-This repo is provided as-is for at-will use. It reflects what works for my workflow; it is not a supported product. Questions can be directed to me, but expect no guaranteed response or maintenance commitment.
+This is a personal tool built for my workflow. Questions and feedback are welcome — I'll do my best to respond when I can.
 
 ### License
 
