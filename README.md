@@ -2,9 +2,7 @@
 
 **Canonical repository:** [https://github.com/rshingleton/skills.git](https://github.com/rshingleton/skills.git)
 
-Composable agent skills for disciplined engineering: planning, implementation, audit, and verification workflows that teams can adopt without surrendering the process to a single rigid playbook.
-
-Developing real applications is hard. Approaches like GSD, BMAD, and Spec-Kit try to help by owning the process end-to-end. That can work, but it also makes it harder to spot when the *process itself* is wrong. These tools stay small, swappable, and model-agnostic so engineers keep control of *what* gets built and *how* it gets reviewed.
+Agent skills tailored to my daily engineering workflow: refactoring existing codebases, adding features, and addressing tech debt across projects tracked in Bitbucket and Jira. The Doc Cycle (`plan-it` → `implement-it` → `audit-it` → `verify-it` → `commit-it`) and introspective skills (`doc-it`, `zoom-out`, `improve-codebase-architecture`) grew out of real needs I hit working with code I didn't always fully know.
 
 **Agent-assisted coding is becoming more mainstream.** Teams use coding agents for implementation, exploration, and documentation with growing acceptance in day-to-day engineering. These skills are not a substitute for engineering judgment. They are meant to **supplement** knowledge and practice, not replace it. The successful engineer uses agents to move faster on well-understood work, then applies **eyes-on** review: read the diff, run the tests, question the design. Manual auditing of agent-produced code is **always** recommended before anything ships.
 
