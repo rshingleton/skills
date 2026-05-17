@@ -40,7 +40,8 @@ mkdir -p "$(dirname "$CLONE_DIR")"
 if [ -d "$CLONE_DIR/.git" ]; then
   echo "==> Updating clone at $CLONE_DIR (branch: $DEFAULT_BRANCH)..."
   git -C "$CLONE_DIR" fetch --depth 1 origin "$DEFAULT_BRANCH"
-  git -C "$CLONE_DIR" checkout -B "$DEFAULT_BRANCH" "origin/$DEFAULT_BRANCH"
+  git -C "$CLONE_DIR" reset --hard "origin/$DEFAULT_BRANCH"
+  git -C "$CLONE_DIR" clean -fd
 else
   echo "==> Cloning $REPO_URL (branch: $DEFAULT_BRANCH)..."
   git clone --depth 1 -b "$DEFAULT_BRANCH" "$REPO_URL" "$CLONE_DIR"
