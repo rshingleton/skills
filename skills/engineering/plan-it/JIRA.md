@@ -31,7 +31,7 @@ Ask during `/plan-it` after phases are scaffolded:
 
 Requires `JIRA_*` env — preflight in [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md). Watcher policy: [jira-notifications.md](../setup-internal-skills/jira-notifications.md).
 
-**Descriptions:** convert phase content to **Jira wiki markup** before POST — `h2. What`, `h2. Done when`, `*` bullets only; no markdown `##` or `- [ ]` ([jira-description-style.md](../setup-internal-skills/jira-description-style.md)).
+**Descriptions:** build from phase scope — work content only (`h2. What`, `h2. Done when`, `*` bullets). Convert to **Jira wiki markup** before POST; no markdown `##` or `- [ ]` ([jira-description-style.md](../setup-internal-skills/jira-description-style.md)). No references to planning docs (`ai-prompt.md`, `execution-notes.md`, audit reports) in the description body.
 
 **Time estimates:** on each phase Task **create**, set Jira `timetracking.originalEstimate` and `remainingEstimate` (same value, e.g. `"4h"`) per [issue-tracker-jira.md § Time estimates](../setup-internal-skills/issue-tracker-jira.md#time-estimates-timetracking). Store hours in `phase-N/ai-prompt.md` as `estimate_hours:` and mirror in the `jira.md` table **Est.** column.
 
@@ -108,7 +108,7 @@ At publish time, if only the env default exists, ask: *"Link phase Tasks to defa
 1. **Resolve parent Epic** — `resolve_jira_parent_epic "<--parent or empty>" "<plan-id>"` ([issue-tracker-jira.md § Default Epic](../setup-internal-skills/issue-tracker-jira.md#default-epic-optional)). Pass the CLI `--parent` value as the first argument when set.
 2. **`--sync-only`** — [jira-epic-sync.md](../setup-internal-skills/jira-epic-sync.md): JQL Tasks under Epic → match phases → fill `jira.md` table. Stop if sync-only.
 3. **Create Epic** (if no parent) — POST Epic; set `epic_key` in `jira.md` frontmatter.
-4. **Create Tasks** — For each `phase-N` without a Jira row: POST Task (`customfield_10880` = Epic; `JIRA_ASSIGNEE` when set; **`timetracking`** from `estimate_hours` in `ai-prompt.md` or ask maintainer — see [time estimates](../setup-internal-skills/issue-tracker-jira.md#time-estimates-timetracking)). Summary/description from phase `ai-prompt.md` (dense structured).
+4. **Create Tasks** — For each `phase-N` without a Jira row: POST Task (`customfield_10880` = Epic; `JIRA_ASSIGNEE` when set; **`timetracking`** from `estimate_hours` in `ai-prompt.md` or ask maintainer — see [time estimates](../setup-internal-skills/issue-tracker-jira.md#time-estimates-timetracking)). Summary/description from phase scope — work content only, no doc references.
 5. **Write `jira.md`** — **Parent Epic** section (when `epic_key` set) + phase table; no duplicate keys elsewhere.
 
 Do **not** create phase Tasks under `docs/issues/`.

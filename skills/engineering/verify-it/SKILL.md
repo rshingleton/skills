@@ -101,7 +101,7 @@ If credentials are missing after sourcing (`JIRA_BASE_URL`, `JIRA_API_TOKEN`, `J
 For each key to resolve (when Jira API is available):
 
 - If `JIRA_ASSIGNEE` is set, `_jira_set_assignee "$KEY"` before other writes.
-- **Prompt for resolution comment:** draft a concise Jira resolution comment from the phase summary (2-4 sentences covering what was delivered). Present it to the user as a suggestion: *"Post this resolution comment to {KEY}? (y/edit/skip)"*. If they edit, use their text. If y, post via `POST /issue/{KEY}/comment?notifyUsers=false`.
+- **Prompt for resolution comment:** draft a concise Jira resolution comment from the phase summary (2-4 sentences covering what was delivered — deliverables only, no references to planning docs or audit reports). Present it to the user as a suggestion: *"Post this resolution comment to {KEY}? (y/edit/skip)"*. If they edit, use their text. If y, post via `POST /issue/{KEY}/comment?notifyUsers=false`.
 - **Resolve:** ask *"Resolve {KEY}? (y/n)"* per key. If yes, transition to the `Resolved` or `Done` status (`POST /issue/{KEY}/transitions?notifyUsers=false`). Apply `_jira_apply_watcher_policy "$KEY" update` after each write.
 
 **Jira API unavailable:** still update local docs (sources status `done`, archive). Report unresolved keys and suggest manual resolution or re-run after sourcing credentials.

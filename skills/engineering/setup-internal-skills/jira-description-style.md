@@ -2,6 +2,8 @@
 
 **Required** for every Jira **create** (`POST /issue`): `summary`, `description`, and triage **create** body. **Time tracking:** set `timetracking.originalEstimate` + `remainingEstimate` on Task creates when hours are known ([issue-tracker-jira.md § Time estimates](issue-tracker-jira.md#time-estimates-timetracking)).
 
+**Stand-alone descriptions:** Jira descriptions and comments describe the work, not the planning artifact it was sourced from. No references to `ai-prompt.md`, `execution-notes.md`, audit reports, or other planning docs in the issue body.
+
 **Renderer:** Jira Server / Data Center **wiki markup** in the `description` field — **not** GitHub Markdown. Markdown headings and `- [ ]` checkboxes produce broken output (e.g. `1. 1. What`, literal `[ ]` text).
 
 Intake `docs/issues/*.md` may use Markdown locally; **convert** before POST ([format rules](#markdown--wiki-conversion)).
@@ -46,7 +48,7 @@ None
 
 ## Markdown → wiki conversion
 
-When source is plan `ai-prompt.md`, phase notes, or intake markdown:
+When source is phase scope, intake markdown, or other planning artifacts:
 
 1. Replace `## Title` / `### Title` → `h2. Title` / `h3. Title` (strip `#` characters only).
 2. Replace leading `- ` / `* ` list markers with `* ` (single asterisk + space).
@@ -101,6 +103,7 @@ None
 ## What to cut
 
 - "This issue will…", "Please refer to…", paragraph walls, vague AC ("works correctly").
+- **References to planning documents** — no mention of `ai-prompt.md`, `execution-notes.md`, phase docs, or audit reports in the Jira description. The description describes the work, not where it was sourced from.
 
 ## What to keep
 
