@@ -47,10 +47,21 @@ git checkout -b <name>
 
 Skip if already on the target branch. If the branch already exists, ask before switching. This isolates phase changes for a cleaner diff at audit time.
 
-**Jira (optional)** — infer plan `{ID}` from `ai-prompt.md` path. Resolve key from **`docs/planning/{ID}/jira.md`** → `## Phase tasks` row (or `_jira_phase_key`; Epic context in `## Parent Epic`) — [issue-tracker-local.md § Resolving Jira](../setup-internal-skills/issue-tracker-local.md#resolving-jira-for-implement-it--verify-it):
+**Jira (optional)** — infer plan `{ID}` from `ai-prompt.md` path. Resolve key from **`docs/planning/{ID}/jira.md`** → `## Phase tasks` row (or `_jira_phase_key`; Epic context in `## Parent Epic`).
 
-- **Jira:** When the phase row has a key — if `JIRA_ASSIGNEE` is set, `_jira_set_assignee "$KEY"` ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#assignee-jira_assignee)). Transition to "In Progress" with `?notifyUsers=false`, then `_jira_apply_watcher_policy "$KEY" update` ([jira-notifications.md](../setup-internal-skills/jira-notifications.md)). If the row is empty, tell the user to run `/plan-it --jira {ID}` or `--sync-only` — do not guess keys.
-- **Sources** — optional note under `docs/planning/{ID}/sources/*.md` that implementation started; Jira keys only from `jira.md`.
+If the phase row has a key, attempt Jira API access **regardless of tracker config**. Source credentials before API calls: follow [issue-tracker-jira.md § Loading credentials](../setup-internal-skills/issue-tracker-jira.md#loading-credentials).
+
+If credentials are missing after sourcing (`JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY`):
+- Report the key needing transition
+- Suggest: `source ~/.local/share/ai-skills/scripts/load-jira-env.sh`
+- **Continue** with implementation — missing Jira access is not blocking
+
+When API is available:
+- If `JIRA_ASSIGNEE` is set, `_jira_set_assignee "$KEY"` ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#assignee-jira_assignee)).
+- Transition to "In Progress" with `?notifyUsers=false`, then `_jira_apply_watcher_policy "$KEY" update` ([jira-notifications.md](../setup-internal-skills/jira-notifications.md)).
+- If the row is empty, tell the user to run `/plan-it --jira {ID}` or `--sync-only` — do not guess keys.
+
+**Sources** — optional note under `docs/planning/{ID}/sources/*.md` that implementation started; Jira keys only from `jira.md`.
 
 ### 2. TDD Loop
 
