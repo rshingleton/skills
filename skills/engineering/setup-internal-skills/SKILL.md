@@ -4,7 +4,7 @@ description: >
   Scaffold AGENTS.md (open format), docs/agents/, and optional tool configs
   (opencode.json, copilot-instructions, cursor rules) so engineering skills
   know issue tracker (local docs/issues/ by default), triage, and domain docs.
-  Run before issue-it, plan-it, implement-it, verify-it, triage, or
+  Run before issue-it, plan-it, implement-it, verify-it, or
   when issue-tracker context is missing.
 disable-model-invocation: true
 ---
