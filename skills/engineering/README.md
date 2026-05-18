@@ -28,6 +28,17 @@ Run when onboarding or before large work on an unfamiliar repo (not part of the 
 
 - **[doc-it](./doc-it/SKILL.md)** — Phase 1: `docs/reference/` (maps, entry points, test landscape). Phase 2: `docs/reference-audit/` (`tech-debt.md`, `testing.md`, `architecture.md`, `follow-ups.md`). Optional intake from audit via [audit-to-issues](./setup-internal-skills/audit-to-issues.md); then `/plan-it` or `/improve-codebase-architecture`.
 
+## Jira bridge
+
+One-way bridges between local artifacts and Jira:
+
+| Skill | Direction | Role |
+|-------|-----------|------|
+| [to-jira](./to-jira/SKILL.md) | Local → Jira | Push an intake issue or plan to Jira as a single issue |
+| [from-jira](./from-jira/SKILL.md) | Jira → Local | Create a Doc Cycle plan from a Jira issue — no inbox step |
+
+For per-phase Jira Task creation, use `/plan-it --jira` instead.
+
 ## Other engineering skills
 
 - **[diagnose](./diagnose/SKILL.md)** — Disciplined diagnosis loop for hard bugs and performance regressions.
@@ -37,5 +48,4 @@ Run when onboarding or before large work on an unfamiliar repo (not part of the 
 - **[prototype](./prototype/SKILL.md)** — Build a throwaway prototype to flesh out a design.
 - **[setup-internal-skills](./setup-internal-skills/SKILL.md)** — Scaffold `AGENTS.md`, `docs/agents/`, and optional OpenCode/Copilot/Cursor config. **Default:** local issues in `docs/issues/`. Jira setup seeds `issue-tracker.md`, [jira-notifications.md](./setup-internal-skills/jira-notifications.md), [jira-description-style.md](./setup-internal-skills/jira-description-style.md).
 - **[tdd](./tdd/SKILL.md)** — Test-driven development with red-green-refactor loop.
-- **[issue-it](./issue-it/SKILL.md)** — Pre-plan intake (`docs/issues/*.md`): bugs, defers, todos, features. Paste email/ServiceNow.
 - **[zoom-out](./zoom-out/SKILL.md)** — Get broader context on unfamiliar code.

@@ -73,7 +73,7 @@ Paths to `CONTRIBUTING.md`, `SECURITY_POLICY.md`, `.compliance-rules/`.
 
 **Section E — Agent platforms.**
 
-> **AGENTS.md** is the open standard (OpenCode, **Cursor**, Copilot, Claude). Tool-specific files are audited, not blindly overwritten. Follow [PLATFORM-AUDIT.md](./PLATFORM-AUDIT.md).
+> **AGENTS.md** is the open standard (**Cursor**, **Copilot**, Claude). Tool-specific files are audited, not blindly overwritten. Follow [PLATFORM-AUDIT.md](./PLATFORM-AUDIT.md).
 
 Report the inventory table from PLATFORM-AUDIT (what exists, what will change).
 
@@ -90,7 +90,7 @@ Report the inventory table from PLATFORM-AUDIT (what exists, what will change).
 - If `.github/copilot-instructions.md` **exists:** read it; if it does not reference `AGENTS.md` / `docs/agents/`, **append** [templates/copilot-agent-skills-snippet.md](./templates/copilot-agent-skills-snippet.md) — preserve existing content.
 - If **missing:** offer [templates/copilot-instructions.md](./templates/copilot-instructions.md).
 
-**OpenCode:** merge `opencode.json` `instructions` to include `AGENTS.md`, or offer [templates/opencode.json](./templates/opencode.json) if absent.
+**OpenCode (optional):** if `opencode.json` exists and the team uses OpenCode, merge `instructions` to include `AGENTS.md`. Otherwise skip.
 
 **Claude:** pointer-only `CLAUDE.md` if missing and user wants it — never duplicate `AGENTS.md` body.
 
@@ -140,7 +140,7 @@ Seed files:
 
 When choosing local, create `docs/issues/` if missing and seed [docs-issues-README.md](./docs-issues-README.md) as `docs/issues/README.md`.
 
-**Platform audit:** Apply [PLATFORM-AUDIT.md](./PLATFORM-AUDIT.md) — patch Copilot in place, merge OpenCode config, report Cursor rules without creating redundant `.mdc` files unless requested.
+**Platform audit:** Apply [PLATFORM-AUDIT.md](./PLATFORM-AUDIT.md) — patch Copilot in place, ensure `AGENTS.md` works for Cursor, report `.cursor/rules/` without creating redundant `.mdc` files unless requested. OpenCode is optional — only merge config if the team uses it.
 
 ### 6. Done
 
@@ -158,4 +158,4 @@ Tell the user setup is complete.
 
 They can edit `docs/agents/*.md` and `AGENTS.md` later; re-run setup to switch trackers.
 
-Mention [AGENT-PLATFORMS.md](../../../docs/AGENT-PLATFORMS.md) in this skills repo for OpenCode / Cursor / Copilot / Claude setup.
+Mention [AGENT-PLATFORMS.md](../../../docs/AGENT-PLATFORMS.md) in this skills repo for platform-specific setup (Cursor, Copilot, Claude, optional OpenCode).

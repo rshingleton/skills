@@ -10,10 +10,10 @@ Record what exists:
 |------|----------|-------|
 | `AGENTS.md` | | Open standard — **always** ensure + update `## Agent skills` |
 | `CLAUDE.md` | | Pointer only; do not duplicate rules |
-| `opencode.json` | | Merge `instructions` to include `AGENTS.md` |
 | `.github/copilot-instructions.md` | | Copilot-specific — **inspect and patch** |
 | `.cursor/rules/*.mdc` | | List filenames; Cursor also reads root `AGENTS.md` |
 | `.cursorrules` | | Legacy — note; prefer `AGENTS.md` |
+| `opencode.json` | | Optional — only if team uses OpenCode |
 
 ## Cursor
 
@@ -29,7 +29,7 @@ If `.cursor/rules/` exists:
 4. If duplicate overlap exists, offer (with approval) a one-liner in the Cursor rule: `Follow AGENTS.md for agent skills and issue-tracker setup.`
 5. **Do not delete** user rules.
 
-**Coexistence is normal:** teams may use `AGENTS.md` for cross-tool conventions and `.cursor/rules/` for Cursor-specific scoping. That is aligned with Cursor’s docs.
+**Coexistence is normal:** teams may use `AGENTS.md` for cross-tool conventions and `.cursor/rules/` for Cursor-specific scoping. That is aligned with Cursor's docs.
 
 **Not covered by rules:** Cursor Tab and Inline Edit (Cmd/Ctrl+K) — only Agent chat loads AGENTS.md / project rules.
 
@@ -44,12 +44,6 @@ If `.github/copilot-instructions.md` **exists**:
 
 If **missing** and the team uses Copilot, offer to create from [copilot-instructions.md](./templates/copilot-instructions.md).
 
-## OpenCode
-
-If `opencode.json` exists, merge `instructions` array to include `"AGENTS.md"` (and `"CONTEXT.md"` if present) without removing other entries.
-
-If missing, offer [templates/opencode.json](./templates/opencode.json).
-
 ## Claude Code
 
 If `CLAUDE.md` exists and is more than a short pointer to `AGENTS.md`, warn about duplication.
@@ -61,3 +55,7 @@ If missing and user uses Claude, offer a pointer file only:
 
 See [AGENTS.md](./AGENTS.md).
 ```
+
+## OpenCode (optional)
+
+Only configure if the team explicitly uses OpenCode. If `opencode.json` exists and is in use, merge `instructions` array to include `"AGENTS.md"` (and `"CONTEXT.md"` if present) without removing other entries. If missing, skip — no template needed unless team requests it.

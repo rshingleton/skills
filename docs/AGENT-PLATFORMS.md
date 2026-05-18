@@ -1,24 +1,12 @@
 # Agent platforms
 
-How to use this skills repo with **OpenCode**, **Cursor**, **GitHub Copilot**, and **Claude Code**.
+How to use this skills repo with **Cursor**, **GitHub Copilot**, **Claude Code**, and optionally **OpenCode**.
 
 ## Canonical file: `AGENTS.md`
 
 [AGENTS.md](../AGENTS.md) at the repo root is the **open format** project instructions file (same idea as OpenCode rules and Cursor’s `AGENTS.md` convention). Tool-specific files should **point here**, not duplicate maintenance rules.
 
 In **application repos** (after `/setup-internal-skills`), `AGENTS.md` also holds a `## Agent skills` block linking `docs/agents/issue-tracker.md`, intake status labels, and domain layout.
-
----
-
-## OpenCode
-
-1. Install skills: `bash scripts/link-skills.sh` from this repo (or `scripts/skills.sh`).
-2. Commit [opencode.json](../opencode.json) (or merge `instructions` into your global config).
-3. OpenCode loads `AGENTS.md` automatically; `CLAUDE.md` is a fallback only if `AGENTS.md` is missing.
-
-Optional global rules: `~/.config/opencode/AGENTS.md` for personal prefs (not committed).
-
-Skills path: `~/.agents/skills/` (same as this repo’s linker). See [OpenCode Agent Skills](https://open-code.ai/en/docs/skills).
 
 ---
 
@@ -52,6 +40,20 @@ Skills path: `~/.agents/skills/` (same as this repo’s linker). See [OpenCode A
 
 ---
 
+## OpenCode (optional)
+
+OpenCode is supported but not required. If using OpenCode:
+
+1. Install skills: `bash scripts/link-skills.sh` from this repo (or `scripts/skills.sh`).
+2. Commit [opencode.json](../opencode.json) or merge `instructions` into your global config.
+3. OpenCode loads `AGENTS.md` automatically; `CLAUDE.md` is a fallback only if `AGENTS.md` is missing.
+
+Optional global rules: `~/.config/opencode/AGENTS.md` for personal prefs (not committed).
+
+Skills path: `~/.agents/skills/` (same as this repo's linker). See [OpenCode Agent Skills](https://open-code.ai/en/docs/skills).
+
+---
+
 ## Per-project setup (all platforms)
 
 Run once per application repository:
@@ -80,9 +82,9 @@ docs/reference/           # baseline maps (/doc-it Phase 1)
 docs/reference-audit/     # sliced review (/doc-it Phase 2)
 CONTEXT.md
 docs/adr/
-opencode.json             # optional — instructions: ["AGENTS.md"]
 .github/copilot-instructions.md   # Copilot-only; setup patches if present
 .cursor/rules/            # optional extras; Cursor still uses AGENTS.md
+opencode.json             # optional — only needed for OpenCode users
 ```
 
 Seed template for new app repos: [skills/engineering/setup-internal-skills/templates/AGENTS.md](../skills/engineering/setup-internal-skills/templates/AGENTS.md).

@@ -266,6 +266,8 @@ With Jira:       …  →  /plan-it --from-issues --jira  →  implement-it  →
 Incremental:     …  →  implement phase-N  →  audit-it --phase phase-N  →  verify-it --phase phase-N  →  …  →  full audit  →  full verify  →  commit-it
 Audit backlog:   /doc-it  →  audit-to-issues  →  /plan-it --from-issues
 Re-sync Jira:    /plan-it <id> --jira --sync-only   (keys in jira.md only)
+Jira → plan:     /from-jira CDS-142                  (fetch Jira → grill → scaffold plan)
+Issue → Jira:    /to-jira docs/issues/bug.md          (push single intake item to Jira)
 Unfamiliar repo: /doc-it  →  follow-ups  →  issue-it / plan-it --from-issues
 ```
 
@@ -292,6 +294,8 @@ Skills I use daily for code work.
 - **[setup-internal-skills](./skills/engineering/setup-internal-skills/SKILL.md)** — Per-repo config; **default** local issues in `docs/issues/`. Run once per repo.
 - **[tdd](./skills/engineering/tdd/SKILL.md)** — Test-driven development with red-green-refactor loop.
 - **[issue-it](./skills/engineering/issue-it/SKILL.md)** — Pre-plan intake under `docs/issues/`.
+- **[to-jira](./skills/engineering/to-jira/SKILL.md)** — Push a local intake issue or plan to Jira as a single issue.
+- **[from-jira](./skills/engineering/from-jira/SKILL.md)** — Create a Doc Cycle plan from a Jira issue — no inbox step.
 - **[verify-it](./skills/engineering/verify-it/SKILL.md)** — Doc Cycle verify phase. Finalizes ADRs, CONTEXT.md, changelog, and planning cleanup. Optionally close Jira issues.
 - **[zoom-out](./skills/engineering/zoom-out/SKILL.md)** — Get broader context on unfamiliar code.
 

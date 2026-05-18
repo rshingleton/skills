@@ -1,6 +1,6 @@
 # Agent instructions
 
-Tool-neutral project instructions. Supported hosts: OpenCode, Cursor, GitHub Copilot, Claude Code.
+Tool-neutral project instructions. Supported hosts: Cursor, GitHub Copilot, Claude Code. OpenCode is also supported.
 
 See `docs/agents/` for machine-readable skill configuration (issue tracker, triage labels, domain docs).
 

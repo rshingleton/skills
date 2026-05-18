@@ -1,13 +1,14 @@
 # Agent instructions
 
-Open, tool-neutral instructions for this repository. **Commit this file.** Point every agent host here.
+Instructions for this repository. **Commit this file.** Point every agent host here.
 
 | Host | Config in this repo |
 |------|---------------------|
-| **OpenCode** | `opencode.json` → `instructions` |
 | **Cursor** | Native **`AGENTS.md`** ([docs](https://cursor.com/docs/context/rules)); optional `.cursor/rules/` for scoped rules |
 | **GitHub Copilot** | `.github/copilot-instructions.md` (tool-specific; should link here) |
 | **Claude Code** | `CLAUDE.md` (pointer + `.claude-plugin/plugin.json`) |
+
+OpenCode is also supported (see [docs/AGENT-PLATFORMS.md](docs/AGENT-PLATFORMS.md)).
 
 Platform setup details: [docs/AGENT-PLATFORMS.md](docs/AGENT-PLATFORMS.md).
 

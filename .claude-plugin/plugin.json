@@ -11,6 +11,8 @@
     "./skills/engineering/internal-compliance",
     "./skills/engineering/plan-it",
     "./skills/engineering/issue-it",
+    "./skills/engineering/to-jira",
+    "./skills/engineering/from-jira",
     "./skills/engineering/prototype",
     "./skills/engineering/setup-internal-skills",
     "./skills/engineering/tdd",
