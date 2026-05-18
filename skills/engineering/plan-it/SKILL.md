@@ -106,10 +106,10 @@ Every evaluation note or question **must** start with:
 1. **Read** the file and `## Comments`.
 2. **Explore** the codebase to assess scope, check `.out-of-scope/` for similar rejections.
 3. **Bugs:** attempt reproduction before asking questions.
-4. **Recommend** a state role — one of `needs-triage` (stay `intake`), `needs-info` (needs more info from reporter), `ready-for-agent` (`ready-for-plan`), `ready-for-human` (human implementation, stays `intake`), or `wontfix`. Wait for user confirmation.
+4. **Recommend** a state — `ready-for-plan` (proceed) or `wontfix` (reject). If more info is needed, leave at `intake` and document questions in `## Comments`. Wait for user confirmation.
 5. **Apply:** update `status:` per [triage-labels.md](../setup-internal-skills/triage-labels.md); append `## Comments` with the disclaimer and evaluation notes.
 6. On **`ready-for-plan`:** proceed to The Grill.
-7. On **`needs-info`:** stop — flag needs reporter input. Do not proceed to The Grill.
+7. On **`intake` (needs info):** stop — flag needs reporter input. Do not proceed to The Grill.
 8. On **`wontfix`:** optional move to `docs/issues/wontfix/<slug>.md`.
 
 #### Jira items
@@ -117,8 +117,8 @@ Every evaluation note or question **must** start with:
 When the tracker is Jira, query issues needing attention and evaluate one at a
 time using the Jira API — labels, transitions, comments. See
 [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md) for API
-patterns. On `ready-for-agent`, continue to The Grill. On `needs-info`, set
-`On Hold` + label `needs-info`.
+patterns. On `ready-for-plan`, continue to The Grill. On needs-info, leave at
+`intake` and add a comment requesting information.
 
 ### 2. The Grill
 

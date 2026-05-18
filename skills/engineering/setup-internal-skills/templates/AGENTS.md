@@ -14,7 +14,7 @@ Intake: `docs/issues/` (`/issue-it`, [audit-to-issues](../audit-to-issues.md)). 
 
 ### Triage labels
 
-Five canonical roles — `/plan-it --from-issues` evaluates intake items. See `docs/agents/triage-labels.md`.
+Three states: `intake` → `ready-for-plan` → `wontfix`. See `docs/agents/triage-labels.md`.
 
 ### Domain docs
 

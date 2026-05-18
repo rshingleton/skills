@@ -414,12 +414,10 @@ After `/plan-it --jira` creates an Epic, suggest adding `JIRA_DEFAULT_EPIC=<key>
 
 ## Triage state mapping
 
-| Triage role | Jira status | Jira label |
-|---|---|---|
-| `needs-triage` | `Open` | `needs-triage` |
-| `needs-info` | `On Hold` | `needs-info` |
-| `ready-for-agent` | `Open` | `ready-for-agent` |
-| `ready-for-human` | `Open` | `ready-for-human` |
+| State | Jira status | Jira label |
+|-------|-------------|------------|
+| `intake` | `Open` | `intake` |
+| `ready-for-plan` | `Open` | `ready-for-plan` |
 | `wontfix` | `Closed` | `wontfix` |
 
 ## When a skill says "publish to the issue tracker"

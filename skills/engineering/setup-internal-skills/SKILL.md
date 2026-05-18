@@ -56,9 +56,9 @@ Choices:
 - **Jira** — issues in Jira API ([issue-tracker-jira.md](./issue-tracker-jira.md)). Requires `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` (export or `.env`; see issue-tracker doc).
 - **Other** — user describes workflow; record as prose in `issue-tracker.md`.
 
-**Section B — Triage label vocabulary.**
+**Section B — Triage state machine.**
 
-Five canonical roles: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`.
+Three states: `intake` → `ready-for-plan` → `wontfix`.
 
 - **Local:** `status` in issue frontmatter + `## Comments`
 - **Jira:** status + labels — see `issue-tracker-jira.md`
@@ -121,7 +121,7 @@ Intake: `docs/issues/` (`/issue-it`). Plans: `docs/planning/` (`/plan-it` evalua
 
 ### Triage labels
 
-Five canonical roles. See `docs/agents/triage-labels.md`.
+Three states: `intake` → `ready-for-plan` → `wontfix`. See `docs/agents/triage-labels.md`.
 
 ### Domain docs
 

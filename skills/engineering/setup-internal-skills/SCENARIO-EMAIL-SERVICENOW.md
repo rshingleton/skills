@@ -90,4 +90,4 @@ See [issue-tracker-jira.md § Default Epic](issue-tracker-jira.md#default-epic-o
 
 ## Tracker choice
 
-This scenario assumes **local inbox** for intake. If the org uses **Jira as the only intake**, `/plan-it` handles Jira issues during intake evaluation — review in Jira until `ready-for-agent`, then plan. Prefer **local inbox + plan-it --jira** when the repo is the planning source of truth.
+This scenario assumes **local inbox** for intake. If the org uses **Jira as the only intake**, `/plan-it` handles Jira issues during intake evaluation — review in Jira until the issue is ready, then plan. Prefer **local inbox + plan-it --jira** when the repo is the planning source of truth.

@@ -1,19 +1,28 @@
 # Triage Labels
 
-Five **canonical roles** used by `/plan-it` during intake evaluation. Map them to your tracker in the columns below.
+Issue state machine used by `/issue-it` and `/plan-it --from-issues`.
 
 **Vocabulary:** **Capture** = `/issue-it`. **Intake evaluation** = `/plan-it` evaluates item readiness. **Grill** = `/plan-it` planning session.
 
-| Canonical role | Local inbox `status:` | Jira label | Meaning |
-|----------------|----------------------|------------|---------|
-| `needs-triage` | `intake` | `needs-triage` | Maintainer needs to evaluate |
-| `needs-info` | `intake` | `needs-info` | Waiting on reporter (document questions in `## Comments` locally) |
-| `ready-for-agent` | `ready-for-plan` | `ready-for-agent` | Ready for `/plan-it` or AFK agent |
-| `ready-for-human` | `intake` | `ready-for-human` | Human implementation (note why in `## Comments` locally) |
+## State machine (local inbox)
+
+```
+intake → ready-for-plan → (plan-it moves to planning/<id>/sources/, status: in-plan)
+                     ↘ wontfix
+```
+
+After move: `in-plan` → `done` (set by `/verify-it`).
+
+## Canonical states
+
+| State | Local `status:` | Jira label | Meaning |
+|-------|----------------|------------|---------|
+| `intake` | `intake` | `intake` | Captured but not yet evaluated |
+| `ready-for-plan` | `ready-for-plan` | `ready-for-plan` | Evaluated, ready for `/plan-it` grill + scaffold |
 | `wontfix` | `wontfix` | `wontfix` | Will not be actioned |
 
-**Local tracker:** edit the **Local inbox `status:`** column if your repo uses different status strings.
+**Intake evaluation** happens during `/plan-it --from-issues`: read context, probe if unclear, recommend `ready-for-plan` or `wontfix`. When more info is needed, set `status: intake` and document questions in `## Comments`.
 
-**Jira:** edit **Jira label** if labels differ; status transitions stay in [issue-tracker-jira.md](issue-tracker-jira.md#triage-state-mapping).
+## Jira state mapping
 
-When `plan-it` says "apply the `ready-for-agent` role", set local `status: ready-for-plan` or Jira label `ready-for-agent` per this table.
+When using Jira as the tracker, intake evaluation maps states to Jira status + labels via [issue-tracker-jira.md](issue-tracker-jira.md#triage-state-mapping).
