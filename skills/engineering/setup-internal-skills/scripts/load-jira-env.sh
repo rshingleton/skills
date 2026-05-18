@@ -5,8 +5,8 @@
 # Canonical copy — bundled with setup-internal-skills / issue-tracker-jira.md.
 #
 # Usage (must source, not execute):
+#   source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh   # consumer repos (recommended)
 #   source skills/engineering/setup-internal-skills/scripts/load-jira-env.sh   # from ai-skills clone
-#   source ~/.local/share/ai-skills/skills/engineering/setup-internal-skills/scripts/load-jira-env.sh
 #   source scripts/load-jira-env.sh   # repo-root shim (same behavior)
 #
 # Search order (first file found wins):
@@ -47,6 +47,13 @@ else
       break
     fi
   done
+fi
+
+# Source Jira helper functions from the same directory.
+_JIRA_HELPERS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$_JIRA_HELPERS_DIR/jira-helpers.sh" ]; then
+  # shellcheck source=scripts/jira-helpers.sh
+  source "$_JIRA_HELPERS_DIR/jira-helpers.sh"
 fi
 
 if [ -n "${_jira_env_loaded}" ] && [ "${JIRA_ENV_VERBOSE:-0}" = "1" ]; then

@@ -86,7 +86,7 @@ mkdir -p ~/.config/ai-skills
 cp .env.example ~/.config/ai-skills/.env   # from your ai-skills clone
 # Edit ~/.config/ai-skills/.env and set JIRA_API_TOKEN
 
-source ~/.local/share/ai-skills/scripts/load-jira-env.sh
+source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh
 ```
 
 A `.env` in the **application repo root** takes precedence over user-wide files when you run the loader from that repo. Also supported: `~/.agents/.env`, `~/.config/ai-skills/.env`. Override the path with `JIRA_ENV_FILE=/path/to/.env`.

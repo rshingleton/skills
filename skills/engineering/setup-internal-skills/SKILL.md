@@ -133,7 +133,9 @@ For **Jira** tracker, say "Jira REST API"; plans use `docs/planning/<id>/jira.md
 Seed files:
 
 - Local → copy [issue-tracker-local.md](./issue-tracker-local.md) to `docs/agents/issue-tracker.md`
-- Jira → copy [issue-tracker-jira.md](./issue-tracker-jira.md) to `docs/agents/issue-tracker.md`, [jira-notifications.md](./jira-notifications.md) to `docs/agents/jira-notifications.md`, and [jira-description-style.md](./jira-description-style.md) to `docs/agents/jira-description-style.md`. Point users at [scripts/load-jira-env.sh](./scripts/load-jira-env.sh) (or repo `scripts/load-jira-env.sh` shim) for credentials.
+- Jira → copy [issue-tracker-jira.md](./issue-tracker-jira.md) to `docs/agents/issue-tracker.md`, [jira-notifications.md](./jira-notifications.md) to `docs/agents/jira-notifications.md`, and [jira-description-style.md](./jira-description-style.md) to `docs/agents/jira-description-style.md`. Point users at `~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh` for credentials + helpers.
+
+**Always** copy [jira-helpers.sh](./scripts/jira-helpers.sh) to `docs/agents/jira-helpers.sh` regardless of tracker choice — agents source this when `jira.md` has keys but the tracker is local. The `load-jira-env.sh` script sources it automatically, so agents need only one command.
 - [triage-labels.md](./triage-labels.md), [domain.md](./domain.md)
 
 When choosing local, create `docs/issues/` if missing and seed [docs-issues-README.md](./docs-issues-README.md) as `docs/issues/README.md`.

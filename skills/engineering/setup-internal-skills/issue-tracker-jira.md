@@ -2,6 +2,24 @@
 
 Issues and Epics for this repo live as Jira issues. Use the Jira REST API v2 via `curl` for all operations.
 
+## Quick start (agents)
+
+One command loads env vars **and** all helper functions:
+
+```bash
+source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh
+```
+
+For this ai-skills repo itself:
+
+```bash
+source skills/engineering/setup-internal-skills/scripts/load-jira-env.sh
+```
+
+Now you have `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` plus functions like `_jira_phase_key`, `_jira_apply_watcher_policy`, `_jira_timetracking_fields`, `_jira_wiki_body`, etc.
+
+If the command sourced a `.env` file it reports which one (`JIRA_ENV_VERBOSE=1` for detail).
+
 ## Environment variables
 
 The skills read these from the environment:
@@ -30,21 +48,17 @@ The skills read these from the environment:
 
 Set `JIRA_PROJECT_KEY` to your Jira project key and `JIRA_API_TOKEN` in that file. Do not commit tokens.
 
-Before Jira `curl` in a shell, run from the application repo (so its `.env` wins):
+**One source command from any consumer repo:**
 
 ```bash
-# Canonical (bundled with this skill):
-source skills/engineering/setup-internal-skills/scripts/load-jira-env.sh
-
-# Installed clone — same script via repo-root shim:
-source ~/.local/share/ai-skills/scripts/load-jira-env.sh
+source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh
 ```
 
-The loader checks: `JIRA_ENV_FILE` (if set), then `./.env`, then `~/.agents/.env`, then `~/.config/ai-skills/.env`.
+This finds the closest `.env` via `$JIRA_ENV_FILE` → `./.env` → `~/.agents/.env` → `~/.config/ai-skills/.env`, then sources the helper functions. The `./.env` at the application repo root wins when present — per-project credentials take precedence.
 
 **Shell exports.** Alternatively `export JIRA_BASE_URL=...` etc. in your profile.
 
-**Agents.** Before calling the Jira API, ensure all three variables are set. If the shell may not have them, `source` the loader script or read the `.env` file and export values for the session. Do not print tokens in chat output.
+**Detecting the script path.** If `~/.agents/skills/setup-internal-skills/` does not exist, check for the clone at `~/.local/share/ai-skills/skills/engineering/setup-internal-skills/scripts/load-jira-env.sh`. If neither exists, the skills are not installed; run `/setup-internal-skills` first.
 
 Optional project alias mapping (matching the doc-manager `PROJECT_<ALIAS>_KEY` convention):
 
@@ -60,29 +74,59 @@ $JIRA_BASE_URL/rest/api/2
 
 All calls use `Authorization: Bearer $JIRA_API_TOKEN` and `Content-Type: application/json`.
 
-## Helper functions (copy into shell before Jira work)
+## Helper functions
+
+All Jira shell helpers are in a single source-able script. They become available automatically when you source `load-jira-env.sh`, or you can source directly:
+
+```bash
+source ~/.agents/skills/setup-internal-skills/scripts/jira-helpers.sh
+```
 
 | Function | Defined in | Use |
 |----------|------------|-----|
-| `_jira_apply_watcher_policy` | [jira-notifications.md](jira-notifications.md) | After every create / PUT / transition / comment |
-| `_jira_set_assignee` | Below | Before implement / verify transitions when `JIRA_ASSIGNEE` set |
-| `resolve_jira_parent_epic` | [Default Epic](#default-epic-optional) | Before `/plan-it --jira` creates |
-| `_jira_phase_key` | Below | Read Jira key for current phase from `jira.md` |
-| `_jira_wiki_body` | [jira-description-style.md](jira-description-style.md) | Optional markdown → wiki sed helper |
-| `_jira_timetracking_fields` | [Time estimates](#time-estimates-timetracking) | Build `timetracking` object for `POST /issue` |
+| `_jira_apply_watcher_policy` | `jira-helpers.sh` | After every create / PUT / transition / comment |
+| `_jira_set_assignee` | `jira-helpers.sh` | Before implement / verify transitions when `JIRA_ASSIGNEE` set |
+| `resolve_jira_parent_epic` | `jira-helpers.sh` | Before `/plan-it --jira` creates |
+| `_jira_phase_key` | `jira-helpers.sh` | Read Jira key for current phase from `jira.md` |
+| `_jira_wiki_body` | `jira-helpers.sh` | Optional markdown → wiki sed helper |
+| `_jira_timetracking_fields` | `jira-helpers.sh` | Build `timetracking` object for `POST /issue` |
+| `_jira_hours_to_duration` | `jira-helpers.sh` | Convert number to Jira duration string |
+| `_jira_remove_ignored_watchers` | `jira-helpers.sh` | Remove watchers per policy |
+| `_jira_add_watchers` | `jira-helpers.sh` | Add watchers on creates |
 
 ## Notification suppression (required on writes)
 
 Follow [jira-notifications.md](jira-notifications.md) on **every** create, update, transition, and comment (same as doc-manager):
 
 1. Append **`?notifyUsers=false`** to the URL.
-2. Apply watcher policy: **remove** `JIRA_WATCHER_IGNORE` (or PAT from `JIRA_EMAIL`); **add** `JIRA_WATCHER_USERNAME` on creates ([jira-notifications.md](jira-notifications.md)).
+2. Call `_jira_apply_watcher_policy "$KEY" create` after creates, `_jira_apply_watcher_policy "$KEY" update` after updates/transitions/comments.
 
 Skips cause watcher email noise to service accounts and shared inboxes.
+
+Note: `_jira_set_assignee` does **not** call watcher policy — call `_jira_apply_watcher_policy` separately after assignee changes.
+
+### Known notification leakage — auto-watch
+
+Jira **auto-adds the PAT owner** as a watcher to any issue they create. This triggers a separate "you are now watching" notification that `?notifyUsers=false` on the create request does **not** suppress. The watcher policy removes the PAT owner after the fact, but the auto-watch notification fires at create time and cannot be prevented via API.
+
+**Belt-and-suspenders:** some Jira Server versions also respect `notifyUsers` as a **field in the request body** on issue create. Adding it alongside the query parameter provides extra coverage:
+
+```json
+{
+  "fields": {...},
+  "notifyUsers": false
+}
+```
+
+This is not standard across all Jira DC versions, so always keep the query parameter too.
+
+**Most reliable mitigation:** disable "Watching" email notifications for the PAT owner's Jira user account (User profile → Notification settings → Watching → off). This eliminates the auto-watch notification at the source regardless of API behavior.
 
 ## Description style (required on create)
 
 All **`summary`** and **`description`** fields on `POST /issue` must follow [jira-description-style.md](jira-description-style.md): **Jira wiki markup** (`h2.`, `*` bullets) — **never** markdown `##` or `- [ ]` in the POST body. Structured and detailed; no AI essay prose.
+
+Use `_jira_wiki_body <file>` to convert markdown to wiki markup.
 
 ## Time estimates (`timetracking`)
 
@@ -116,27 +160,12 @@ On create, set **`originalEstimate`** and **`remainingEstimate`** to the **same*
 2. Else `JIRA_DEFAULT_ESTIMATE_HOURS` from env.
 3. Else ask once per phase during `/plan-it --jira` publish (record in frontmatter + `jira.md` **Est.** column).
 
-### Shell helper
+### Using the helpers
 
 ```bash
-# Usage: _jira_hours_to_duration 4  → 4h
-# Usage: _jira_timetracking_fields 4  → JSON fragment for jq --argjson
-_jira_hours_to_duration() {
-  local h="${1:-}"
-  [ -z "$h" ] && return 1
-  case "$h" in
-    *h|*m|*d|*w) echo "$h" ;;  # already Jira duration
-    *.*) printf '%sm' "$(echo "$h * 60" | bc 2>/dev/null | cut -d. -f1)" ;;
-    *) echo "${h}h" ;;
-  esac
-}
-
-_jira_timetracking_fields() {
-  local dur
-  dur="$(_jira_hours_to_duration "$1")" || return 1
-  jq -n --arg o "$dur" --arg r "$dur" \
-    '{timetracking: {originalEstimate: $o, remainingEstimate: $r}}'
-}
+_jira_hours_to_duration 4    # → 4h
+_jira_hours_to_duration 2.5  # → 150m
+_jira_timetracking_fields 4  # → {"timetracking":{"originalEstimate":"4h","remainingEstimate":"4h"}}
 ```
 
 ### jq create (Task + Epic link + estimate + assignee)
@@ -164,9 +193,9 @@ PAYLOAD=$(jq -n \
   }')
 
 if [ -n "$EST_HOURS" ]; then
-  DUR=$(_jira_hours_to_duration "$EST_HOURS")
-  PAYLOAD=$(echo "$PAYLOAD" | jq --arg o "$DUR" --arg r "$DUR" \
-    '.fields.timetracking = {originalEstimate: $o, remainingEstimate: $r}')
+  TIMETRACKING=$(_jira_timetracking_fields "$EST_HOURS")
+  PAYLOAD=$(echo "$PAYLOAD" | jq --argjson tt "$TIMETRACKING" \
+    '.fields + $tt')
 fi
 
 curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
@@ -181,7 +210,7 @@ After POST, `_jira_apply_watcher_policy "$KEY" create`.
 
 ## Assignee (`JIRA_ASSIGNEE`)
 
-When `JIRA_ASSIGNEE` is set (e.g. `alice`), include assignee on **creates** and set/update on **Doc Cycle** Jira writes:
+When `JIRA_ASSIGNEE` is set (e.g. `alice`), include assignee on **creates** and set/update on **Doc Cycle** Jira writes. `_jira_set_assignee` does NOT apply watcher policy — call `_jira_apply_watcher_policy "$KEY" update` separately after the assignee PUT.
 
 | Skill | When |
 |-------|------|
@@ -195,44 +224,20 @@ When `JIRA_ASSIGNEE` is set (e.g. `alice`), include assignee on **creates** and 
 **Phase key from plan** (implement-it / verify-it):
 
 ```bash
-# Usage: _jira_phase_key "<plan-id>" "phase-1"
-_jira_phase_key() {
-  local plan="$1" phase="$2" f="docs/planning/${plan}/jira.md"
-  [ -f "$f" ] || return 1
-  # Match lines that start with | and have the phase name as the first column,
-  # then extract the Jira key from the second column.
-  awk -F'|' -v p="$phase" '
-    NF >= 4 {
-      gsub(/^[ \t]+|[ \t]+$/, "", $2)
-      if ($2 == p) {
-        gsub(/^[ \t]+|[ \t]+$/, "", $3)
-        if ($3 != "" && $3 !~ /^(Jira|Phase|Est\.?|)$/) { print $3; exit }
-      }
-    }
-  ' "$f"
-}
+_jira_phase_key "<plan-id>" "phase-1"
 ```
 
-**Assign existing issue** (after any PUT, run watcher policy):
+The helper lives in `jira-helpers.sh` (sourced via `load-jira-env.sh`).
+
+**Set assignee on an existing issue** (does NOT apply watcher policy):
 
 ```bash
-_jira_set_assignee() {
-  local key="$1"
-  [ -z "${JIRA_ASSIGNEE:-}" ] || [ -z "$key" ] && return 0
-  curl -s -o /dev/null -X PUT \
-    -H "Authorization: Bearer $JIRA_API_TOKEN" \
-    -H "Content-Type: application/json" \
-    "$JIRA_BASE_URL/rest/api/2/issue/${key}?notifyUsers=false" \
-    -d "{\"fields\": {\"assignee\": {\"name\": \"${JIRA_ASSIGNEE}\"}}}"
-  _jira_apply_watcher_policy "$key" update
-}
+_jira_set_assignee "$KEY"
 ```
 
-**On create** (jq — omit assignee key when unset):
-
+Then apply watcher policy if needed:
 ```bash
-# Inside fields: add assignee only when JIRA_ASSIGNEE is set
-# assignee: (if $assignee != "" then {name: $assignee} else null end)
+_jira_apply_watcher_policy "$KEY" update
 ```
 
 ## Epic custom fields
@@ -256,7 +261,7 @@ Use a default parent Epic so `/plan-it --jira` can link phase Tasks without pass
 | 2 | Plan Jira map | `epic_key:` in `docs/planning/<plan-id>/jira.md` |
 | 3 | Intake file | `jira_key:` on `docs/issues/<slug>.md` or `sources/*.md` |
 | 4 | Project `.env` | `JIRA_DEFAULT_EPIC=MT-100` |
-| 5 | This file | **default_epic:** `MT-100` below |
+| 5 | This file | **default_epic:** `` below |
 
 **default_epic:** ``
 
@@ -266,35 +271,13 @@ When all are empty, Tasks are created without Epic Link unless the user passes `
 
 ### Resolving the parent Epic (agents)
 
-Before POSTing Tasks, resolve the Epic key (equivalent logic in any language):
+Before POSTing Tasks, resolve the Epic key:
 
 ```bash
-# Usage: resolve_jira_parent_epic "<--parent or empty>" "<plan-id or slug or empty>"
-resolve_jira_parent_epic() {
-  local flag_parent="$1" id="$2" k=""
-  if [ -n "$flag_parent" ]; then echo "$flag_parent"; return; fi
-  if [ -n "$id" ] && [ -f "docs/planning/${id}/jira.md" ]; then
-    k=$(awk -F': *' '/^epic_key:/{gsub(/[" \t]/,"",$2); print $2; exit}' "docs/planning/${id}/jira.md")
-    [ -n "$k" ] && echo "$k" && return
-  fi
-  if [ -n "$id" ] && [ -f "docs/issues/${id}.md" ]; then
-    k=$(awk -F': *' '/^jira_key:/{gsub(/[" \t]/,"",$2); print $2; exit}' "docs/issues/${id}.md")
-    [ -n "$k" ] && echo "$k" && return
-  fi
-  if [ -n "$id" ] && [ -f "docs/issues/${id}/epic.md" ]; then
-    k=$(awk -F': *' '/^jira_key:/{gsub(/[" \t]/,"",$2); print $2; exit}' "docs/issues/${id}/epic.md")
-    [ -n "$k" ] && echo "$k" && return
-  fi
-  if [ -n "${JIRA_DEFAULT_EPIC:-}" ]; then echo "$JIRA_DEFAULT_EPIC"; return; fi
-  if [ -f docs/agents/issue-tracker.md ]; then
-    k=$(grep -E '^\*\*default_epic:\*\*|^default_epic:' docs/agents/issue-tracker.md \
-      | sed -n 's/.*`\([^`]*\)`.*/\1/p' | head -1)
-    [ -n "$k" ] && echo "$k" && return
-  fi
-}
+resolve_jira_parent_epic "<--parent or empty>" "<plan-id or slug or empty>"
 ```
 
-When a resolved Epic exists, set `customfield_10880` on Task creates. Tell the user which Epic was used when it was not passed explicitly.
+The helper lives in `jira-helpers.sh`. When a resolved Epic exists, set `customfield_10880` on Task creates. Tell the user which Epic was used when it was not passed explicitly.
 
 After `/plan-it --jira` creates an Epic, suggest adding `JIRA_DEFAULT_EPIC=<key>` to the project `.env` if the team wants that Epic as the ongoing default.
 
@@ -316,13 +299,11 @@ After `/plan-it --jira` creates an Epic, suggest adding `JIRA_DEFAULT_EPIC=<key>
     }'
   ```
 
-  Then apply watcher policy (best-effort; [jira-notifications.md](jira-notifications.md)):
+  Then apply watcher policy:
 
   ```bash
   _jira_apply_watcher_policy "<NEW_KEY>" create
   ```
-
-  See [jira-notifications.md](jira-notifications.md) for the helper and rationale.
 
 - **Create an issue with multi-line body** (use `jq` to build JSON safely):
   ```bash
@@ -348,20 +329,14 @@ After `/plan-it --jira` creates an Epic, suggest adding `JIRA_DEFAULT_EPIC=<key>
       --arg project "$JIRA_PROJECT_KEY" \
       --arg summary "Issue title" \
       --arg body "$BODY" \
-      --arg est "${JIRA_DEFAULT_ESTIMATE_HOURS:-}" \
       '{
-        fields: ({
+        fields: {
           project: {key: $project},
           summary: $summary,
           description: $body,
           issuetype: {name: "Task"},
           labels: ["ai-generated"]
-        } + (if $est != "" then {
-          timetracking: {
-            originalEstimate: ($est + "h"),
-            remainingEstimate: ($est + "h")
-          }
-        } else {} end))
+        }
       }')"
   ```
 
@@ -435,6 +410,8 @@ After `/plan-it --jira` creates an Epic, suggest adding `JIRA_DEFAULT_EPIC=<key>
     -d "{\"transition\": {\"id\": \"$TID\"}}"
   ```
 
+  After transition, call `_jira_apply_watcher_policy "$KEY" update`.
+
 ## Triage state mapping
 
 | Triage role | Jira status | Jira label |
@@ -447,7 +424,7 @@ After `/plan-it --jira` creates an Epic, suggest adding `JIRA_DEFAULT_EPIC=<key>
 
 ## When a skill says "publish to the issue tracker"
 
-Create a Jira issue via `curl` POST to `/rest/api/2/issue?notifyUsers=false`, then remove the API user from watchers per [jira-notifications.md](jira-notifications.md).
+Create a Jira issue via `curl` POST to `/rest/api/2/issue?notifyUsers=false`, then call `_jira_apply_watcher_policy "$KEY" create`.
 
 ## When a skill says "fetch the relevant ticket"
 

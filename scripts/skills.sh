@@ -88,7 +88,7 @@ if [ -n "${JIRA_API_TOKEN:-}" ]; then
   echo "  1. Jira credentials: loaded (${_jira_env_loaded:-from environment})"
 else
   echo "  1. Jira credentials: copy .env.example to ~/.config/ai-skills/.env"
-  echo "       then: source $CLONE_DIR/scripts/load-jira-env.sh"
+  echo "       then (from any repo): source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh"
   echo "     (or export JIRA_BASE_URL, JIRA_API_TOKEN, JIRA_PROJECT_KEY)"
 fi
 echo "  2. Run /setup-internal-skills in each application repo."

@@ -12,6 +12,8 @@ Append the query parameter to **every** mutating request. Do not skip on Epic vs
 | Update fields | PUT | `/rest/api/2/issue/{key}?notifyUsers=false` |
 | Transition | POST | `/rest/api/2/issue/{key}/transitions?notifyUsers=false` |
 | Comment | POST | `/rest/api/2/issue/{key}/comment?notifyUsers=false` |
+| Add watcher | POST | `/rest/api/2/issue/{key}/watchers?notifyUsers=false` |
+| Remove watcher | DELETE | `/rest/api/2/issue/{key}/watchers?username={u}&notifyUsers=false` |
 
 GET and search JQL do not use this parameter.
 
@@ -29,61 +31,40 @@ Jira adds the **PAT owner** as a watcher on create/update. `notifyUsers=false` o
 - If **`JIRA_WATCHER_IGNORE`** is unset and **`JIRA_EMAIL`** is set, remove the email local-part once (PAT self-unwatch).
 - **`JIRA_WATCHER_USERNAME`** is independent — use for humans/teams who should watch agent-created issues.
 
-### Helpers (agents)
+## 3. Known notification leakage via auto-watch
 
-```bash
-# Comma- or space-separated list → words
-_jira_split_usernames() { echo "${1//,/ }"; }
+Jira **auto-adds the PAT owner** as a watcher to any issue they create. This triggers a separate notification event that `notifyUsers=false` on the create request does **not** suppress. Our watcher policy removes the PAT owner after the fact, but the initial auto-watch notification may have already been sent.
 
-_jira_remove_ignored_watchers() {
-  local key="$1" users="" u
-  if [ -n "${JIRA_WATCHER_IGNORE:-}" ]; then
-    users="$(_jira_split_usernames "$JIRA_WATCHER_IGNORE")"
-  elif [ -n "${JIRA_EMAIL:-}" ]; then
-    users="${JIRA_EMAIL%%@*}"
-  fi
-  for u in $users; do
-    [ -z "$u" ] && continue
-    curl -s -o /dev/null -X DELETE \
-      -H "Authorization: Bearer $JIRA_API_TOKEN" \
-      "$JIRA_BASE_URL/rest/api/2/issue/${key}/watchers?username=${u}" 2>/dev/null || true
-  done
-}
+This affects only the **PAT owner** (not other watchers) and only on **issue create** (not on updates/transitions).
 
-_jira_add_watchers() {
-  local key="$1" u
-  [ -z "${JIRA_WATCHER_USERNAME:-}" ] && return 0
-  for u in $(_jira_split_usernames "$JIRA_WATCHER_USERNAME"); do
-    [ -z "$u" ] && continue
-    curl -s -o /dev/null -X POST \
-      -H "Authorization: Bearer $JIRA_API_TOKEN" \
-      -H "Content-Type: application/json" \
-      -d "$(jq -n --arg u "$u" '$u')" \
-      "$JIRA_BASE_URL/rest/api/2/issue/${key}/watchers" 2>/dev/null || true
-  done
-}
+**Mitigations:**
 
-# After create: remove ignored, then add watchers. After update/transition: remove only.
-_jira_apply_watcher_policy() {
-  local key="$1" mode="${2:-create}"
-  _jira_remove_ignored_watchers "$key"
-  [ "$mode" = "create" ] && _jira_add_watchers "$key"
-}
+- **Disable email notifications for the PAT owner's Jira account.** In Jira user preferences → Notification settings, turn off "Watching" notifications. This prevents auto-watch emails regardless of API parameters. This is the most reliable fix.
+- **Use a dedicated service account** for the API token with email notifications globally disabled in Jira user preferences.
+- The `?notifyUsers=false` parameter is also added to the watchers DELETE and POST calls (see [jira-helpers.sh](./scripts/jira-helpers.sh)) to suppress any notification the watchers endpoint itself might trigger.
 
-# Legacy alias used in skill examples
-_remove_jira_watcher() { _jira_apply_watcher_policy "$1" "update"; }
-```
+## Helper functions
 
-Call `_jira_apply_watcher_policy "$KEY" create` after **POST** create; `_jira_apply_watcher_policy "$KEY" update` after PUT, transition, or comment.
+All watcher helpers are in **`jira-helpers.sh`** (sourced automatically via `load-jira-env.sh`):
+
+| Function | Purpose |
+|----------|---------|
+| `_jira_apply_watcher_policy "$KEY" create` | After POST create — removes ignored + adds watchers |
+| `_jira_apply_watcher_policy "$KEY" update` | After PUT, transition, or comment — remove ignored only |
+| `_jira_remove_ignored_watchers "$KEY"` | Remove per `JIRA_WATCHER_IGNORE` / `JIRA_EMAIL` |
+| `_jira_add_watchers "$KEY"` | Add per `JIRA_WATCHER_USERNAME` |
+
+These are defined in `scripts/jira-helpers.sh` alongside the other Jira helpers.
 
 ## Checklist (agents)
 
 After each Jira write batch:
 
-1. Every POST/PUT used `?notifyUsers=false`.
+1. Every POST/PUT used `?notifyUsers=false` — including watchers add/remove.
 2. Ignored usernames removed per `JIRA_WATCHER_IGNORE` / `JIRA_EMAIL`.
 3. On creates, `JIRA_WATCHER_USERNAME` users added when set.
 4. Tokens and usernames were not printed in chat.
+5. For the PAT owner's auto-watch email: not suppressible via API — requires disabling "Watching" notifications on the PAT owner's Jira user account.
 
 ## Reference
 

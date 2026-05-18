@@ -4,6 +4,8 @@ Use when Jira already has Tasks under an Epic but **`docs/planning/<plan-id>/jir
 
 **Invocation:** `/plan-it <plan-id> --jira --sync-only` on an **existing** plan (skips grill/rescaffold). Does **not** update remote Jira description text — keys in `jira.md` only.
 
+For **creating** new Tasks (not just syncing), see [JIRA.md](../../plan-it/JIRA.md) — the publish flow creates Epic + Tasks and writes `jira.md`.
+
 ## When to run
 
 | Situation | Action |
@@ -18,8 +20,7 @@ From `jira.md` frontmatter `epic_key`, `--parent`, or `resolve_jira_parent_epic`
 ## 2. List Tasks under the Epic
 
 ```bash
-source skills/engineering/setup-internal-skills/scripts/load-jira-env.sh
-# or: source scripts/load-jira-env.sh  (repo-root shim)
+source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh
 EPIC_KEY="CDS-109"
 JQL="cf[10880] = ${EPIC_KEY} AND issuetype = Task ORDER BY created ASC"
 
@@ -55,11 +56,7 @@ Never assign one Jira key to two phases.
 
 4. Add `## Unmatched` for orphan Jira rows or phases without keys.
 
-## 5. Create vs skip (`--jira` without sync-only)
-
-After sync, POST Tasks only for phases with empty Jira column. Include **`timetracking`** from each phase's `estimate_hours:` ([issue-tracker-jira.md § Time estimates](issue-tracker-jira.md#time-estimates-timetracking)). Update `jira.md` after each create (Jira key + **Est.** column).
-
-## 6. Report
+## 5. Report
 
 ```
 Plan: auth-v2

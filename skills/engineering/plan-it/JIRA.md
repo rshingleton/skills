@@ -2,7 +2,19 @@
 
 Jira keys for a Doc Cycle plan live in **`docs/planning/<plan-id>/jira.md`** only — not in `docs/issues/` task trees or scattered phase frontmatter.
 
-Before any Jira API calls, **read `docs/agents/issue-tracker.md`** — it contains the tracker type, `JIRA_*` env vars, helper functions, and conventions. Run `/setup-internal-skills` if missing.
+Before any Jira API calls, source env vars + helpers:
+
+```bash
+source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh
+```
+
+This sets `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` and provides all helper functions (`_jira_apply_watcher_policy`, `resolve_jira_parent_epic`, `_jira_timetracking_fields`, `_jira_wiki_body`, etc.).
+
+For this ai-skills repo itself:
+
+```bash
+source skills/engineering/setup-internal-skills/scripts/load-jira-env.sh
+```
 
 ## Invocations
 
@@ -29,11 +41,11 @@ Ask during `/plan-it` after phases are scaffolded:
 - *"Create Jira issues for this plan?"* → continue with **`--jira`** (or user says yes mid-skill).
 - *"Sync from existing Epic?"* → **`--jira --sync-only`** when `JIRA_DEFAULT_EPIC` already has phase Tasks.
 
-Requires `JIRA_*` env — preflight in [issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md). Watcher policy: [jira-notifications.md](../setup-internal-skills/jira-notifications.md).
+Requires `JIRA_*` env — source via `load-jira-env.sh` as shown above. Watcher policy: [jira-notifications.md](../setup-internal-skills/jira-notifications.md).
 
 **Descriptions:** build from phase scope — work content only (`h2. What`, `h2. Done when`, `*` bullets). Convert to **Jira wiki markup** before POST; no markdown `##` or `- [ ]` ([jira-description-style.md](../setup-internal-skills/jira-description-style.md)). No references to planning docs (`ai-prompt.md`, `execution-notes.md`, audit reports) in the description body.
 
-**Time estimates:** on each phase Task **create**, set Jira `timetracking.originalEstimate` and `remainingEstimate` (same value, e.g. `"4h"`) per [issue-tracker-jira.md § Time estimates](../setup-internal-skills/issue-tracker-jira.md#time-estimates-timetracking). Store hours in `phase-N/ai-prompt.md` as `estimate_hours:` and mirror in the `jira.md` table **Est.** column.
+**Time estimates:** on each phase Task **create**, set Jira `timetracking.originalEstimate` and `remainingEstimate` (same value, e.g. `"4h"`) per [issue-tracker-jira.md § Time estimates](../setup-internal-skills/issue-tracker-jira.md#time-estimates-timetracking). Use `_jira_timetracking_fields $HOURS` to build the JSON. Store hours in `phase-N/ai-prompt.md` as `estimate_hours:` and mirror in the `jira.md` table **Est.** column.
 
 ## `jira.md` format
 
@@ -105,11 +117,18 @@ At publish time, if only the env default exists, ask: *"Link phase Tasks to defa
 
 ## Publish flow
 
-1. **Resolve parent Epic** — `resolve_jira_parent_epic "<--parent or empty>" "<plan-id>"` ([issue-tracker-jira.md § Default Epic](../setup-internal-skills/issue-tracker-jira.md#default-epic-optional)). Pass the CLI `--parent` value as the first argument when set.
-2. **`--sync-only`** — [jira-epic-sync.md](../setup-internal-skills/jira-epic-sync.md): JQL Tasks under Epic → match phases → fill `jira.md` table. Stop if sync-only.
-3. **Create Epic** (if no parent) — POST Epic; set `epic_key` in `jira.md` frontmatter.
-4. **Create Tasks** — For each `phase-N` without a Jira row: POST Task (`customfield_10880` = Epic; `JIRA_ASSIGNEE` when set; **`timetracking`** from `estimate_hours` in `ai-prompt.md` or ask maintainer — see [time estimates](../setup-internal-skills/issue-tracker-jira.md#time-estimates-timetracking)). Summary/description from phase scope — work content only, no doc references.
-5. **Write `jira.md`** — **Parent Epic** section (when `epic_key` set) + phase table; no duplicate keys elsewhere.
+1. **Source env + helpers** — `source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh`. This gives all `JIRA_*` vars and helper functions.
+2. **Resolve parent Epic** — `resolve_jira_parent_epic "<--parent or empty>" "<plan-id>"`. Pass the CLI `--parent` value as the first argument when set.
+3. **Sync-only early exit** — If `--sync-only`: run [jira-epic-sync.md](../setup-internal-skills/jira-epic-sync.md) (JQL Tasks under Epic → match phases → fill `jira.md` table), then stop.
+4. **Create Epic** (if no parent) — POST Epic; set `epic_key` in `jira.md` frontmatter; apply `_jira_apply_watcher_policy "$KEY" create`.
+5. **Create Tasks** — For each `phase-N` without a Jira row:
+   - Resolve `estimate_hours:` from `phase-N/ai-prompt.md`, else `JIRA_DEFAULT_ESTIMATE_HOURS`, else ask once.
+   - POST Task with `customfield_10880` = Epic key; `JIRA_ASSIGNEE` when set.
+   - Use `_jira_timetracking_fields $HOURS` for the `timetracking` object.
+   - Summary/description from phase scope — work content only, no doc references, wiki markup.
+   - After POST, `_jira_apply_watcher_policy "$KEY" create`.
+   - Write Jira key + **Est.** to `jira.md` phase row immediately.
+6. **Write `jira.md`** — **Parent Epic** section (when `epic_key` set) + phase table.
 
 Do **not** create phase Tasks under `docs/issues/`.
 

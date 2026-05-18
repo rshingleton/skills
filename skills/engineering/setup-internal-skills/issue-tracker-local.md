@@ -83,7 +83,11 @@ Intake evaluation: **`/plan-it --from-issues`** updates `status` and `## Comment
 ## Resolving Jira for implement-it / verify-it
 
 1. `docs/planning/{ID}/jira.md` → row for `phase-N` (or `_jira_phase_key`).
-2. Source context: `docs/planning/{ID}/sources/*.md` if needed — **not** `docs/issues/`.
+2. Source Jira helpers from `docs/agents/jira-helpers.sh` (copied by `/setup-internal-skills`) or directly from the installed skill:
+   ```bash
+   source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh
+   ```
+3. Source context: `docs/planning/{ID}/sources/*.md` if needed — **not** `docs/issues/`.
 
 ## verify-it and archive
 

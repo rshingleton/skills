@@ -179,8 +179,13 @@ Design deep interfaces; update `CONTEXT.md` terminology.
 
 If user wants Jira (or passed `--jira`):
 
-1. **Read `docs/agents/issue-tracker.md`** — it tells you the tracker type (Local vs Jira), `JIRA_*` env vars, and provides helper functions. **Source Jira env before any API calls:** follow [issue-tracker-jira.md § Loading credentials](../setup-internal-skills/issue-tracker-jira.md#loading-credentials) — do not ask the user for credentials.
-2. **Follow [JIRA.md](JIRA.md):** publish phase Tasks (with **time estimates** per phase), fill **`docs/planning/{ID}/jira.md`**. Sync-from-Epic first when `JIRA_DEFAULT_EPIC` may already have phase tasks. If `estimate_hours` is missing on a phase, ask for hours before POST or use `JIRA_DEFAULT_ESTIMATE_HOURS`.
+1. **Source Jira env + helpers** — one command gives env vars and all helper functions:
+   ```bash
+   source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh
+   ```
+   Do not ask the user for credentials — if missing, guide them to set up `.env`.
+2. **Read `docs/agents/issue-tracker.md`** for tracker type (local vs Jira) and conventions — but Jira helpers come from the sourced script, not from `issue-tracker.md`.
+3. **Follow [JIRA.md](JIRA.md):** publish phase Tasks (with **time estimates** per phase), fill **`docs/planning/{ID}/jira.md`**. Sync-from-Epic first when `JIRA_DEFAULT_EPIC` may already have phase tasks. If `estimate_hours` is missing on a phase, ask for hours before POST or use `JIRA_DEFAULT_ESTIMATE_HOURS`.
 
 When `JIRA_DEFAULT_EPIC` is set but this plan belongs elsewhere, require or confirm **`--parent EPIC-KEY`** — do not silently use the env default if the user named a different Epic.
 

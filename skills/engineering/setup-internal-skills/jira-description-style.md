@@ -56,6 +56,8 @@ When source is phase scope, intake markdown, or other planning artifacts:
 4. Remove duplicate summary paragraph at top.
 5. Do **not** paste markdown through unchanged.
 
+The helper `_jira_wiki_body <file>` automates steps 1-3 (defined in `jira-helpers.sh`, sourced via `load-jira-env.sh`).
+
 ### Example — broken (what the UI shows wrong)
 
 ```markdown
@@ -116,15 +118,7 @@ None
 3. Every AC is one `*` line under `h2. Done when`.
 4. `jq --arg body` or heredoc contains wiki text, not markdown.
 
-Optional helper when converting in shell — strip common markdown mistakes:
-
-```bash
-# Illustrative; prefer deliberate edit for plan content
-_jira_wiki_body() {
-  sed -e 's/^## /h2. /' -e 's/^### /h3. /' \
-      -e 's/^- \[[ xX]\] /* /' -e 's/^- /* /' "$1"
-}
-```
+Use `_jira_wiki_body <file>` (from `jira-helpers.sh`) to automate conversion.
 
 ## Local vs Jira
 

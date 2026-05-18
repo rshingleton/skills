@@ -49,16 +49,21 @@ Skip if already on the target branch. If the branch already exists, ask before s
 
 **Jira (optional)** — infer plan `{ID}` from `ai-prompt.md` path. Resolve key from **`docs/planning/{ID}/jira.md`** → `## Phase tasks` row (or `_jira_phase_key`; Epic context in `## Parent Epic`).
 
-If the phase row has a key, attempt Jira API access **regardless of tracker config**. Source credentials before API calls: follow [issue-tracker-jira.md § Loading credentials](../setup-internal-skills/issue-tracker-jira.md#loading-credentials).
+If the phase row has a key, source Jira credentials and helpers then update the issue. One command gives env vars + all helpers:
+
+```bash
+source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh
+```
 
 If credentials are missing after sourcing (`JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY`):
 - Report the key needing transition
-- Suggest: `source ~/.local/share/ai-skills/scripts/load-jira-env.sh`
+- Suggest checking `.env` at the repo root or `~/.config/ai-skills/.env`
 - **Continue** with implementation — missing Jira access is not blocking
 
 When API is available:
-- If `JIRA_ASSIGNEE` is set, `_jira_set_assignee "$KEY"` ([issue-tracker-jira.md](../setup-internal-skills/issue-tracker-jira.md#assignee-jira_assignee)).
-- Transition to "In Progress" with `?notifyUsers=false`, then `_jira_apply_watcher_policy "$KEY" update` ([jira-notifications.md](../setup-internal-skills/jira-notifications.md)).
+- If `JIRA_ASSIGNEE` is set, `_jira_set_assignee "$KEY"` (does not apply watcher policy).
+- Transition to "In Progress" with `?notifyUsers=false`.
+- Then `_jira_apply_watcher_policy "$KEY" update` to clean up watchers from both writes.
 - If the row is empty, tell the user to run `/plan-it --jira {ID}` or `--sync-only` — do not guess keys.
 
 **Sources** — optional note under `docs/planning/{ID}/sources/*.md` that implementation started; Jira keys only from `jira.md`.

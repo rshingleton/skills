@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # Shim — canonical loader lives with setup-internal-skills (Jira setup skill).
 # Keeps stable path for skills.sh, README curl docs, and app repos that already source scripts/.
+#
+# Agents in consumer repos should prefer:
+#   source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh
+# This shim is for ai-skills repo developers and backward compatibility.
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   echo "Source this script instead of executing it:" >&2
