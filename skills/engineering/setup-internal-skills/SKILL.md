@@ -109,14 +109,21 @@ Draft for user review:
 
 ### 5. Migrate from old layout (re-run only)
 
-When re-running on a repo with a prior setup, clean up files that are no longer written to `docs/agents/`:
+When re-running on a repo with a prior setup, migrate files and update references:
 
-**Check for stale files:** `docs/agents/triage-labels.md`, `docs/agents/domain.md`, `docs/agents/jira-helpers.sh`, `docs/agents/jira-notifications.md`, `docs/agents/jira-description-style.md`.
+**Step A — Validate AGENTS.md references (always).** Scan `AGENTS.md` for old paths:
+- `docs/agents/triage-labels.md` → `~/.agents/skills/setup-internal-skills/triage-labels.md`
+- `docs/agents/domain.md` → `~/.agents/skills/setup-internal-skills/domain.md`
+
+Report any stale entries found and update them. If none, skip.
+
+**Step B — Clean up stale docs/agents/ files.** Check for:
+`docs/agents/triage-labels.md`, `docs/agents/domain.md`, `docs/agents/jira-helpers.sh`, `docs/agents/jira-notifications.md`, `docs/agents/jira-description-style.md`.
 
 **If any exist:** present the list and ask:
 > Found {N} file(s) from a previous setup that are now read from the installed skill path. Remove them? (Y/n)
 
-If yes, delete the files. Also check `AGENTS.md` for old `docs/agents/triage-labels.md` / `docs/agents/domain.md` references and update them to `~/.agents/skills/setup-internal-skills/...` paths.
+If yes, delete the files.
 
 ### 6. Write
 
