@@ -32,7 +32,7 @@ Read whatever exists; don't assume:
 - **Cursor:** `.cursor/rules/*.mdc`, legacy `.cursorrules` (Cursor also loads root `AGENTS.md` — see [PLATFORM-AUDIT.md](./PLATFORM-AUDIT.md))
 - **Claude:** `CLAUDE.md` (pointer only)
 - `CONTEXT.md`, `CONTEXT-MAP.md`, `docs/adr/`, `src/*/docs/adr/`
-- `docs/agents/` — prior setup output?
+- `docs/agents/issue-tracker.md` — prior setup output? (only file written here)
 - `docs/issues/` — local issue tracker in use
 - `.scratch/` — legacy local tracker (migrate to `docs/issues/`)
 - `docs/planning/` — Doc Cycle plans
@@ -77,7 +77,7 @@ Paths to `CONTRIBUTING.md`, `SECURITY_POLICY.md`, `.compliance-rules/`.
 
 Report the inventory table from PLATFORM-AUDIT (what exists, what will change).
 
-**Always:** create or update `AGENTS.md` + `docs/agents/` (merge `## Agent skills` block from [templates/AGENTS.md](./templates/AGENTS.md)).
+**Always:** create or update `AGENTS.md` + write `docs/agents/issue-tracker.md` (merge `## Agent skills` block from [templates/AGENTS.md](./templates/AGENTS.md)).
 
 **Cursor (existing repos):**
 
@@ -103,7 +103,8 @@ Expect `main`; note if remote differs.
 Draft for user review:
 
 - `AGENTS.md` with `## Agent skills` block
-- `docs/agents/issue-tracker.md`, `triage-labels.md`, `domain.md`, optional `compliance.md`
+- `docs/agents/issue-tracker.md` (per-repo tracker config — only file written to `docs/agents/`)
+- Optional `docs/agents/compliance.md`
 - Optional platform files from Section E
 
 ### 5. Write
@@ -121,22 +122,25 @@ Intake: `docs/issues/` (`/issue-it`). Plans: `docs/planning/` (`/plan-it` evalua
 
 ### Triage labels
 
-Three states: `intake` → `ready-for-plan` → `wontfix`. See `docs/agents/triage-labels.md`.
+Three states: `intake` → `ready-for-plan` → `wontfix`. See `~/.agents/skills/setup-internal-skills/triage-labels.md`.
 
 ### Domain docs
 
-[single-context | multi-context]. See `docs/agents/domain.md`.
+[single-context | multi-context]. See `~/.agents/skills/setup-internal-skills/domain.md`.
 ```
 
 For **Jira** tracker, say "Jira REST API"; plans use `docs/planning/<id>/jira.md` via `/plan-it --jira`.
 
-Seed files:
+Seed files (per-repo config only — canonical docs reference installed skill path):
 
 - Local → copy [issue-tracker-local.md](./issue-tracker-local.md) to `docs/agents/issue-tracker.md`
-- Jira → copy [issue-tracker-jira.md](./issue-tracker-jira.md) to `docs/agents/issue-tracker.md`, [jira-notifications.md](./jira-notifications.md) to `docs/agents/jira-notifications.md`, and [jira-description-style.md](./jira-description-style.md) to `docs/agents/jira-description-style.md`. Point users at `~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh` for credentials + helpers.
+- Jira → copy [issue-tracker-jira.md](./issue-tracker-jira.md) to `docs/agents/issue-tracker.md`. Point users at `~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh` for credentials + helpers.
 
-**Always** copy [jira-helpers.sh](./scripts/jira-helpers.sh) to `docs/agents/jira-helpers.sh` regardless of tracker choice — agents source this when `jira.md` has keys but the tracker is local. The `load-jira-env.sh` script sources it automatically, so agents need only one command.
-- [triage-labels.md](./triage-labels.md), [domain.md](./domain.md)
+Do **not** copy `triage-labels.md`, `domain.md`, `jira-helpers.sh`, `jira-notifications.md`, or `jira-description-style.md` to `docs/agents/`. Skills read these directly from the installed skills path (`~/.agents/skills/setup-internal-skills/`). When Jira is the tracker, add this note to `docs/agents/issue-tracker.md`:
+
+```
+Canonical docs: `~/.agents/skills/setup-internal-skills/` (jira-helpers.sh, jira-notifications.md, jira-description-style.md, triage-labels.md, domain.md)
+```
 
 When choosing local, create `docs/issues/` if missing and seed [docs-issues-README.md](./docs-issues-README.md) as `docs/issues/README.md`.
 
@@ -154,8 +158,8 @@ Tell the user setup is complete.
 >
 > Email/ServiceNow: [SCENARIO-EMAIL-SERVICENOW.md](./SCENARIO-EMAIL-SERVICENOW.md). Unfamiliar codebase: `/doc-it`.
 
-**If Jira chosen:** remind them to set `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` (shell export or `.env` per [issue-tracker-jira.md](./issue-tracker-jira.md#loading-credentials)), plus optional `JIRA_DEFAULT_EPIC`, `JIRA_ASSIGNEE`, `JIRA_DEFAULT_ESTIMATE_HOURS`, or `default_epic` in `docs/agents/issue-tracker.md`, and optional watcher env vars ([jira-notifications.md](./jira-notifications.md)).
+**If Jira chosen:** remind them to set `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` (shell export or `.env` per [issue-tracker-jira.md](./issue-tracker-jira.md#loading-credentials)), plus optional `JIRA_DEFAULT_EPIC`, `JIRA_ASSIGNEE`, `JIRA_DEFAULT_ESTIMATE_HOURS`, or `default_epic` in `docs/agents/issue-tracker.md`, and optional watcher env vars (`~/.agents/skills/setup-internal-skills/jira-notifications.md`).
 
-They can edit `docs/agents/*.md` and `AGENTS.md` later; re-run setup to switch trackers.
+They can edit `docs/agents/issue-tracker.md` and `AGENTS.md` later; re-run setup to switch trackers.
 
 Mention [AGENT-PLATFORMS.md](../../../docs/AGENT-PLATFORMS.md) in this skills repo for platform-specific setup (Cursor, Copilot, Claude, optional OpenCode).

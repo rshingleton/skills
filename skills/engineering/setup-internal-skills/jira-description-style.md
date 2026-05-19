@@ -101,6 +101,7 @@ None
 
 - One line, &lt; ~100 chars, verb + object.
 - Do not repeat the summary as the first line of the description.
+- For Tasks under an Epic: use the phase title as-is by default. Optionally prefix with `<Plan title>: ` (e.g. "Auth v2: Implement login form") when the user opts in — the Epic link already provides parent context.
 
 ## What to cut
 

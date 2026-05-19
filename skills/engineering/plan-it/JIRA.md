@@ -121,14 +121,20 @@ At publish time, if only the env default exists, ask: *"Link phase Tasks to defa
 2. **Resolve parent Epic** — `resolve_jira_parent_epic "<--parent or empty>" "<plan-id>"`. Pass the CLI `--parent` value as the first argument when set.
 3. **Sync-only early exit** — If `--sync-only`: run [jira-epic-sync.md](../setup-internal-skills/jira-epic-sync.md) (JQL Tasks under Epic → match phases → fill `jira.md` table), then stop.
 4. **Create Epic** (if no parent) — POST Epic; set `epic_key` in `jira.md` frontmatter; apply `_jira_apply_watcher_policy "$KEY" create`.
-5. **Create Tasks** — For each `phase-N` without a Jira row:
+5. **Ask about title prefix** — before creating tasks, ask:
+   > Prefix phase titles with plan name in Jira? E.g. **"Auth v2: Implement login form"** instead of **"Implement login form"** (y/N)
+   
+   If yes, each phase summary becomes `"<Plan title>: <phase title>"`. If no (default), use phase title as-is. The Epic link already provides parent context.
+
+6. **Create Tasks** — For each `phase-N` without a Jira row:
    - Resolve `estimate_hours:` from `phase-N/ai-prompt.md`, else `JIRA_DEFAULT_ESTIMATE_HOURS`, else ask once.
    - POST Task with `customfield_10880` = Epic key; `JIRA_ASSIGNEE` when set.
    - Use `_jira_timetracking_fields $HOURS` for the `timetracking` object.
-   - Summary/description from phase scope — work content only, no doc references, wiki markup.
+   - Summary: phase title from `ai-prompt.md` (with optional plan-name prefix if user chose y).
+   - Description from phase scope — work content only, no doc references, wiki markup.
    - After POST, `_jira_apply_watcher_policy "$KEY" create`.
    - Write Jira key + **Est.** to `jira.md` phase row immediately.
-6. **Write `jira.md`** — **Parent Epic** section (when `epic_key` set) + phase table.
+7. **Write `jira.md`** — **Parent Epic** section (when `epic_key` set) + phase table.
 
 Do **not** create phase Tasks under `docs/issues/`.
 

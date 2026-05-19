@@ -273,7 +273,7 @@ Unfamiliar repo: /doc-it  →  follow-ups  →  issue-it / plan-it --from-issues
 
 **Email / ServiceNow (org):** paste request in project repo → `/issue-it` → review `docs/issues/<slug>.md` → `/plan-it --from-issues` → `/plan-it <id> --jira [--parent EPIC]` (override `.env` default Epic). See [SCENARIO-EMAIL-SERVICENOW.md](./skills/engineering/setup-internal-skills/SCENARIO-EMAIL-SERVICENOW.md).
 
-Deprecated: `/to-epic`, `/to-jiras`, `/promote-to-jira`, `/issue-it --jira` — see [issue-it](./skills/engineering/issue-it/SKILL.md).
+Deprecated: `/to-epic`, `/to-jiras`, `/promote-to-jira`, `/issue-it --jira` — use `/to-jira` or `/plan-it --jira` instead ([issue-it](./skills/engineering/issue-it/SKILL.md)).
 
 ## Reference
 

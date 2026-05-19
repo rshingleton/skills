@@ -22,7 +22,7 @@ Jira Epic issue linking phase Tasks. Referenced in `jira.md` as `epic_key`. Not 
 _Avoid_: PRD, product requirements document
 
 **Triage role**:
-State machine (`intake` → `ready-for-plan` → `wontfix`) mapped to local inbox `status:` or Jira labels by `/plan-it` intake evaluation. See `docs/agents/triage-labels.md`.
+State machine (`intake` → `ready-for-plan` → `wontfix`) mapped to local inbox `status:` or Jira labels by `/plan-it` intake evaluation. See `~/.agents/skills/setup-internal-skills/triage-labels.md`.
 
 ## Relationships
 

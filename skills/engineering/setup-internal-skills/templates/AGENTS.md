@@ -14,11 +14,11 @@ Intake: `docs/issues/` (`/issue-it`, [audit-to-issues](../audit-to-issues.md)). 
 
 ### Triage labels
 
-Three states: `intake` → `ready-for-plan` → `wontfix`. See `docs/agents/triage-labels.md`.
+Three states: `intake` → `ready-for-plan` → `wontfix`. See `~/.agents/skills/setup-internal-skills/triage-labels.md`.
 
 ### Domain docs
 
-Single-context. See `docs/agents/domain.md`.
+Single-context. See `~/.agents/skills/setup-internal-skills/domain.md`.
 
 ## Doc Cycle
 

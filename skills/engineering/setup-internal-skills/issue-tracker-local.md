@@ -62,7 +62,7 @@ jira_key:
 
 **Status flow (inbox only):** `intake` → `ready-for-plan` → (plan-it moves to `sources/`, status `in-plan`). See [issue-it](../../issue-it/SKILL.md).
 
-Intake evaluation: **`/plan-it --from-issues`** updates `status` and `## Comments` per [triage-labels.md](triage-labels.md). Capture new items with **`/issue-it`** (same file shape).
+Intake evaluation: **`/plan-it --from-issues`** updates `status` and `## Comments` per `~/.agents/skills/setup-internal-skills/triage-labels.md`. Capture new items with **`/issue-it`** (same file shape).
 
 ## Capture intake
 
@@ -83,7 +83,7 @@ Intake evaluation: **`/plan-it --from-issues`** updates `status` and `## Comment
 ## Resolving Jira for implement-it / verify-it
 
 1. `docs/planning/{ID}/jira.md` → row for `phase-N` (or `_jira_phase_key`).
-2. Source Jira helpers from `docs/agents/jira-helpers.sh` (copied by `/setup-internal-skills`) or directly from the installed skill:
+2. Source Jira helpers from the installed skill:
    ```bash
    source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh
    ```

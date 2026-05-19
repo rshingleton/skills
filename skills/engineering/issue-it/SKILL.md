@@ -121,6 +121,13 @@ intake → ready-for-plan → (plan-it moves to planning/<id>/sources/, status i
 
 After move, lifecycle continues under `docs/planning/<id>/sources/` (`in-plan` → `done` at verify-it).
 
+## Push to Jira
+
+- **Single intake item** → Jira: use `/to-jira docs/issues/<slug>.md`. Creates one Jira Task/Bug from the intake file.
+- **Plan with phases** → Jira: use `/plan-it <id> --jira`. Creates Epic + per-phase Tasks.
+
+Deprecated: `/to-epic`, `/to-jiras`, `/promote-to-jira`, `/issue-it --jira` — use `/to-jira` or `/plan-it --jira` instead.
+
 ## Optional: link existing Jira
 
 If reporting from an existing ticket, set `jira_key` on the intake file only. Plan-it will map phases in `jira.md` when publishing.

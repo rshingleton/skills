@@ -96,7 +96,7 @@ source ~/.agents/skills/setup-internal-skills/scripts/jira-helpers.sh
 
 ## Notification suppression (required on writes)
 
-Follow [jira-notifications.md](jira-notifications.md) on **every** create, update, transition, and comment (same as doc-manager):
+Follow `~/.agents/skills/setup-internal-skills/jira-notifications.md` on **every** create, update, transition, and comment (same as doc-manager):
 
 1. Append **`?notifyUsers=false`** to the URL.
 2. Call `_jira_apply_watcher_policy "$KEY" create` after creates, `_jira_apply_watcher_policy "$KEY" update` after updates/transitions/comments.
@@ -124,7 +124,7 @@ This is not standard across all Jira DC versions, so always keep the query param
 
 ## Description style (required on create)
 
-All **`summary`** and **`description`** fields on `POST /issue` must follow [jira-description-style.md](jira-description-style.md): **Jira wiki markup** (`h2.`, `*` bullets) — **never** markdown `##` or `- [ ]` in the POST body. Structured and detailed; no AI essay prose.
+All **`summary`** and **`description`** fields on `POST /issue` must follow `~/.agents/skills/setup-internal-skills/jira-description-style.md`: **Jira wiki markup** (`h2.`, `*` bullets) — **never** markdown `##` or `- [ ]` in the POST body. Structured and detailed; no AI essay prose.
 
 Use `_jira_wiki_body <file>` to convert markdown to wiki markup.
 

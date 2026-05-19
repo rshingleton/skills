@@ -3,8 +3,8 @@ name: to-jira
 description: >
   Push a local intake issue or plan to Jira as a single issue. Reads
   docs/issues/<slug>.md or docs/planning/<id>/ and creates a Jira Task/Bug
-  from it. Use when user says to-jira, push to jira, create jira from issue,
-  or promote to jira.
+  from it. Use when user says to-jira, push to jira, create jira, make jira,
+  create jira from issue, or promote to jira.
 ---
 
 # To Jira

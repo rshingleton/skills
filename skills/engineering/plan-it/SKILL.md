@@ -34,6 +34,8 @@ From existing inbox items:
 
 → Evaluates intake (triage), grills, scaffolds. With Jira: `/plan-it <id> --jira`.
 
+Single issue (not a plan): `/to-jira docs/issues/<slug>.md` ([to-jira](../to-jira/SKILL.md)).
+
 ## Three layers (do not mix)
 
 | Layer | Path | Purpose |
@@ -94,7 +96,7 @@ grill. One item at a time; get user confirmation before moving on.
 
 **Reference docs** (run `/setup-internal-skills` if missing):
 - `docs/agents/issue-tracker.md` — which tracker this repo uses
-- `docs/agents/triage-labels.md` — role → local `status` / Jira label
+- `~/.agents/skills/setup-internal-skills/triage-labels.md` — role → local `status` / Jira label
 - `.out-of-scope/` — knowledge base of rejected features (see [OUT-OF-SCOPE.md](OUT-OF-SCOPE.md))
 
 Every evaluation note or question **must** start with:
@@ -192,6 +194,8 @@ When `JIRA_DEFAULT_EPIC` is set but this plan belongs elsewhere, require or conf
 Do **not** create `docs/issues/<slug>/tasks/` for plan phases.
 
 **If Jira was not requested:** ask the user *"Create Jira issues for this plan now?"* If yes, run the Jira publish flow (step 5a); if no, note that they can later run `/plan-it {ID} --jira` or `/plan-it {ID} --jira --sync-only` to publish or re-sync.
+
+For a **single intake item** (not a multi-phase plan), suggest `/to-jira docs/issues/<slug>.md` ([to-jira](../to-jira/SKILL.md)) as a lighter alternative — creates one Jira issue without the Epic+Task hierarchy.
 
 ### 7. Next skill
 
