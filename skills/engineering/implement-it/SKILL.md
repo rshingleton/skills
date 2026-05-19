@@ -7,12 +7,6 @@ description: >
   code, engineer, tdd, red green refactor.
 ---
 
-## Arguments
-
-| Argument | Meaning |
-|----------|---------|
-| `--branch <name>` | Create and switch to a feature branch before making changes. Use for phase isolation — gives audit-it a cleaner diff and commit-it a branch to push. |
-
 ## Role
 
 Implementation Agent (Engineer). Writes production code and tests for the current plan phase only. Does **not** finalize ADRs, CONTEXT, or changelog. Does **not** run `/audit-it` until **every** implementation phase in the plan is complete.
@@ -38,14 +32,6 @@ Read the orchestration `README.md` and the current phase's `ai-prompt.md`. **Str
 Discover repo standards per [STANDARDS.md](STANDARDS.md) §1 before the first edit.
 
 Flag ambiguities to the Planning Agent (Architect) via the user — do not guess past the prompt.
-
-**Branch (optional).** If `--branch <name>` was passed:
-
-```bash
-git checkout -b <name>
-```
-
-Skip if already on the target branch. If the branch already exists, ask before switching. This isolates phase changes for a cleaner diff at audit time.
 
 **Jira (optional)** — infer plan `{ID}` from `ai-prompt.md` path. Resolve key from **`docs/planning/{ID}/jira.md`** → `## Phase tasks` row (or `_jira_phase_key`; Epic context in `## Parent Epic`).
 
@@ -126,5 +112,4 @@ Still implementing — do **not** suggest full `/audit-it` or `/verify-it`.
 - **Standards-first:** Discover and follow repo docs before generating code ([STANDARDS.md](STANDARDS.md)).
 - **Test-first:** Every feature starts with a failing test. Red → Green → Refactor. Never skip Red.
 - **Non-Architect:** Do not author new plans or change architectural direction.
-- **Branch-isolated:** When `--branch` is used, all phase changes stay on that branch.
 - **Decoupled:** Do not perform git commits; do not finalize durable documentation.
