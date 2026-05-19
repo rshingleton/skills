@@ -51,4 +51,13 @@ Per commit `4a1beaf`, only `issue-tracker.md` is seeded — the other files are 
 
 ## Resolution
 
-Both medium findings fixed in the same session — see `skills/engineering/README.md:49` and `templates/AGENTS.md:13,29`.
+All findings closed:
+
+| # | Status | Action |
+|---|--------|--------|
+| M1 | Fixed | `skills/engineering/README.md:49` updated |
+| M2 | Fixed | `templates/AGENTS.md:13,29` relative links replaced |
+| L1 | Fixed | Added "Use when" trigger to `internal-compliance/SKILL.md` |
+| L2 | Fixed | Added "Use when" trigger to `handoff/SKILL.md` |
+| L3 | Noted | 212 lines — acceptable; major concerns already split to JIRA.md, FROM-ISSUES.md, REFERENCE.md |
+| L4 | Noted | 165 lines — acceptable; orchestration of multi-step interactive setup requires the length |

@@ -1,6 +1,6 @@
 ---
 name: handoff
-description: Compact the current conversation into a handoff document for another agent to pick up.
+description: Compact the current conversation into a handoff document for another agent to pick up. Use when switching agents, ending a session, or when user says handoff, hand over, transfer context, or summary for next session.
 argument-hint: "What will the next session be used for?"
 ---
 

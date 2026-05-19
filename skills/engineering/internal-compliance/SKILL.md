@@ -1,6 +1,6 @@
 ---
 name: internal-compliance
-description: Pre-flight compliance check against internal security linting rules before finalizing any pull request. Scans code for secret leakage, dependency policy violations, and organization coding standards.
+description: Pre-flight compliance check against internal security linting rules before finalizing any pull request. Scans code for secret leakage, dependency policy violations, and organization coding standards. Use when user says compliance check, security scan, secret leak, pre-flight, or before marking a PR ready for review.
 ---
 
 # Internal Compliance Check
