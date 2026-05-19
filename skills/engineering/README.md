@@ -46,6 +46,6 @@ For per-phase Jira Task creation, use `/plan-it --jira` instead.
 - **[improve-codebase-architecture](./improve-codebase-architecture/SKILL.md)** — Find deepening opportunities; optional intake via [audit-to-issues](./setup-internal-skills/audit-to-issues.md).
 - **[internal-compliance](./internal-compliance/SKILL.md)** — Pre-flight compliance check against internal security linting rules before finalizing any PR.
 - **[prototype](./prototype/SKILL.md)** — Build a throwaway prototype to flesh out a design.
-- **[setup-internal-skills](./setup-internal-skills/SKILL.md)** — Scaffold `AGENTS.md`, `docs/agents/`, and optional OpenCode/Copilot/Cursor config. **Default:** local issues in `docs/issues/`. Jira setup seeds `issue-tracker.md`, [jira-notifications.md](./setup-internal-skills/jira-notifications.md), [jira-description-style.md](./setup-internal-skills/jira-description-style.md).
+- **[setup-internal-skills](./setup-internal-skills/SKILL.md)** — Scaffold `AGENTS.md`, `docs/agents/`, and optional OpenCode/Copilot/Cursor config. **Default:** local issues in `docs/issues/`. Jira setup seeds `docs/agents/issue-tracker.md` only; canonical docs (jira-notifications.md, jira-description-style.md, jira-helpers.sh, triage-labels.md, domain.md) are read from `~/.agents/skills/setup-internal-skills/`.
 - **[tdd](./tdd/SKILL.md)** — Test-driven development with red-green-refactor loop.
 - **[zoom-out](./zoom-out/SKILL.md)** — Get broader context on unfamiliar code.
