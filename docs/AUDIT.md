@@ -61,3 +61,4 @@ All findings closed:
 | L2 | Fixed | Added "Use when" trigger to `handoff/SKILL.md` |
 | L3 | Noted | 212 lines — acceptable; major concerns already split to JIRA.md, FROM-ISSUES.md, REFERENCE.md |
 | L4 | Noted | 165 lines — acceptable; orchestration of multi-step interactive setup requires the length |
+| L5 | Fixed | Added migration step to `/setup-internal-skills` that cleans up old `docs/agents/` files on re-run, updates AGENTS.md references |

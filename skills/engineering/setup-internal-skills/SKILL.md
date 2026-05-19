@@ -107,7 +107,18 @@ Draft for user review:
 - Optional `docs/agents/compliance.md`
 - Optional platform files from Section E
 
-### 5. Write
+### 5. Migrate from old layout (re-run only)
+
+When re-running on a repo with a prior setup, clean up files that are no longer written to `docs/agents/`:
+
+**Check for stale files:** `docs/agents/triage-labels.md`, `docs/agents/domain.md`, `docs/agents/jira-helpers.sh`, `docs/agents/jira-notifications.md`, `docs/agents/jira-description-style.md`.
+
+**If any exist:** present the list and ask:
+> Found {N} file(s) from a previous setup that are now read from the installed skill path. Remove them? (Y/n)
+
+If yes, delete the files. Also check `AGENTS.md` for old `docs/agents/triage-labels.md` / `docs/agents/domain.md` references and update them to `~/.agents/skills/setup-internal-skills/...` paths.
+
+### 6. Write
 
 **AGENTS.md:** Create from [templates/AGENTS.md](./templates/AGENTS.md) if missing; otherwise update the `## Agent skills` block in place.
 
@@ -146,7 +157,7 @@ When choosing local, create `docs/issues/` if missing and seed [docs-issues-READ
 
 **Platform audit:** Apply [PLATFORM-AUDIT.md](./PLATFORM-AUDIT.md) — patch Copilot in place, ensure `AGENTS.md` works for Cursor, report `.cursor/rules/` without creating redundant `.mdc` files unless requested. OpenCode is optional — only merge config if the team uses it.
 
-### 6. Done
+### 7. Done
 
 Tell the user setup is complete.
 
