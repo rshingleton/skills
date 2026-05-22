@@ -11,6 +11,8 @@ description: >
 
 Creates a `docs/planning/<id>/` plan from an existing Jira issue — no local inbox file needed.
 
+This is the **read direction** (Jira → local). For the write direction (local → Jira), use [`to-jira`](../to-jira/SKILL.md).
+
 ## Quick start
 
 ```text

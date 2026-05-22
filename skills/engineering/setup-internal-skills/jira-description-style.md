@@ -1,6 +1,6 @@
 # Jira description style
 
-**Required** for every Jira **create** (`POST /issue`): `summary`, `description`, and triage **create** body. **Time tracking:** set `timetracking.originalEstimate` + `remainingEstimate` on Task creates when hours are known ([issue-tracker-jira.md § Time estimates](issue-tracker-jira.md#time-estimates-timetracking)).
+**Required** for every Jira **create** (delegated to `to-jira` which posts `POST /issue`): `summary`, `description`, and triage **create** body. **Time tracking:** set `timetracking.originalEstimate` + `remainingEstimate` on Task creates when hours are known ([issue-tracker-jira.md § Time estimates](issue-tracker-jira.md#time-estimates-timetracking)).
 
 **Stand-alone descriptions:** Jira descriptions and comments describe the work, not the planning artifact it was sourced from. No references to `ai-prompt.md`, `execution-notes.md`, audit reports, or other planning docs in the issue body.
 

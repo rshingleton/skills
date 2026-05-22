@@ -3,9 +3,10 @@ name: plan-it
 description: >
   Doc Cycle — plan phase. Grill, scaffold phases, draft ADRs, optional Jira
   (jira.md), start from intake (--from-issues), re-sync Jira keys
-  (--jira --sync-only). Use when a feature, bugfix, or change needs
-  structured scoping, or when user says plan-it, plan, --from-issues,
-  design, or architecture.
+  (--jira --sync-only). Jira API operations delegate to
+  [to-jira](../to-jira/SKILL.md) — no direct curl. Use when a feature,
+  bugfix, or change needs structured scoping, or when user says plan-it,
+  plan, --from-issues, design, or architecture.
 ---
 
 ## Role
@@ -179,23 +180,24 @@ Design deep interfaces; update `CONTEXT.md` terminology.
 
 ### 6. Jira (optional)
 
+Delegate all Jira API operations to [`to-jira`](../to-jira/SKILL.md) — plan-it does not source credentials or curl Jira directly.
+
 If user wants Jira (or passed `--jira`):
 
-1. **Source Jira env + helpers** — one command gives env vars and all helper functions:
-   ```bash
-   source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh
-   ```
-   Do not ask the user for credentials — if missing, guide them to set up `.env`.
-2. **Read `docs/agents/issue-tracker.md`** for tracker type (local vs Jira) and conventions — but Jira helpers come from the sourced script, not from `issue-tracker.md`.
-3. **Follow [JIRA.md](JIRA.md):** publish phase Tasks (with **time estimates** per phase), fill **`docs/planning/{ID}/jira.md`**. Sync-from-Epic first when `JIRA_DEFAULT_EPIC` may already have phase tasks. If `estimate_hours` is missing on a phase, ask for hours before POST or use `JIRA_DEFAULT_ESTIMATE_HOURS`.
+1. **Read `docs/agents/issue-tracker.md`** for tracker type (local vs Jira) and conventions.
+2. **Follow [JIRA.md](JIRA.md):** prepare phase data (titles, descriptions, `estimate_hours:`), then delegate API calls to **`to-jira`**:
+   - Create Epic: `/to-jira create-epic "<Plan Title>" <plan-id>`
+   - Create Tasks: `/to-jira create-task <plan-id> phase-N` per phase
+   - Sync from Epic: `/plan-it <id> --jira --sync-only` (runs jira-epic-sync.md)
+3. Fill **`docs/planning/{ID}/jira.md`** with keys returned by `to-jira`.
 
 When `JIRA_DEFAULT_EPIC` is set but this plan belongs elsewhere, require or confirm **`--parent EPIC-KEY`** — do not silently use the env default if the user named a different Epic.
 
 Do **not** create `docs/issues/<slug>/tasks/` for plan phases.
 
-**If Jira was not requested:** ask the user *"Create Jira issues for this plan now?"* If yes, run the Jira publish flow (step 5a); if no, note that they can later run `/plan-it {ID} --jira` or `/plan-it {ID} --jira --sync-only` to publish or re-sync.
+**If Jira was not requested:** ask the user *"Create Jira issues for this plan now?"* If yes, delegate to `to-jira` per JIRA.md; if no, note that they can later run `/plan-it {ID} --jira` or `/plan-it {ID} --jira --sync-only` to publish or re-sync.
 
-For a **single intake item** (not a multi-phase plan), suggest `/to-jira docs/issues/<slug>.md` ([to-jira](../to-jira/SKILL.md)) as a lighter alternative — creates one Jira issue without the Epic+Task hierarchy.
+For a **single intake item** (not a multi-phase plan), suggest `/to-jira create docs/issues/<slug>.md` as a lighter alternative — creates one Jira issue without the Epic+Task hierarchy.
 
 ### 7. Next skill
 

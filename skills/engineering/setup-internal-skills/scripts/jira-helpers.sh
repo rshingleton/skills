@@ -52,9 +52,6 @@ _jira_apply_watcher_policy() {
   [ "$mode" = "create" ] && _jira_add_watchers "$key"
 }
 
-# Legacy alias for update-only calls (implement-it, verify-it transitions).
-_remove_jira_watcher() { _jira_apply_watcher_policy "$1" "update"; }
-
 # Set assignee on an issue. Does NOT call watcher policy — call
 # _jira_apply_watcher_policy separately after this if needed.
 _jira_set_assignee() {

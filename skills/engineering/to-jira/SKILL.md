@@ -1,17 +1,23 @@
 ---
 name: to-jira
 description: >
-  Push a local intake issue or plan to Jira as a single issue. Reads
-  docs/issues/<slug>.md or docs/planning/<id>/ and creates a Jira Task/Bug
-  from it. Use when user says to-jira, push to jira, create jira, make jira,
+  Central Jira operation handler. All skills delegate Jira API calls here
+  instead of duplicating curl commands — create, transition, resolve,
+  comment, assign, and watcher-policy. Reads docs/issues/<slug>.md or
+  docs/planning/<id>/ and creates Jira issues from local artifacts.
+  Use when user says to-jira, push to jira, create jira, make jira,
   create jira from issue, or promote to jira.
 ---
 
 # To Jira
 
-Creates a **single Jira issue** from an existing local artifact. For plan phase Tasks, use `/plan-it --jira` instead.
+Central Jira operation handler. **All other skills delegate Jira API operations here** — no skill sources credentials or curls Jira directly.
+
+The helper functions in `setup-internal-skills/scripts/jira-helpers.sh` remain the canonical implementation; this skill is the **orchestration layer** that calls them.
 
 ## Quick start
+
+Bare path defaults to `create`:
 
 ```text
 /to-jira docs/issues/rate-limit-auth.md
@@ -19,124 +25,233 @@ Creates a **single Jira issue** from an existing local artifact. For plan phase 
 /to-jira docs/planning/auth-v2/
 ```
 
-Optional `--parent EPIC-KEY` links the new issue to an Epic. If omitted, resolves from `JIRA_DEFAULT_EPIC` or prompts you.
+Other operations:
 
-## Workflow
+```text
+/to-jira create-epic "Plan Title" <plan-id>
+/to-jira create-task <plan-id> phase-1
+/to-jira transition KEY-123 "In Progress"
+/to-jira resolve KEY-123 "Done"
+/to-jira comment KEY-123 "Comment text"
+/to-jira assign KEY-123
+/to-jira watcher-policy KEY-123 create|update
+```
 
-### 1. Identify the source
+## Sourcing credentials (read first)
 
-| Source | What happens |
-|--------|-------------|
-| `docs/issues/<slug>.md` | Create one Jira issue from the intake body. Issue type: `Task` (feature/todo/defer) or `Bug` (bug). |
-| `docs/planning/<id>/` | Create one Jira issue from the plan README scope. Issue type: `Task`. For per-phase Tasks, use `/plan-it --jira`. |
-
-### 2. Source Jira credentials
+Every operation needs Jira credentials. Source once:
 
 ```bash
 source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh
 ```
 
-### 3. Resolve parent Epic
+This sets `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` and provides all helper functions (`_jira_apply_watcher_policy`, `resolve_jira_parent_epic`, `_jira_timetracking_fields`, `_jira_wiki_body`, `_jira_set_assignee`, etc.).
 
-Check `--parent` flag, then `JIRA_DEFAULT_EPIC`, else ask:
-
-> Link this issue to an Epic? (key or blank)
-
-When resolved, set `customfield_10880` on the POST payload.
-
-### 4. Build the Jira description
-
-Read the source body, convert markdown → Jira wiki markup:
+For this ai-skills repo itself:
 
 ```bash
-_jira_wiki_body docs/issues/rate-limit-auth.md
+source skills/engineering/setup-internal-skills/scripts/load-jira-env.sh
 ```
 
-Follow [jira-description-style.md](../setup-internal-skills/jira-description-style.md):
-- `h2.` sections, `*` bullets
-- No `##`, no `- [ ]`
-- Concrete behavior, no planning doc references
+If credentials are missing after sourcing:
+- Report the target key(s)
+- Suggest checking `.env` at the repo root or `~/.config/ai-skills/.env`
+- **Stop** — Jira operations cannot proceed without credentials
 
-### 5. POST to Jira
+Each operation below says "(credentials)" instead of repeating this block.
 
-Build the payload with `jq`, including Epic link when resolved:
+## Default operation: `create`
+
+When invoked with a **bare path** (no subcommand), `/to-jira <path>` runs the `create` flow. Aliases: any invocation that starts with a path or `--parent` flag triggers create.
+
+Parts of this flow ask you questions before acting — Epic linking, phase splitting, and posting all require confirmation.
+
+## Operations
+
+### `create` — Create Jira issue(s) from a local artifact
+
+| Source | Issue type | Behaviour |
+|--------|-----------|-----------|
+| `docs/issues/<slug>.md` | `Task` (feature/todo/defer) or `Bug` (bug) | Creates one Jira issue from intake body |
+| `docs/planning/<id>/` | `Task` or per-phase Tasks | Detects phases and offers single vs per-phase |
+
+#### Phase 1: Epic grill
+
+If `--parent EPIC-KEY` was not passed:
+
+1. Check `JIRA_DEFAULT_EPIC` env var.
+2. If found, confirm with the user: *"Link to default Epic {JIRA_DEFAULT_EPIC}? (Y/n)"*. If no, ask for an alternate key or blank for standalone.
+3. If not found, ask: *"Link this issue to an Epic? (key or blank)"*.
+
+Resolved Epic key → set `customfield_10880` on the POST payload.
+
+#### Phase 2: Phase detection (plan sources only)
+
+When the source is `docs/planning/<id>/`:
+
+1. Detect phases by listing `phase-*/ai-prompt.md` files.
+2. If multiple phases found and an Epic is resolved (or `JIRA_DEFAULT_EPIC` is set), ask:
+
+   > This plan has {N} phase(s). Create a single Task for the whole plan, or one Task per phase? (single/per-phase)
+
+   - **single** → Create one `Task` from the plan README. Write one row in `jira.md` with that key for all phases.
+   - **per-phase** → Run `create-task` for each phase under the resolved Epic. Write per-phase rows in `jira.md`.
+
+   If no Epic is resolved, create one `Task` for the whole plan.
+
+#### Phase 3: Create
+
+1. Read source body, convert markdown → Jira wiki markup (`_jira_wiki_body`)
+2. Build payload with `jq`, POST with `notifyUsers=false`
+3. Apply watcher policy: `_jira_apply_watcher_policy "$KEY" create`
+4. Write Jira key back to source (frontmatter for issues, per-phase rows for plans)
+
+### `create-epic` — Create a new Epic
+
+Used by the create flow when the user chooses per-phase but no parent Epic exists.
 
 ```bash
-PAYLOAD=$(jq -n \
-  --arg project "$JIRA_PROJECT_KEY" \
-  --arg summary "<issue title>" \
-  --arg body "$BODY" \
-  --arg type "<Task|Bug>" \
-  --arg epic "$EPIC_KEY" \
-  '{
-    fields: ({
-      project: {key: $project},
-      summary: $summary,
-      description: $body,
-      issuetype: {name: $type},
-      labels: ["ai-generated"]
-    } + (if $epic != "" then {customfield_10880: $epic} else {} end))
-  }')
-```
-
-Include `timetracking` when estimate hours are available (from `estimate_hours:` in plan README or `JIRA_DEFAULT_ESTIMATE_HOURS`):
-
-```bash
-EST_HOURS="${JIRA_DEFAULT_ESTIMATE_HOURS:-}"
-TIMETRACKING=$(_jira_timetracking_fields "$EST_HOURS")
-PAYLOAD=$(echo "$PAYLOAD" | jq --argjson tt "$TIMETRACKING" '.fields + $tt')
-```
-
-POST:
-
-```bash
-KEY=$(curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
+# (credentials)
+EPIC_KEY=$(curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
   -H "Content-Type: application/json" \
   -X POST \
   "$JIRA_BASE_URL/rest/api/2/issue?notifyUsers=false" \
-  -d "$PAYLOAD" | jq -r '.key')
+  -d "$(jq -n \
+    --arg project "$JIRA_PROJECT_KEY" \
+    --arg summary "$1" \
+    '{
+      fields: {
+        project: {key: $project},
+        summary: $summary,
+        issuetype: {name: "Epic"},
+        labels: ["ai-generated"]
+      }
+    }')" | jq -r '.key')
+_jira_apply_watcher_policy "$EPIC_KEY" create
 ```
 
-After POST:
+Write `epic_key` to `jira.md` frontmatter. Report key.
+
+### `create-task` — Create a phase Task under an Epic
+
+Used by the create flow for per-phase splits.
+
+Args: `<plan-id> <phase-N>` (e.g. `auth-v2 phase-1`)
+
+Reads `docs/planning/<plan-id>/phase-<N>/ai-prompt.md` for title, scope, and `estimate_hours:`. Reads `jira.md` for Epic key.
+
 ```bash
-_jira_apply_watcher_policy "$KEY" create
+# (credentials)
+# Resolve plan-id and phase
+PLAN_ID="$1" PHASE="$2"
+EPIC_KEY=$(awk -F': *' '/^epic_key:/{gsub(/[" \t]/,"",$2); print $2; exit}' "docs/planning/${PLAN_ID}/jira.md")
+EST_HOURS=$(grep -E '^estimate_hours:' "docs/planning/${PLAN_ID}/${PHASE}/ai-prompt.md" | awk '{print $2}')
+# ... POST Task with customfield_10880 = Epic key, timetracking from EST_HOURS
+# ... _jira_apply_watcher_policy "$KEY" create
+# ... Write key to jira.md phase row
 ```
 
-### 6. Write back
+If `JIRA_ASSIGNEE` is set, include it in the POST payload. After POST, write Jira key to `jira.md` phase row immediately.
 
-Record the Jira key in the source file:
+### `transition` — Transition an issue to a new status
 
-**For an intake issue** (`docs/issues/<slug>.md`): set `jira_key: KEY-123` in frontmatter.
+Used by `/implement-it` (→ "In Progress") and `/verify-it` (→ "Done"/"Resolved").
 
-**For a plan** (`docs/planning/<id>/`): write key to `jira.md`:
+Before executing, present the transition to the user for confirmation:
 
-```markdown
----
-jira_key: KEY-123
----
+> Transition {KEY} to "{status}"? (y/n)
 
-# Jira map
+If yes:
 
-| Source | Jira | Summary |
-|--------|------|---------|
-| <plan-id> | KEY-123 | <plan title> |
+```bash
+# (credentials)
+TRANSITIONS=$(curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
+  "$JIRA_BASE_URL/rest/api/2/issue/$1/transitions")
+TARGET_ID=$(echo "$TRANSITIONS" | jq -r ".transitions[] | select(.to.name == \"$2\") | .id" | head -1)
+curl -s -o /dev/null -X POST \
+  -H "Authorization: Bearer $JIRA_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  "$JIRA_BASE_URL/rest/api/2/issue/$1/transitions?notifyUsers=false" \
+  -d "$(jq -n --arg id "$TARGET_ID" '{transition: {id: $id}}')"
+_jira_apply_watcher_policy "$1" update
 ```
 
-### 7. Report
+If credentials are missing, report which key needs transition and suggest checking `.env`. **Continue** — missing Jira access is non-blocking.
 
-> Created KEY-123 from `docs/issues/<slug>.md`. Linked in frontmatter.
-> Browse: $JIRA_BASE_URL/browse/KEY-123
+### `resolve` — Transition to Done and optional comment
+
+Used by `/verify-it`. Shorthand for `transition KEY "Done"` + optional `comment`.
+
+Ask:
+
+> Resolve {KEY} to "{status}"? (y/n)
+
+If yes, prompt for a resolution comment:
+
+> Add a resolution comment? (y/n)
+
+If yes, ask for text (or present a draft): *"Post this comment to {KEY}? (y/edit/skip)"*. Post if confirmed.
+
+```bash
+# (credentials)
+# Run transition "$1" "Done" (or "Resolved")
+# If comment text provided, post via curl POST /issue/$1/comment?notifyUsers=false
+_jira_apply_watcher_policy "$1" update
+```
+
+### `comment` — Add a comment to an issue
+
+Always prompt before posting:
+
+> Post this comment to {KEY}? (y/edit/skip)
+
+If y, post. If edit, take user's edited text. If skip, abort.
+
+```bash
+# (credentials)
+curl -s -o /dev/null -X POST \
+  -H "Authorization: Bearer $JIRA_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  "$JIRA_BASE_URL/rest/api/2/issue/$1/comment?notifyUsers=false" \
+  -d "$(jq -n --arg body "$2" '{body: $body}')"
+```
+
+### `assign` — Set assignee on an issue
+
+```bash
+# (credentials)
+_jira_set_assignee "$1"
+```
+
+Does **not** apply watcher policy — caller should run `watcher-policy` separately.
+
+### `watcher-policy` — Apply watcher policy
+
+```bash
+# (credentials)
+_jira_apply_watcher_policy "$1" "$2"
+```
+
+`$2` is `create` (add watchers + remove ignored) or `update` (remove ignored only).
+
+## Delegation rules
+
+| Skill | Delegates to `to-jira` | What |
+|-------|------------------------|------|
+| `plan-it` | `create-epic`, `create-task`, `watcher-policy` | Publish phase Tasks to Jira |
+| `implement-it` | `transition`, `assign`, `watcher-policy` | Move phase to "In Progress" |
+| `verify-it` | `resolve`, `comment`, `transition`, `watcher-policy` | Resolve phase in Jira |
+| `from-jira` | — (reads FROM Jira, inverse direction) | Uses own fetch logic |
 
 ## When to use
 
-| Use `/to-jira` | Use `/plan-it --jira` |
-|----------------|----------------------|
-| Single intake item needs Jira tracking | Plan has multiple phases needing per-phase Tasks |
-| Bug needs Jira visibility without full Doc Cycle | Need Epic + Task hierarchy |
-| Quick push from intake to shared tracker | Need time tracking per phase |
+| Use `/to-jira` (this skill) | Other |
+|-----------------------------|-------|
+| Any Jira create/update/transition/comment | `/from-jira` for reading Jira → local plan |
+| Single intake item needs Jira tracking | `/plan-it --jira` for Epic + per-phase Task hierarchy |
+| Phase needs transition during implement-it | Direct Jira UI for manual edits |
 
 ## Not supported
 
-- No Epic creation — links to existing Epics only (use `/plan-it --jira` to create new Epics + phase Tasks)
-- No transition or status changes on existing Jira issues
 - No sync direction from Jira back to local (use `/from-jira`)
+- No JQL queries or bulk operations

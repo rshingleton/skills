@@ -2,25 +2,13 @@
 
 Jira keys for a Doc Cycle plan live in **`docs/planning/<plan-id>/jira.md`** only — not in `docs/issues/` task trees or scattered phase frontmatter.
 
-Before any Jira API calls, source env vars + helpers:
-
-```bash
-source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh
-```
-
-This sets `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` and provides all helper functions (`_jira_apply_watcher_policy`, `resolve_jira_parent_epic`, `_jira_timetracking_fields`, `_jira_wiki_body`, etc.).
-
-For this ai-skills repo itself:
-
-```bash
-source skills/engineering/setup-internal-skills/scripts/load-jira-env.sh
-```
+**All Jira API operations delegate to `to-jira`** ([to-jira](../to-jira/SKILL.md)) — plan-it does not source credentials or curl Jira directly.
 
 ## Invocations
 
 | Command | Use |
 |---------|-----|
-| `/plan-it <id> --jira` | Publish phase Tasks to Jira (creates Epic + Tasks) |
+| `/plan-it <id> --jira` | Publish phase Tasks to Jira (creates Epic + Tasks via `to-jira`) |
 | `/plan-it <id> --jira --sync-only` | Re-sync keys from existing Epic, no re-grill |
 | `/plan-it <id> --jira --parent EPIC-KEY` | Override default parent Epic |
 
@@ -41,7 +29,7 @@ Ask during `/plan-it` after phases are scaffolded:
 - *"Create Jira issues for this plan?"* → continue with **`--jira`** (or user says yes mid-skill).
 - *"Sync from existing Epic?"* → **`--jira --sync-only`** when `JIRA_DEFAULT_EPIC` already has phase Tasks.
 
-Requires `JIRA_*` env — source via `load-jira-env.sh` as shown above. Watcher policy: [jira-notifications.md](../setup-internal-skills/jira-notifications.md).
+Requires `JIRA_*` env — source via `load-jira-env.sh`. Watcher policy: [jira-notifications.md](../setup-internal-skills/jira-notifications.md).
 
 **Descriptions:** build from phase scope — work content only (`h2. What`, `h2. Done when`, `*` bullets). Convert to **Jira wiki markup** before POST; no markdown `##` or `- [ ]` ([jira-description-style.md](../setup-internal-skills/jira-description-style.md)). No references to planning docs (`ai-prompt.md`, `execution-notes.md`, audit reports) in the description body.
 
@@ -99,44 +87,18 @@ Phase Tasks below use Epic Link (`customfield_10880` = CDS-109).
 No parent Epic — phase Tasks are standalone in $JIRA_PROJECT_KEY.
 ```
 
-`/implement-it` and `/verify-it` read the **current phase row** from **Phase tasks** for Jira transitions; use **Parent Epic** for context and JQL sync.
-
-## Parent Epic override
-
-**`--parent EPIC-KEY` on the invocation always wins** over `JIRA_DEFAULT_EPIC` in `.env`, `default_epic` in `issue-tracker.md`, and prior team habit.
-
-Examples:
-
-```text
-/plan-it auth-fix --jira --parent CDS-200
-```
-
-Even when `.env` has `JIRA_DEFAULT_EPIC=CDS-100`, phase Tasks link to **CDS-200**. Set `parent_source: --parent` in `jira.md`.
-
-At publish time, if only the env default exists, ask: *"Link phase Tasks to default Epic CDS-100, or pass `--parent` for a different Epic?"*
-
 ## Publish flow
 
-1. **Source env + helpers** — `source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh`. This gives all `JIRA_*` vars and helper functions.
-2. **Resolve parent Epic** — `resolve_jira_parent_epic "<--parent or empty>" "<plan-id>"`. Pass the CLI `--parent` value as the first argument when set.
-3. **Sync-only early exit** — If `--sync-only`: run [jira-epic-sync.md](../setup-internal-skills/jira-epic-sync.md) (JQL Tasks under Epic → match phases → fill `jira.md` table), then stop.
-4. **Create Epic** (if no parent) — POST Epic; set `epic_key` in `jira.md` frontmatter; apply `_jira_apply_watcher_policy "$KEY" create`.
+Delegate all Jira API operations to [`to-jira`](../to-jira/SKILL.md):
+
+1. **Source env** — `source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh`. Needed for plan-it's own local operations (resolve parent Epic, read `jira.md`). `to-jira` also sources credentials separately for its API calls.
+2. **Resolve parent Epic** — `resolve_jira_parent_epic "<--parent or empty>" "<plan-id>"`
+3. **Sync-only early exit** — If `--sync-only`: run [jira-epic-sync.md](../setup-internal-skills/jira-epic-sync.md), then stop
+4. **Create Epic** (if no parent) — `/to-jira create-epic "<Plan Title>" <plan-id>`
 5. **Ask about title prefix** — before creating tasks, ask:
    > Prefix phase titles with plan name in Jira? E.g. **"Auth v2: Implement login form"** instead of **"Implement login form"** (y/N)
-   
-   If yes, each phase summary becomes `"<Plan title>: <phase title>"`. If no (default), use phase title as-is. The Epic link already provides parent context.
-
-6. **Create Tasks** — For each `phase-N` without a Jira row:
-   - Resolve `estimate_hours:` from `phase-N/ai-prompt.md`, else `JIRA_DEFAULT_ESTIMATE_HOURS`, else ask once.
-   - POST Task with `customfield_10880` = Epic key; `JIRA_ASSIGNEE` when set.
-   - Use `_jira_timetracking_fields $HOURS` for the `timetracking` object.
-   - Summary: phase title from `ai-prompt.md` (with optional plan-name prefix if user chose y).
-   - Description from phase scope — work content only, no doc references, wiki markup.
-   - After POST, `_jira_apply_watcher_policy "$KEY" create`.
-   - Write Jira key + **Est.** to `jira.md` phase row immediately.
-7. **Write `jira.md`** — **Parent Epic** section (when `epic_key` set) + phase table.
-
-Do **not** create phase Tasks under `docs/issues/`.
+6. **Create Tasks** — For each `phase-N` without a Jira row: `/to-jira create-task <plan-id> phase-N`
+7. **Write `jira.md`** — **Parent Epic** section + phase table with keys from step 6
 
 ## Small plan (≤3 phases)
 
@@ -146,7 +108,7 @@ whole plan instead of creating an Epic + per-phase Tasks:
 > This plan has {N} phase(s). Map to a single Jira Task instead of
 > Epic+Tasks? (Y/n)
 
-If yes, create one Task and write one row in `jira.md`:
+If yes, delegate to `/to-jira create docs/planning/<plan-id>/` and write one row in `jira.md`:
 
 ```markdown
 | phase-1 | CDS-200 | <plan title> |
@@ -163,6 +125,20 @@ When to choose:
 | ≤3 phases, all tightly coupled | 4+ phases, or phases with independent timelines |
 | Team prefers light Jira footprint | Team wants per-phase time tracking and Jira reporting |
 | Quick spike, straightforward scope | Complex work needing phase-level audit trail |
+
+## Parent Epic override
+
+**`--parent EPIC-KEY` on the invocation always wins** over `JIRA_DEFAULT_EPIC` in `.env`, `default_epic` in `issue-tracker.md`, and prior team habit.
+
+Examples:
+
+```text
+/plan-it auth-fix --jira --parent CDS-200
+```
+
+Even when `.env` has `JIRA_DEFAULT_EPIC=CDS-100`, phase Tasks link to **CDS-200**. Set `parent_source: --parent` in `jira.md`.
+
+At publish time, if only the env default exists, ask: *"Link phase Tasks to default Epic CDS-100, or pass `--parent` for a different Epic?"*
 
 ## curl reference
 

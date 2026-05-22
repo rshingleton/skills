@@ -34,7 +34,7 @@ One-way bridges between local artifacts and Jira:
 
 | Skill | Direction | Role |
 |-------|-----------|------|
-| [to-jira](./to-jira/SKILL.md) | Local → Jira | Push an intake issue or plan to Jira as a single issue |
+| [to-jira](./to-jira/SKILL.md) | Local → Jira | Central Jira handler: create, transition, resolve, comment, assign. Other skills delegate here. |
 | [from-jira](./from-jira/SKILL.md) | Jira → Local | Create a Doc Cycle plan from a Jira issue — no inbox step |
 
 For per-phase Jira Task creation, use `/plan-it --jira` instead.

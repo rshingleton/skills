@@ -1,6 +1,6 @@
 # Issue tracker: Jira
 
-Issues and Epics for this repo live as Jira issues. Use the Jira REST API v2 via `curl` for all operations.
+Issues and Epics for this repo live as Jira issues. Skills delegate all Jira write operations to `to-jira`; this doc documents how `to-jira` works internally. For read-only fetch operations, skills use `from-jira` or direct `curl` GET.
 
 ## Quick start (agents)
 
@@ -422,7 +422,7 @@ After `/plan-it --jira` creates an Epic, suggest adding `JIRA_DEFAULT_EPIC=<key>
 
 ## When a skill says "publish to the issue tracker"
 
-Create a Jira issue via `curl` POST to `/rest/api/2/issue?notifyUsers=false`, then call `_jira_apply_watcher_policy "$KEY" create`.
+Delegate to `to-jira`: `/to-jira create <path>`. The raw API pattern (POST `/rest/api/2/issue?notifyUsers=false` + watcher policy) is what `to-jira` executes internally.
 
 ## When a skill says "fetch the relevant ticket"
 

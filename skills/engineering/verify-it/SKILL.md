@@ -82,20 +82,9 @@ See [EXAMPLES.md](EXAMPLES.md) for archive examples.
 
 **Load the issue tracker** — read `docs/agents/issue-tracker.md` for local conventions (create `docs/agents/` via `/setup-internal-skills` if missing).
 
-**Jira resolution** — if any row in `jira.md` has a Jira key (produced by `/plan-it --jira`), attempt Jira API access. The tracker config may say "local" while `jira.md` has keys — source env vars and proceed.
+**Jira resolution** — if any row in `jira.md` has a Jira key (produced by `/plan-it --jira`), delegate Jira API operations to [`to-jira`](../to-jira/SKILL.md). The tracker config may say "local" while `jira.md` has keys — still proceed.
 
-Source credentials and helpers in one command:
-
-```bash
-source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh
-```
-
-This gives env vars (`JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY`) plus all helpers (`_jira_phase_key`, `_jira_apply_watcher_policy`, `_jira_set_assignee`, etc.).
-
-If credentials are missing after sourcing:
-- Report which keys need resolution
-- Suggest checking `.env` at the repo root or `~/.config/ai-skills/.env`
-- **Continue** with local doc updates — missing Jira access is not a blocking failure
+Verify-it does not source credentials or curl Jira directly — delegate all API calls.
 
 **Jira resolution scope:**
 
@@ -104,12 +93,11 @@ If credentials are missing after sourcing:
 | **Full verify** | Every phase row with a key in `jira.md` |
 | **Incremental close** | Only this phase's row (e.g. `phase-2` key) |
 
-For each key to resolve (when Jira API is available):
+For each key to resolve:
 
-- If `JIRA_ASSIGNEE` is set, `_jira_set_assignee "$KEY"` (does not apply watcher policy).
-- **Prompt for resolution comment:** draft a concise Jira resolution comment from the phase summary (2-4 sentences covering what was delivered — deliverables only, no references to planning docs or audit reports). Present it to the user as a suggestion: *"Post this resolution comment to {KEY}? (y/edit/skip)"*. If they edit, use their text. If y, post via `POST /issue/{KEY}/comment?notifyUsers=false`.
-- **Resolve:** ask *"Resolve {KEY}? (y/n)"* per key. If yes, transition to the `Resolved` or `Done` status (`POST /issue/{KEY}/transitions?notifyUsers=false`).
-- Apply `_jira_apply_watcher_policy "$KEY" update` once at the end to handle watchers from all writes.
+1. If `JIRA_ASSIGNEE` is set: `/to-jira assign <KEY>` (does not apply watcher policy).
+2. **Prompt for resolution comment:** draft a concise Jira resolution comment from the phase summary (2-4 sentences covering what was delivered — deliverables only, no references to planning docs or audit reports). Present it to the user as a suggestion: *"Post this resolution comment to {KEY}? (y/edit/skip)"*. If they edit, use their text. If y: `/to-jira comment <KEY> "<comment>"`.
+3. **Resolve:** ask *"Resolve {KEY}? (y/n)"* per key. If yes: `/to-jira resolve <KEY> "Done"` (transitions + applies watcher policy).
 
 **Jira API unavailable:** still update local docs (sources status `done`, archive). Report unresolved keys and suggest manual resolution or re-run after sourcing credentials.
 
