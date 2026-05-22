@@ -9,11 +9,12 @@ Record what exists:
 | Path | Present? | Notes |
 |------|----------|-------|
 | `AGENTS.md` | | Open standard — **always** ensure + update `## Agent skills` |
-| `CLAUDE.md` | | Pointer only; do not duplicate rules |
-| `.github/copilot-instructions.md` | | Copilot-specific — **inspect and patch** |
 | `.cursor/rules/*.mdc` | | List filenames; Cursor also reads root `AGENTS.md` |
 | `.cursorrules` | | Legacy — note; prefer `AGENTS.md` |
+| `.github/copilot-instructions.md` | | Copilot-specific — **inspect and patch** |
+| `CLAUDE.md` | | Pointer only; do not duplicate rules |
 | `opencode.json` | | Optional — only if team uses OpenCode |
+| `Gemini / agy` | | No config file needed — loads `AGENTS.md` natively. Gemini migrating to `agy` CLI |
 
 ## Cursor
 
@@ -55,6 +56,12 @@ If missing and user uses Claude, offer a pointer file only:
 
 See [AGENTS.md](./AGENTS.md).
 ```
+
+## Gemini / agy (antigravity)
+
+Gemini loads `AGENTS.md` as project instructions natively — no tool-specific config file needed. If the team uses Gemini, ensure the `AGENTS.md` `## Agent skills` block is up to date. No Gemini-specific file to create or patch.
+
+Gemini is migrating to the **`agy`** (antigravity) CLI. Both read `AGENTS.md` the same way; no config change needed.
 
 ## OpenCode (optional)
 

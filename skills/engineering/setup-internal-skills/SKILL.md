@@ -28,9 +28,10 @@ Read whatever exists; don't assume:
 
 - `git remote -v` — for **this skills repo**, expect `https://github.com/rshingleton/skills.git`; for app repos, verify `github.com/rshingleton/skills` when applicable
 - **Open standard:** `AGENTS.md`, `opencode.json`
-- **Copilot:** `.github/copilot-instructions.md` (read full file if present)
 - **Cursor:** `.cursor/rules/*.mdc`, legacy `.cursorrules` (Cursor also loads root `AGENTS.md` — see [PLATFORM-AUDIT.md](./PLATFORM-AUDIT.md))
-- **Claude:** `CLAUDE.md` (pointer only)
+- **Copilot:** `.github/copilot-instructions.md` (read full file if present)
+- **Claude:** `CLAUDE.md` (pointer only — see PLATFORM-AUDIT.md)
+- **Gemini / agy:** no config file needed — loads `AGENTS.md` natively. Gemini migrating to `agy` CLI
 - `CONTEXT.md`, `CONTEXT-MAP.md`, `docs/adr/`, `src/*/docs/adr/`
 - `docs/agents/issue-tracker.md` — prior setup output? (only file written here)
 - `docs/issues/` — local issue tracker in use
@@ -73,7 +74,7 @@ Paths to `CONTRIBUTING.md`, `SECURITY_POLICY.md`, `.compliance-rules/`.
 
 **Section E — Agent platforms.**
 
-> **AGENTS.md** is the open standard (**Cursor**, **Copilot**, Claude). Tool-specific files are audited, not blindly overwritten. Follow [PLATFORM-AUDIT.md](./PLATFORM-AUDIT.md).
+> **AGENTS.md** is the open standard (**Cursor**, **Copilot**, Claude, Gemini/agy, OpenCode). Tool-specific files are audited, not blindly overwritten. Follow [PLATFORM-AUDIT.md](./PLATFORM-AUDIT.md).
 
 Report the inventory table from PLATFORM-AUDIT (what exists, what will change).
 
@@ -93,6 +94,8 @@ Report the inventory table from PLATFORM-AUDIT (what exists, what will change).
 **OpenCode (optional):** if `opencode.json` exists and the team uses OpenCode, merge `instructions` to include `AGENTS.md`. Otherwise skip.
 
 **Claude:** pointer-only `CLAUDE.md` if missing and user wants it — never duplicate `AGENTS.md` body.
+
+**Gemini / agy:** no tool-specific file needed — `AGENTS.md` is read natively. Gemini migrating to `agy` (antigravity) CLI. Ensure `## Agent skills` block is present.
 
 ### 3. Confirm default branch
 

@@ -1,6 +1,6 @@
 # Agent platforms
 
-How to use this skills repo with **Cursor**, **GitHub Copilot**, **Claude Code**, and optionally **OpenCode**.
+How to use this skills repo with **Cursor**, **GitHub Copilot**, **Claude Code**, **Gemini**, and optionally **OpenCode**.
 
 ## Canonical file: `AGENTS.md`
 
@@ -37,6 +37,16 @@ In **application repos** (after `/setup-internal-skills`), `AGENTS.md` also hold
 1. [CLAUDE.md](../CLAUDE.md) points at `AGENTS.md`.
 2. [.claude-plugin/plugin.json](../.claude-plugin/plugin.json) lists skill paths for the plugin marketplace / project skills.
 3. Legacy workflows that only read `CLAUDE.md` still work via the pointer.
+
+---
+
+---
+
+## Gemini / agy (antigravity)
+
+Gemini loads **`AGENTS.md`** natively as project instructions — no tool-specific config file required. The shared open standard works out of the box.
+
+Gemini is migrating to the **`agy`** (antigravity) CLI. Both use the same `AGENTS.md` standard; no config change needed during migration.
 
 ---
 
@@ -82,8 +92,8 @@ docs/reference/           # baseline maps (/doc-it Phase 1)
 docs/reference-audit/     # sliced review (/doc-it Phase 2)
 CONTEXT.md
 docs/adr/
-.github/copilot-instructions.md   # Copilot-only; setup patches if present
 .cursor/rules/            # optional extras; Cursor still uses AGENTS.md
+.github/copilot-instructions.md   # Copilot-only; setup patches if present
 opencode.json             # optional — only needed for OpenCode users
 ```
 
