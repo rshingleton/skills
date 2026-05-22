@@ -7,7 +7,7 @@ Instructions for this repository. **Commit this file.** Point every agent host h
 | **Cursor** | Native **`AGENTS.md`** ([docs](https://cursor.com/docs/context/rules)); optional `.cursor/rules/` for scoped rules |
 | **GitHub Copilot** | `.github/copilot-instructions.md` (tool-specific; should link here) |
 | **Claude Code** | `CLAUDE.md` (pointer + `.claude-plugin/plugin.json`) |
-| **Gemini / agy** | `AGENTS.md` (shared standard) — Gemini migrating to `agy` CLI. Skills: workspace `.agents/skills/`, global `~/.gemini/antigravity-cli/skills/`, shared `~/.gemini/skills/` |
+| **Gemini / agy** | `AGENTS.md` (shared standard) — Gemini migrating to `agy` CLI. Skills: workspace `<project>/.agents/skills/` (preferred), global `~/.gemini/antigravity-cli/skills/`, shared `~/.gemini/skills/` |
 | **OpenCode** | `AGENTS.md` + optional `opencode.json` |
 
 Platform setup details: [docs/AGENT-PLATFORMS.md](docs/AGENT-PLATFORMS.md).

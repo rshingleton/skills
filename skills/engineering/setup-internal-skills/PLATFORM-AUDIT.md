@@ -14,7 +14,7 @@ Record what exists:
 | `.github/copilot-instructions.md` | | Copilot-specific — **inspect and patch** |
 | `CLAUDE.md` | | Pointer only; do not duplicate rules |
 | `opencode.json` | | Optional — only if team uses OpenCode |
-| `Gemini / agy` | | No config file — loads `AGENTS.md` natively. Gemini migrating to `agy` CLI. Skills: workspace `.agents/skills/`, global `~/.gemini/antigravity-cli/skills/`, shared `~/.gemini/skills/` |
+| `Gemini / agy` | | No config file — loads `AGENTS.md` natively. Gemini migrating to `agy` CLI. Skills: `<project>/.agents/skills/` (agy workspace, preferred over fallbacks), `~/.gemini/antigravity-cli/skills/`, `~/.gemini/skills/` |
 
 ## Cursor
 
@@ -63,7 +63,7 @@ Gemini loads `AGENTS.md` as project instructions natively — no tool-specific c
 
 Gemini is migrating to the **`agy`** (antigravity) CLI. Both read `AGENTS.md` the same way; no config change needed.
 
-**agy skill lookup** — workspace always wins:
+**agy skill lookup** — workspace always wins (agy-only convention; other tools use `~/.agents/skills/`):
 1. `<project>/.agents/skills/{name}/SKILL.md` — **prefer over all other places**
 2. `~/.gemini/antigravity-cli/skills/{name}/SKILL.md` — global fallback
 3. `~/.gemini/skills/{name}/SKILL.md` — shared fallback

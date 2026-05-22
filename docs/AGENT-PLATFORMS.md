@@ -48,7 +48,7 @@ Gemini loads **`AGENTS.md`** natively as project instructions — no tool-specif
 
 Gemini is migrating to the **`agy`** (antigravity) CLI. Both use the same `AGENTS.md` standard; no config change needed during migration.
 
-**agy skill paths** — workspace takes precedence over global and shared:
+**agy-specific skill paths** (workspace `<project>/.agents/skills/` preferred — other tools use `~/.agents/skills/` instead):
 
 | Scope | Path | Priority |
 |-------|------|----------|

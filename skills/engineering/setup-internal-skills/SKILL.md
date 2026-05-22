@@ -31,7 +31,7 @@ Read whatever exists; don't assume:
 - **Cursor:** `.cursor/rules/*.mdc`, legacy `.cursorrules` (Cursor also loads root `AGENTS.md` — see [PLATFORM-AUDIT.md](./PLATFORM-AUDIT.md))
 - **Copilot:** `.github/copilot-instructions.md` (read full file if present)
 - **Claude:** `CLAUDE.md` (pointer only — see PLATFORM-AUDIT.md)
-- **Gemini / agy:** no config file needed — loads `AGENTS.md` natively. Gemini migrating to `agy` CLI. Skills: `.agents/skills/` (workspace, preferred), `~/.gemini/antigravity-cli/skills/`, `~/.gemini/skills/`
+- **Gemini / agy:** no config file needed — loads `AGENTS.md` natively. Gemini migrating to `agy` CLI. Skills: `<project>/.agents/skills/` (workspace, preferred for agy — other tools use `~/.agents/skills/` instead), `~/.gemini/antigravity-cli/skills/`, `~/.gemini/skills/`
 - `CONTEXT.md`, `CONTEXT-MAP.md`, `docs/adr/`, `src/*/docs/adr/`
 - `docs/agents/issue-tracker.md` — prior setup output? (only file written here)
 - `docs/issues/` — local issue tracker in use
@@ -95,7 +95,7 @@ Report the inventory table from PLATFORM-AUDIT (what exists, what will change).
 
 **Claude:** pointer-only `CLAUDE.md` if missing and user wants it — never duplicate `AGENTS.md` body.
 
-**Gemini / agy:** no tool-specific file needed — `AGENTS.md` is read natively. Gemini migrating to `agy` (antigravity) CLI. Skills installed at workspace `.agents/skills/`, global `~/.gemini/antigravity-cli/skills/`, or shared `~/.gemini/skills/`. Ensure `## Agent skills` block is present.
+**Gemini / agy:** no tool-specific file needed — `AGENTS.md` is read natively. Gemini migrating to `agy` (antigravity) CLI. Skills: workspace `<project>/.agents/skills/` (agy-preferred — distinct from other tools' `~/.agents/skills/`), `~/.gemini/antigravity-cli/skills/`, `~/.gemini/skills/`. Ensure `## Agent skills` block is present.
 
 ### 3. Confirm default branch
 
