@@ -9,8 +9,9 @@ Self-contained examples for each workflow step. Replace placeholder values
 
 | Invocation | Audit required | What it finalizes |
 |---|---|---|
-| `/verify-it` | `docs/planning/{key}/audit-report.md` (full) | ADR, CONTEXT, changelog, accordion compression, all Jira keys |
+| `/verify-it` | `docs/planning/{key}/audit-report.md` (full) | ADR, CONTEXT, changelog, compact planning docs into ADRs, all Jira keys |
 | `/verify-it --phase phase-2` | `docs/planning/{key}/audit-report-phase-2.md` | ADR notes + CONTEXT for phase 2, resolves phase 2 Jira key only |
+| `/verify-it --retro` | None | Sweep `docs/archive/planning/` + orphaned `docs/planning/`, backfill ADRs, delete artifacts |
 
 ---
 
@@ -91,12 +92,12 @@ Append a dated section to the project changelog:
 
 ---
 
-## Accordion Compression — Archive
+## Compact -- extract essence, discard artifacts
 
-All phases of a planning key are done. Move the entire directory to preserve execution history:
+All phases done. Review ADRs and changelog for gaps, then discard the planning directory.
 
 ```bash
-mv docs/planning/{key} docs/archive/planning/{key}
+rm -rf docs/planning/{key}
 ```
 
 Before:
@@ -105,16 +106,56 @@ docs/planning/{key}/
 ├── README.md
 ├── phase-1/
 ├── phase-2/
-└── phase-3/
+├── phase-3/
+└── sources/
 ```
+
+After — durable records hold the condensed value:
+```
+docs/adr/{N}-{title}.md    # decision rationale, now Accepted
+CHANGELOG.md                 # what shipped
+CONTEXT.md                   # domain terms introduced
+```
+
+Checklist:
+- [ ] Each trade-off or architectural finding from the planning docs is captured in an ADR
+- [ ] Changelog covers what was delivered across all phases
+- [ ] `CONTEXT.md` has any new domain terms
+- [ ] `rm -rf docs/planning/{key}` — no archive needed
+
+---
+
+## Retroactive cleanup (`--retro`)
+
+Clean up historic planning archives left from the old archive policy:
+
+```bash
+/verify-it --retro
+```
+
+Before:
+```
+docs/
+├── archive/
+│   └── planning/
+│       ├── plan-001/        # old archive, decisions might lack ADR coverage
+│       └── plan-002/
+├── planning/
+│   └── plan-003/            # orphaned -- never verified
+```
+
+Scan flow per directory:
+
+1. Has `docs/adr/` cover plan-001's scope? If not, read `phase-*/*.md` and `sources/*.md`, suggest ADR backfills.
+2. Does changelog mention plan-001 deliverables? If not, surface for user to append.
+3. Confirm with user, then `rm -rf` the directory.
 
 After:
 ```
-docs/archive/planning/{key}/
-├── README.md
-├── phase-1/
-├── phase-2/
-└── phase-3/
+docs/
+└── adr/                     # backfilled with any missing decisions
+CHANGELOG.md                  # appended with unrecorded deliverables
+CONTEXT.md                    # any missing terms added
 ```
 
-Always archive — never delete without a copy. The archive preserves `ai-prompt.md`, `execution-notes.md`, `audit-report.md`, and `sources/` for future reference.
+Plan-001's `audit-report.md` can contain findings not worth ADR-ing. Discard those or capture as a `docs/issues/` item if still actionable.

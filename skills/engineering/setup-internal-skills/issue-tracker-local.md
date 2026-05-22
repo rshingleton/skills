@@ -89,10 +89,10 @@ Intake evaluation: **`/plan-it --from-issues`** updates `status` and `## Comment
    ```
 3. Source context: `docs/planning/{ID}/sources/*.md` if needed — **not** `docs/issues/`.
 
-## verify-it and archive
+## verify-it cleanup
 
 - Append completion notes on `sources/*.md`; set `status: done`.
-- Verify-it archives `docs/planning/{ID}/` (including `sources/`) to `docs/archive/planning/{ID}/` by default.
+- Verify-it extracts missing decisions from planning docs into ADRs, then discards `docs/planning/{ID}/`. The durable core (ADRs, changelog, CONTEXT.md) replaces the archive.
 
 ## Legacy
 

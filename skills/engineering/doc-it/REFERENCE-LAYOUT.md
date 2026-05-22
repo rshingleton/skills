@@ -23,6 +23,7 @@ Phase 1 of `/doc-it` creates or refreshes this tree. Keep pages navigable; prefe
 
 ## Style
 
+- **Javadoc-style architecture docs** -- precise, navigable, grepable. Each page answers "what lives here, what are its boundaries, how does data flow." Prefer tables and maps over prose. The goal is a faster reference than grepping the entire codebase.
 - Present tense, factual ("The Order module validates…").
 - Every section that names a module should include at least one path (e.g. `src/orders/`).
 - Mark uncertainty: `*(unverified)*` when not confirmed in source.

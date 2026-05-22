@@ -7,7 +7,7 @@ Use when work already exists as **pre-plan** files in the **`docs/issues/` inbox
 | Location | Contents |
 |----------|----------|
 | `docs/issues/<slug>.md` | **Active inbox only** — not yet attached to a plan |
-| `docs/planning/<plan-id>/sources/<slug>.md` | Intake **moved here at plan creation** — stays with the plan through implement/verify/archive |
+| `docs/planning/<plan-id>/sources/<slug>.md` | Intake **moved here at plan creation** -- discarded with planning directory after verify-it extracts decisions into ADRs |
 
 **Do not leave planned or in-flight items in `docs/issues/`** — that causes duplicate plans when browsing the inbox.
 

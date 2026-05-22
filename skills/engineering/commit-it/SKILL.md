@@ -37,7 +37,8 @@ git status --short
 
 If clean, stop. If dirty, gather context from the changelog
 (`CHANGELOG.md` or `docs/changelog*`), the most recent ADR
-(`docs/adr/`), and any remaining `docs/planning/{ID}/` files.
+(`docs/adr/`), and reference docs (`docs/reference/`). Planning
+directories are discarded after verify -- do not expect them.
 
 ### 1. Compliance gate
 

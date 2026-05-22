@@ -88,7 +88,7 @@ For whole-codebase or sprint-level reviews (not tied to a single phase):
 
 ### 1. Gather context
 
-Scan: `CHANGELOG.md` / `docs/changelog*`, `docs/adr/`, `docs/planning/`, `docs/sprints/`, `CONTEXT.md`.
+Scan: `CHANGELOG.md` / `docs/changelog*`, `docs/adr/`, `docs/reference/`, `CONTEXT.md`. For repos with residual `docs/archive/planning/` or orphaned `docs/planning/` dirs, suggest `/verify-it --retro` to backfill ADRs and delete artifacts.
 
 Summarize the smallest vertical slice intended vs value-to-complexity ratio.
 
