@@ -28,6 +28,8 @@ Also skim, when present: `SECURITY_POLICY.md`, `.compliance-rules/`, `docs/agent
 
 **Comments.** Explain non-obvious *why*, not obvious *what*. Never leave credential placeholders in comments (`// TODO: insert API key`).
 
+**Compliance rules.** If `.compliance-rules/` exists at repo root, read all rule files and apply them to the diff. Treat HIGH-severity rules as blocking.
+
 **Secrets.** No hardcoded keys, tokens, or passwords. Do not create or stage `.env` / `.env.*`. No plaintext credentials in connection strings.
 
 **Dependencies.** If manifests change: no `"*"` or unbounded `>=` ranges; no unofficial registries; cross-check `.dependency-audit.json` when it exists.
@@ -55,6 +57,7 @@ Before signaling phase complete:
 [ ] Full test suite + lint/type-check green
 [ ] Diff aligns with standards docs from §1
 [ ] No secrets, credential comments, or env files in the diff
+[ ] Compliance rules at `.compliance-rules/` (if present) are satisfied
 [ ] New dependencies (if any) comply with policy
 [ ] CONTEXT.md vocabulary and ADRs respected; conflicts surfaced to user
 [ ] Deletion test passed for each new module

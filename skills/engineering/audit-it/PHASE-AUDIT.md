@@ -98,10 +98,18 @@ Spot-check the combined diff against standards docs from [STANDARDS.md](../imple
 
 Blocking subset (full PR gate: `/internal-compliance`):
 
+### 5.1 Repo compliance rules
+
+If `.compliance-rules/` exists at repo root, read all `*.md` and `*.yaml` files. Apply their rules to the diff — treat any HIGH-severity violation as blocking.
+
+### 5.2 Universal checks
+
 - [ ] No secrets, tokens, or passwords in diff
 - [ ] No `.env` / `.env.*` staged or added
 - [ ] No credential placeholders in comments
 - [ ] New dependencies comply with policy (no `*`, unbounded `>=`, shadow registries)
+
+### 5.3 Verdict
 
 | Result | Action |
 |--------|--------|
