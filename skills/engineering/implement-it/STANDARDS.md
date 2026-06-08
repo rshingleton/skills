@@ -16,6 +16,8 @@ Scan once per phase for how this repo expects code to be written:
 
 Also skim, when present: `SECURITY_POLICY.md`, `.compliance-rules/`, `docs/agents/compliance/`.
 
+**`.compliance-rules/` layering** (if present): `coding-standards.md` defines repo-specific overrides to this file, and `coding-standards-<lang>.md` files add per-language rules. Later files override earlier ones.
+
 **Run** the project's test, lint, and format commands. Do not manually re-check what tooling already enforces.
 
 ## 2. While coding
@@ -28,7 +30,7 @@ Also skim, when present: `SECURITY_POLICY.md`, `.compliance-rules/`, `docs/agent
 
 **Comments.** Explain non-obvious *why*, not obvious *what*. Never leave credential placeholders in comments (`// TODO: insert API key`).
 
-**Compliance rules.** If `.compliance-rules/` exists at repo root, read all rule files and apply them to the diff. Treat HIGH-severity rules as blocking.
+**Compliance rules.** If `.compliance-rules/` exists at repo root, read all rule files and apply them **on every TDD cycle** (Red→Green→Refactor). Treat HIGH-severity rules as blocking — fix before proceeding to the next step. Do not defer compliance to handoff.
 
 **Secrets.** No hardcoded keys, tokens, or passwords. Do not create or stage `.env` / `.env.*`. No plaintext credentials in connection strings.
 

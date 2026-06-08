@@ -29,7 +29,7 @@ From a planned project:
 
 Read the orchestration `README.md` and the current phase's `ai-prompt.md`. **Strictly** load only files listed there.
 
-Discover repo standards per [STANDARDS.md](STANDARDS.md) §1 before the first edit.
+Discover repo standards per [STANDARDS.md](STANDARDS.md) §1 before the first edit. If `.compliance-rules/` exists at repo root, read all rule files as part of standards discovery — they apply throughout every TDD cycle.
 
 Flag ambiguities to the Planning Agent (Architect) via the user — do not guess past the prompt.
 
@@ -38,9 +38,9 @@ Flag ambiguities to the Planning Agent (Architect) via the user — do not guess
 Delegate all Jira API operations to [`to-jira`](../to-jira/SKILL.md) — implement-it does not source credentials or curl Jira directly.
 
 If the phase row has a key, delegate to `to-jira`:
-- Assign: `/to-jira assign <KEY>`
-- Transition to "In Progress": `/to-jira transition <KEY> "In Progress"`
-- Apply watcher policy: `/to-jira watcher-policy <KEY> update`
+1. If `JIRA_ASSIGNEE` is set and the issue has no existing assignee: `/to-jira assign <KEY>` (set assignee before moving to In Progress)
+2. `/to-jira transition <KEY> "In Progress"`
+3. `/to-jira watcher-policy <KEY> update`
 
 If the row is empty, tell the user to run `/plan-it --jira {ID}` or `--sync-only` — do not guess keys.
 
@@ -50,11 +50,11 @@ Missing Jira access is not blocking — continue with implementation.
 
 ### 2. TDD Loop
 
-Every feature follows test-driven development:
+Every feature follows test-driven development. **Compliance rules from `.compliance-rules/` (if present) are checked at every step** — not just at handoff.
 
-- **Red:** Failing test for the desired behavior. Confirm it fails.
-- **Green:** Minimal production code to pass. No speculative code.
-- **Refactor:** Clean up with all tests green.
+- **Red:** Write a failing test for the desired behavior. Run it to confirm failure. Check compliance rules on the new test file.
+- **Green:** Write minimal production code to pass the test. No speculative code. Run the test to confirm it passes. Check compliance rules on the diff.
+- **Refactor:** Clean up with all tests green. Run compliance rules to ensure no regressions.
 
 Apply [STANDARDS.md](STANDARDS.md) §2 on every cycle. Run the full test suite and lint/type-check after each phase. Never skip Red.
 
@@ -106,4 +106,5 @@ Still implementing — do **not** suggest full `/audit-it` or `/verify-it`.
 - **Standards-first:** Discover and follow repo docs before generating code ([STANDARDS.md](STANDARDS.md)).
 - **Test-first:** Every feature starts with a failing test. Red → Green → Refactor. Never skip Red.
 - **Non-Architect:** Do not author new plans or change architectural direction.
+- **Compliance-throughout:** `.compliance-rules/` (if present) checked on every Red→Green→Refactor step, not just at handoff.
 - **Decoupled:** Do not perform git commits; do not finalize durable documentation.

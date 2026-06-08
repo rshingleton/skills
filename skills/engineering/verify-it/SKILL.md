@@ -84,42 +84,11 @@ See [EXAMPLES.md](EXAMPLES.md) for examples.
 
 ### 4. Tracker update
 
-**Load the issue tracker** — read `docs/agents/issue-tracker.md` for local conventions (create `docs/agents/` via `/setup-internal-skills` if missing).
-
-**Jira resolution** — if any row in `jira.md` has a Jira key (produced by `/plan-it --jira`), delegate Jira API operations to [`to-jira`](../to-jira/SKILL.md). The tracker config may say "local" while `jira.md` has keys — still proceed.
-
-Verify-it does not source credentials or curl Jira directly — delegate all API calls.
-
-**Jira resolution scope:**
-
-| Mode | Resolve |
-|------|---------|
-| **Full verify** | Every phase row with a key in `jira.md` |
-| **Incremental close** | Only this phase's row (e.g. `phase-2` key) |
-
-For each key to resolve:
-
-1. If `JIRA_ASSIGNEE` is set: `/to-jira assign <KEY>` (does not apply watcher policy).
-2. **Prompt for resolution comment:** draft a concise Jira resolution comment from the phase summary (2-4 sentences covering what was delivered — deliverables only, no references to planning docs or audit reports). Present it to the user as a suggestion: *"Post this resolution comment to {KEY}? (y/edit/skip)"*. If they edit, use their text. If y: `/to-jira comment <KEY> "<comment>"`.
-3. **Resolve:** ask *"Resolve {KEY}? (y/n)"* per key. If yes: `/to-jira resolve <KEY> "Done"` (transitions + applies watcher policy).
-
-**Jira API unavailable:** still update local docs (sources status `done`). Report unresolved keys and suggest manual resolution or re-run after sourcing credentials.
-
-If any target phase row lacks a Jira key, report it — run `/plan-it --jira {ID} --sync-only` before closing.
-
-**Sources** -- on each `docs/planning/{ID}/sources/*.md`, set `status: done` and append that verify-it completed the Doc Cycle. These are discarded with the planning directory.
+If any row in `jira.md` has a Jira key, follow [JIRA-RESOLUTION.md](JIRA-RESOLUTION.md) for the per-key resolution loop. The tracker config may say "local" while `jira.md` has keys — still proceed.
 
 ### 5. Retroactive cleanup (`--retro`)
 
-Sweep historic artifacts left behind by the old archive policy. No audit required.
-
-1. **Scan** for `docs/archive/planning/` and any orphaned `docs/planning/` dirs not tied to a current cycle.
-2. **For each dir**, check:
-   - Does the plan reference an ADR that already captures the decisions? If not, scan phase docs for architectural context, trade-off rationale, or design constraints not yet recorded. Present to user for confirmation before backfilling.
-   - Does the changelog already cover what shipped? If not, surface unrecorded deliverables for user to add.
-   - Mark `sources/*.md` status `done` if present.
-3. **Discard** the directory (archive or planning). Confirm with user before each deletion.
-4. **Report** summary: `{N} directories cleaned, {M} ADRs backfilled, {K} changelog entries added.`
+Follow [RETRO-CLEANUP.md](RETRO-CLEANUP.md) to sweep historic artifacts. No audit required.
 
 ### 6. Conclusion
 
@@ -132,7 +101,7 @@ Sweep historic artifacts left behind by the old archive policy. No audit require
 
 > Verify complete. Durable core updated.
 >
-> **Next:** Run `/commit-it` to stage, commit, and push. Before opening a PR, run `/internal-compliance`.
+> **Next:** Run `/commit-it` to stage and commit locally (push only after your approval). Before opening a PR, run `/internal-compliance`.
 >
 > For non-blocking architecture notes, consider `/improve-codebase-architecture`, `/issue-it` or [audit-to-issues](../setup-internal-skills/audit-to-issues.md) for inbox tracking, or a follow-up `/plan-it` slice.
 

@@ -1,39 +1,75 @@
-# Repo Audit: to-jira centralization — verification pass
+# Repo Audit — post-session verification
 
-**Date:** 2026-05-22
-**Scope:** Verify fixes from prior audit (commit range covering to-jira centralization + immediate follow-up fixes)
+**Date:** 2026-06-08
+**Scope:** Session changes: commit-it push policy, implement-it compliance-rules +
+Jira assign, skill partitions (to-jira, from-jira, verify-it),
+.compliance-rules/coding-standards*.
 
 ## Process
 
-1. All prior findings re-checked against current working tree
-2. Credential sourcing duplication counted across shipped skills
-3. CONTEXT.md, README.md, bucket READMEs checked for stale references
-4. Cross-skill delegation patterns re-verified
+1. `git diff HEAD` and `git status` — verify all changes are in-repo only
+2. `~/.local/share/ai-skills` and `~/.agents/skills/` checked for stale diffs
+3. All new sub-files checked: references, line counts, structural consistency
+4. Cross-referenced against write-a-skill review checklist
+5. Cross-referenced against `internal-compliance`, `audit-it/PHASE-AUDIT.md`, `.compliance-rules/`
 
-## Findings from previous audit
+## Findings
 
-| # | Status | Resolution |
-|---|--------|-----------|
-| M1 | **Deferred** | `from-jira` still has independent credential sourcing — justified (read-only, inverse direction). Not worth the abstraction layer. |
-| M2 | **FIXED** | `CONTEXT.md:35` — added `to-jira` as central Jira handler to the Relationships list |
-| M3 | **FIXED** | `to-jira/SKILL.md` — credential sourcing block moved to top (one canonical copy), 7 operation blocks changed from `source ...` to `# (credentials)` reference |
-| L1 | Noted | Deprecated skills still present — non-blocking, harmless |
-| L2 | **FIXED** | `from-jira/SKILL.md` — added read-direction note with cross-reference to `to-jira` |
-| L3 | **FIXED** | `plan-it/JIRA.md` — clarified step 1 credentials are for plan-it's own local ops |
-| L4 | **FIXED** | `jira-helpers.sh` — removed unused `_remove_jira_watcher` alias |
+### H1 — Split brain: agent install vs repo **RESOLVED**
 
-## New findings
+All changes confirmed in-repo only (`git diff HEAD` shows everything). The stale
+diff in `~/.local/share/ai-skills` is from early symlink edits — those same
+edits were re-applied to prod/skills. Sub-files (OPERATIONS.md, COMMANDS.md,
+etc.) exist only in prod/skills.
 
-None. All prior findings resolved (M1 deferred as intentional). The delegation boundary is clean — only `to-jira` and `from-jira` touch Jira API.
+**Post-commit:** run `bash scripts/skills.sh` to re-sync the install, overwriting the stale files.
 
-## Core value
+### M2 — Skill partitions: 3 skills split into sub-files
 
-The centralization is structurally sound. The `# (credentials)` shorthand keeps bash blocks copy-pasteable while eliminating the duplication maintenance hazard. CONTEXT.md now documents the boundary for new readers.
+| Skill | Before | After | Sub-files |
+|-------|--------|-------|-----------|
+| `to-jira` | 257 lines | 131 lines | `OPERATIONS.md` (126 lines) |
+| `from-jira` | 136 lines | 77 lines | `COMMANDS.md` (30) + `REFERENCE.md` (39) |
+| `verify-it` | 151 lines | 120 lines | `JIRA-RESOLUTION.md` (29) + `RETRO-CLEANUP.md` (13) |
+
+All sub-files are one-level deep references. SKILL.md files hold core orchestration only.
+
+### M3 — implement-it Jira assign logic updated
+
+Before: unconditional `Assign` → `Transition "In Progress"` → `Watcher policy`
+After: conditional assign (`JIRA_ASSIGNEE` set + no existing assignee) → `Transition` → `Watcher policy`
+
+Consistent with verify-it's JIRA-RESOLUTION.md pattern.
+
+### L1 — grill-me is minimal (10 lines)
+
+At 10 lines this is the thinnest skill. Intentional for a productivity pattern skill.
+
+### L2 — to-jira still over 100 lines (131)
+
+The orchestration logic (create flow, delegation tables) remains in SKILL.md and
+can't be cleanly extracted. The bash-heavy content was the right extraction target.
+
+### L3 — verify-it still over 100 lines (120)
+
+Same pattern — core workflow for 3 distinct modes remains in SKILL.md. The two
+sub-flows (Jira resolution, retro cleanup) were extracted.
 
 ## Accretion
 
-None introduced. The overall diff is +296/−213 lines — net negative after the fix pass, which is the right direction.
++7 new files (3 coding-standards, 5 partition sub-files), —275 lines net from
+the 3 partitioned skills. Good compression ratio.
+
+## Simplification proposals
+
+None. All changes are structural improvements.
+
+## Deletion candidates
+
+None.
 
 ## Next
 
-No remaining findings. Ready for `/commit-it` if desired.
+> Audit PASS. Ready for verify and commit.
+>
+> **Post-commit:** run `bash scripts/skills.sh` to sync the install.

@@ -24,34 +24,11 @@ This is the **read direction** (Jira → local). For the write direction (local 
 
 ### 1. Resolve the Jira key
 
-From a bare key (`CDS-142`) or URL (`https://.../browse/CDS-142`):
+See [COMMANDS.md](COMMANDS.md) for bash: key extraction, credential sourcing, and issue fetch.
 
-```bash
-JIRA_KEY=$(echo "$INPUT" | grep -oE '[A-Z]+-[0-9]+' | head -1)
-```
+From a bare key (`CDS-142`) or URL (`https://.../browse/CDS-142`), extract the key, then source credentials and fetch the issue.
 
-### 2. Source Jira credentials
-
-```bash
-source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh
-```
-
-### 3. Fetch the issue and comments
-
-```bash
-ISSUE=$(curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
-  "$JIRA_BASE_URL/rest/api/2/issue/$JIRA_KEY?fields=summary,description,issuetype,status,labels,created")
-
-COMMENTS=$(curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
-  "$JIRA_BASE_URL/rest/api/2/issue/$JIRA_KEY/comment")
-
-SUMMARY=$(echo "$ISSUE" | jq -r '.fields.summary')
-ISSUE_TYPE=$(echo "$ISSUE" | jq -r '.fields.issuetype.name')
-STATUS=$(echo "$ISSUE" | jq -r '.fields.status.name')
-BODY=$(echo "$ISSUE" | jq -r '.fields.description // ""')
-```
-
-### 4. Present to user
+### 2. Present to user
 
 Summarise what was fetched — title, type, status, description preview, comment count. Ask:
 
@@ -62,57 +39,21 @@ Summarise what was fetched — title, type, status, description preview, comment
 
 If yes, continue. If no, stop.
 
-### 5. Grill
+### 3. Grill
 
 Run the standard plan-it grill ([plan-it SKILL.md](../plan-it/SKILL.md#2-the-grill)) using the Jira description and comments as scope context. One question at a time. Always keep the Jira key for later mapping.
 
 By default the grill treats the Jira issue as the scope anchor. The user can narrow, split, or merge scope during grilling.
 
-### 6. Scaffold
+### 4. Scaffold
 
-Create `docs/planning/<id>/` with:
+Create `docs/planning/<id>/` following the template in [REFERENCE.md](REFERENCE.md) — README.md, phase prompts, and `jira.md` pre-filled with the Jira key.
 
-- **README.md** — phase list, dependency order, non-goals
-- **phase-N/ai-prompt.md** — one per phase, with scope and verification criteria
-- **jira.md** — pre-filled with the Jira key:
+### 5. Draft ADR
 
-```markdown
----
-epic_key: CDS-142
-epic_summary: <title from Jira>
-parent_source: from-jira
----
+See [REFERENCE.md](REFERENCE.md) for the ADR format.
 
-# Jira map
-
-## Parent Epic
-
-| Field | Value |
-|-------|-------|
-| Key | CDS-142 |
-| Summary | <title> |
-| Link | $JIRA_BASE_URL/browse/CDS-142 |
-| Source | from-jira |
-
-## Phase tasks
-
-| Phase | Jira | Summary | Est. |
-|-------|------|---------|------|
-| phase-1 | | | |
-```
-
-The Jira key becomes the `epic_key` in `jira.md`. When the plan publishes to Jira later (`/plan-it <id> --jira`), new phase Tasks will link to this Epic.
-
-If the original Jira issue is a Task (not an Epic), set a note in `jira.md`:
-
-> Source issue CDS-142 is a Task — no Epic was created. Phase Tasks will be standalone.
-> To create an Epic, run `/plan-it <id> --jira` and use `--parent <epic-key>`.
-
-### 7. Draft ADR
-
-Create `docs/adr/<id>-from-jira.md` noting the source Jira key and the decision to plan.
-
-### 8. Next skill
+### 6. Next skill
 
 > Plan `{ID}` created from CDS-142 — {N} phase(s).
 >

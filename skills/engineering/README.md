@@ -20,7 +20,7 @@ Pipeline for plan-it–driven work:
 - **[implement-it](./implement-it/SKILL.md)** — TDD implementation with repo standards and spec-bound scope. Transitions Jira to "In Progress" on start.
 - **[audit-it](./audit-it/SKILL.md)** — Independent phase auditor (spec, standards, compliance, architecture). Single-phase mode (`--phase phase-N`) for early feedback. Repo reviews write `docs/AUDIT.md`. Gates verify-it.
 - **[verify-it](./verify-it/SKILL.md)** — After audit passes, finalize ADRs, CONTEXT.md, changelog, and planning cleanup. Incremental close (`--phase phase-N`) for per-phase Jira resolution and CONTEXT updates.
-- **[commit-it](./commit-it/SKILL.md)** — After verify, stage changes, auto-draft commit message from changelog, push.
+- **[commit-it](./commit-it/SKILL.md)** — After verify, stage changes, auto-draft commit message from changelog, and commit locally. Push only after user approval.
 
 ## Codebase reference
 

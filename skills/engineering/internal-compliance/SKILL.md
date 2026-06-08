@@ -15,7 +15,7 @@ Look for these files in order — they define the rules the compliance check enf
 
 - `SECURITY_POLICY.md` at the repo root or `docs/`
 - `CONTRIBUTING.md` at the repo root
-- `.compliance-rules/` directory at the repo root (if it exists, read all `*.md` and `*.yaml` files)
+- `.compliance-rules/` directory at the repo root (if it exists, read all `*.md` and `*.yaml` files; `coding-standards.md` overrides the baseline in `implement-it/STANDARDS.md`, and `coding-standards-<lang>.md` adds per-language rules)
 - `.secrets.baseline` — if present, compare against it for new secrets
 
 If none of these exist, check for a shared policy at `docs/agents/compliance/` (created by `/setup-internal-skills`). If still nothing, flag the absence as a finding and proceed with the built-in rules below.

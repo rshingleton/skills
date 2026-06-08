@@ -1,4 +1,4 @@
-# Commit-it — Stage, message, push
+# Commit-it — Stage, message, commit (push on approval)
 
 ## Stage
 
@@ -56,6 +56,10 @@ git checkout -b <branch-name>
 ```
 
 If already on a feature branch:
+
+**Ask the user to confirm pushing to the remote.** Do not push without
+explicit approval. Present the branch name and remote. Only proceed when
+the user says yes.
 
 ```bash
 git push -u origin HEAD

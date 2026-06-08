@@ -1,16 +1,18 @@
 ---
 name: commit-it
 description: >
-  Doc Cycle — close phase. Stages changes grouped by Jira key, auto-drafts
-  commit messages prefixed with that key, and pushes. Does NOT replace code
-  review. Use after verify-it, or when user says commit-it, commit, ship, push.
+  Doc Cycle — close phase. Stages changes grouped by Jira key, drafts
+  commit messages prefixed with that key, and commits locally. Does NOT
+  push without asking. Never pushes without user approval. Does NOT replace
+  code review. Use after verify-it, or when user says commit-it, commit,
+  ship, push.
 ---
 
 # commit-it
 
 Doc Cycle epilogue: stage working tree changes grouped by Jira key, commit
-with a key-prefixed message, then push. One commit per Jira key so audit
-trails stay clean.
+with a key-prefixed message. Push only after explicit user approval. One
+commit per Jira key so audit trails stay clean.
 
 Does **not** push to main/master directly — creates a feature branch if needed.
 
@@ -23,7 +25,7 @@ commit-it
 From a verified, working tree:
 1. `git status --short` — confirm you have changes
 2. Offer to run `/internal-compliance`
-3. Follow prompts to stage, confirm message, commit, and push
+3. Follow prompts to stage, confirm message, commit, and **ask before push**
 
 ## Workflow
 
@@ -54,8 +56,9 @@ execute `git commit`.
 ### 3. Push
 
 Follow [COMMIT-PROCESS.md § Push & PR](COMMIT-PROCESS.md#push-and-pr) for
-branch isolation and `git push`. Create a pull request only if the user
-asks (unprompted).
+branch isolation. **Always ask the user before pushing.** Do not push
+without explicit confirmation. Create a pull request only if the user asks
+(unprompted).
 
 ### Multi-phase plans
 
@@ -68,6 +71,7 @@ the tree may contain changes for the next phase. See
 - **One commit per Jira key** — every commit maps to exactly one issue.
 - **Key-prefixed message** — `CDS-135: <msg>` links commits to tickets.
 - **Compliance-first** — always gate on `/internal-compliance`.
-- **User-confirmed message** — never push unapproved text.
+- **User-confirmed message** — never commit unapproved text.
+- **Never push without asking** — push only after explicit user approval, every time.
 - **Branch isolation** — never push directly to main/master.
 - **No code review replacement** — remind the user to review the diff.

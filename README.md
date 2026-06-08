@@ -243,7 +243,7 @@ At plan creation, `--from-issues` **moves** inbox files to `docs/planning/<id>/s
 
 | | `/implement-it` | `/audit-it` | `/verify-it` | `/commit-it` |
 |---|---|---|---|---|
-| **Does** | TDD per plan phase | Phase audit (spec, standards, compliance, architecture) | Durable docs after audit PASS | Stage, commit, push after verify |
+| **Does** | TDD per plan phase | Phase audit (spec, standards, compliance, architecture) | Durable docs after audit PASS | Commit locally, ask before push |
 | **Jira** | Assignee + In Progress when `JIRA_ASSIGNEE` set | — | Assignee + close (transition to "Resolved") | — |
 
 **Doc Cycle (plan-it–driven):** `/plan-it` → `/implement-it` (each phase) → `/audit-it` → `/verify-it` → `/commit-it`
@@ -282,7 +282,7 @@ Deprecated: `/to-epic`, `/to-jiras`, `/promote-to-jira`, `/issue-it --jira` — 
 Skills I use daily for code work.
 
 - **[audit-it](./skills/engineering/audit-it/SKILL.md)** — Doc Cycle audit phase; repo reviews write `docs/AUDIT.md`. Gates verify-it.
-- **[commit-it](./skills/engineering/commit-it/SKILL.md)** — Doc Cycle close phase; stage, commit, push after verify.
+- **[commit-it](./skills/engineering/commit-it/SKILL.md)** — Doc Cycle close phase; commit locally, push only after user approval.
 - **[diagnose](./skills/engineering/diagnose/SKILL.md)** — Disciplined diagnosis loop for hard bugs and performance regressions.
 - **[doc-it](./skills/engineering/doc-it/SKILL.md)** — **Baseline codebase documentation:** Phase 1 writes `docs/reference/`. Phase 2 writes `docs/reference-audit/` (`tech-debt.md`, `testing.md`, `architecture.md`, `follow-ups.md`, index `README.md`). Not `/verify-it` or `/zoom-out`.
 - **[grill-with-docs](./skills/engineering/grill-with-docs/SKILL.md)** — Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates `CONTEXT.md` and ADRs inline.
