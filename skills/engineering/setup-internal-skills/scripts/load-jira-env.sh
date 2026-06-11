@@ -42,6 +42,7 @@ else
   for candidate in \
     "${PWD}/.env" \
     "${HOME}/.agents/.env" \
+    "${HOME}/.config/env" \
     "${HOME}/.config/ai-skills/.env"; do
     if _load_jira_env_file "$candidate"; then
       break

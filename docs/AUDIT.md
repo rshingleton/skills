@@ -1,75 +1,72 @@
-# Repo Audit — post-session verification
+# Audit: Jira pipeline fixes & handoff template fix
 
-**Date:** 2026-06-08
-**Scope:** Session changes: commit-it push policy, implement-it compliance-rules +
-Jira assign, skill partitions (to-jira, from-jira, verify-it),
-.compliance-rules/coding-standards*.
+Generated: repo audit — ad-hoc changes in a single session.
 
-## Process
+## Scope
 
-1. `git diff HEAD` and `git status` — verify all changes are in-repo only
-2. `~/.local/share/ai-skills` and `~/.agents/skills/` checked for stale diffs
-3. All new sub-files checked: references, line counts, structural consistency
-4. Cross-referenced against write-a-skill review checklist
-5. Cross-referenced against `internal-compliance`, `audit-it/PHASE-AUDIT.md`, `.compliance-rules/`
+4 files changed, 41 insertions, 8 deletions across two concerns:
+
+| Concern | Files | Δ |
+|---------|-------|---|
+| Jira auth infrastructure | `jira-helpers.sh`, `load-jira-env.sh`, `.env.example` | +40 −8 |
+| Handoff temp-file template | `skills/productivity/handoff/SKILL.md` | +1 −1 |
+
+---
+
+## Process log
+
+1. Identified that `jira-helpers.sh` hardcoded `-H "Authorization: Bearer $JIRA_API_TOKEN"` in every curl call (3 occurrences), and had no support for Basic auth.
+2. Added `_jira_curl` wrapper — centralized auth injection, respects `JIRA_AUTH_TYPE=basic|bearer`.
+3. Added `_jira_extract_project_key` and `_jira_ensure_project_key` — infer project key from any Jira key (DASH-2196 → DASH).
+4. Updated the 3 internal curl calls to use `_jira_curl`.
+5. Added `~/.config/env` to the env-search chain in `load-jira-env.sh`.
+6. Fixed `handoff/SKILL.md` mktemp template from `-t handoff-XXXXXX.md` (produces literal XXXXXX on BSD mktemp) to `mktemp /tmp/handoff-XXXXXX` (portable, replaces trailing X's).
+7. Synced the handoff fix to the installed copy at `~/.agents/skills/handoff/SKILL.md`.
 
 ## Findings
 
-### H1 — Split brain: agent install vs repo **RESOLVED**
+### Core value
 
-All changes confirmed in-repo only (`git diff HEAD` shows everything). The stale
-diff in `~/.local/share/ai-skills` is from early symlink edits — those same
-edits were re-applied to prod/skills. Sub-files (OPERATIONS.md, COMMANDS.md,
-etc.) exist only in prod/skills.
+- `_jira_curl` centralises auth header construction in one place instead of 3 curl calls. If auth changes again, it's one function, not a grep across files.
+- `_jira_extract_project_key` + `_jira_ensure_project_key` remove the need to manually export `JIRA_PROJECT_KEY` when a known Jira key exists in context.
+- `handoff` mktemp fix eliminates the bug where files were created with literal `XXXXXX` in the name.
 
-**Post-commit:** run `bash scripts/skills.sh` to re-sync the install, overwriting the stale files.
+### Accretion — none
 
-### M2 — Skill partitions: 3 skills split into sub-files
+All additions are minimal and directly address identified gaps. No dead code, no over-engineered abstractions.
 
-| Skill | Before | After | Sub-files |
-|-------|--------|-------|-----------|
-| `to-jira` | 257 lines | 131 lines | `OPERATIONS.md` (126 lines) |
-| `from-jira` | 136 lines | 77 lines | `COMMANDS.md` (30) + `REFERENCE.md` (39) |
-| `verify-it` | 151 lines | 120 lines | `JIRA-RESOLUTION.md` (29) + `RETRO-CLEANUP.md` (13) |
+### Concerns
 
-All sub-files are one-level deep references. SKILL.md files hold core orchestration only.
+1. **Installed `jira-helpers.sh` not synced** — `~/.agents/skills/setup-internal-skills/scripts/jira-helpers.sh` and `load-jira-env.sh` still have the old code without `_jira_curl`, `_jira_extract_project_key`, or `~/.config/env` support. Consumers sourcing from the installed path (most consumer repos) won't benefit until synced.
 
-### M3 — implement-it Jira assign logic updated
+2. **Reference docs still have hardcoded auth** — `OPERATIONS.md`, `issue-tracker-jira.md`, `from-jira/COMMANDS.md`, and `plan-it/JIRA.md` all contain curl examples with inline `-H "Authorization: Bearer $JIRA_API_TOKEN"`. Agents executing those steps bypass `_jira_curl`. Documented but not blocking — the reference blocks are for agents to read and execute, and agents will use whatever headers the doc specifies. If the Jira changes auth type, all these docs need patching too.
 
-Before: unconditional `Assign` → `Transition "In Progress"` → `Watcher policy`
-After: conditional assign (`JIRA_ASSIGNEE` set + no existing assignee) → `Transition` → `Watcher policy`
+### Simplification proposals
 
-Consistent with verify-it's JIRA-RESOLUTION.md pattern.
+- **Auto-infer in `resolve_jira_parent_epic`** — add `_jira_ensure_project_key "$k"` after each successful key resolution in `resolve_jira_parent_epic`. Currently callers must remember to call it separately. Low risk, the function returns early if `JIRA_PROJECT_KEY` is already set.
 
-### L1 — grill-me is minimal (10 lines)
+- **Ship `_jira_curl` reference** — add a one-liner in `issue-tracker-jira.md` or `OPERATIONS.md` saying "All Jira curl calls: use `_jira_curl` from helpers instead of raw curl + auth header" so agents coding new operations know to use the wrapper.
 
-At 10 lines this is the thinnest skill. Intentional for a productivity pattern skill.
+### Deletion candidates — none
 
-### L2 — to-jira still over 100 lines (131)
+## Test verification
 
-The orchestration logic (create flow, delegation tables) remains in SKILL.md and
-can't be cleanly extracted. The bash-heavy content was the right extraction target.
+| Check | Result |
+|-------|--------|
+| `bash -n jira-helpers.sh` | SYNTAX OK |
+| `bash -n load-jira-env.sh` | SYNTAX OK |
+| Source jira-helpers.sh | SOURCED OK |
+| `_jira_extract_project_key DASH-2196` | `DASH` |
+| `_jira_extract_project_key MT-123` | `MT` |
+| `_jira_extract_project_key ""` | `` |
+| `_jira_extract_project_key NOHASH` | `` |
+| `_jira_ensure_project_key DASH-3373` | sets `JIRA_PROJECT_KEY=DASH` |
+| `_jira_ensure_project_key` when already set | idempotent — no override |
+| `_jira_curl` with `JIRA_AUTH_TYPE=basic` | uses `-u ":$JIRA_API_TOKEN"` |
+| `_jira_curl` with default bearer | uses `-H "Authorization: Bearer $JIRA_API_TOKEN"` |
 
-### L3 — verify-it still over 100 lines (120)
+## Verdict
 
-Same pattern — core workflow for 3 distinct modes remains in SKILL.md. The two
-sub-flows (Jira resolution, retro cleanup) were extracted.
+**PASS** — no blocking findings. Contains one notable gap (installed helpers not synced) and minor suggestions.
 
-## Accretion
-
-+7 new files (3 coding-standards, 5 partition sub-files), —275 lines net from
-the 3 partitioned skills. Good compression ratio.
-
-## Simplification proposals
-
-None. All changes are structural improvements.
-
-## Deletion candidates
-
-None.
-
-## Next
-
-> Audit PASS. Ready for verify and commit.
->
-> **Post-commit:** run `bash scripts/skills.sh` to sync the install.
+**Next:** Sync installed copy at `~/.agents/skills/` via `/setup-internal-skills` or `scripts/link-skills.sh`, then `/commit-it` to stage and commit.

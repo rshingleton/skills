@@ -8,11 +8,30 @@
 #   source ~/.agents/skills/setup-internal-skills/scripts/jira-helpers.sh
 #
 # All functions require JIRA_BASE_URL and JIRA_API_TOKEN in the environment.
+# Auth type: set JIRA_AUTH_TYPE=basic for Basic auth (-u ":$TOKEN"), default is Bearer.
+# JIRA_PROJECT_KEY can be inferred from any Jira key (e.g. DASH-2196 -> DASH) via _jira_extract_project_key.
 
 # shellcheck disable=SC2317  # functions are for callers, not called directly here
 
 # Comma- or space-separated list -> words
 _jira_split_usernames() { echo "${1//,/ }"; }
+
+# Centralized curl wrapper for Jira API calls.
+# Automatically adds auth header based on JIRA_AUTH_TYPE (bearer|basic).
+# All Jira curl calls from helpers MUST use this function.
+_jira_curl() {
+  case "${JIRA_AUTH_TYPE:-bearer}" in
+    basic) curl -u ":$JIRA_API_TOKEN" "$@" ;;
+    *) curl -H "Authorization: Bearer $JIRA_API_TOKEN" "$@" ;;
+  esac
+}
+
+# Extract project key from a Jira issue key (e.g. DASH-2196 -> DASH).
+# Usage: _jira_extract_project_key "DASH-2196"  ->  DASH
+_jira_extract_project_key() {
+  local key="$1"
+  [[ "$key" =~ ^([A-Za-z][A-Za-z0-9]*)-[0-9] ]] && echo "${BASH_REMATCH[1]}" || echo ""
+}
 
 # Remove ignored watchers from an issue.
 _jira_remove_ignored_watchers() {
@@ -24,8 +43,7 @@ _jira_remove_ignored_watchers() {
   fi
   for u in $users; do
     [ -z "$u" ] && continue
-    curl -s -o /dev/null -X DELETE \
-      -H "Authorization: Bearer $JIRA_API_TOKEN" \
+    _jira_curl -s -o /dev/null -X DELETE \
       "$JIRA_BASE_URL/rest/api/2/issue/${key}/watchers?username=${u}&notifyUsers=false" 2>/dev/null || true
   done
 }
@@ -36,8 +54,7 @@ _jira_add_watchers() {
   [ -z "${JIRA_WATCHER_USERNAME:-}" ] && return 0
   for u in $(_jira_split_usernames "$JIRA_WATCHER_USERNAME"); do
     [ -z "$u" ] && continue
-    curl -s -o /dev/null -X POST \
-      -H "Authorization: Bearer $JIRA_API_TOKEN" \
+    _jira_curl -s -o /dev/null -X POST \
       -H "Content-Type: application/json" \
       -d "$(jq -n --arg u "$u" '$u')" \
       "$JIRA_BASE_URL/rest/api/2/issue/${key}/watchers?notifyUsers=false" 2>/dev/null || true
@@ -57,11 +74,21 @@ _jira_apply_watcher_policy() {
 _jira_set_assignee() {
   local key="$1"
   [ -z "${JIRA_ASSIGNEE:-}" ] || [ -z "$key" ] && return 0
-  curl -s -o /dev/null -X PUT \
-    -H "Authorization: Bearer $JIRA_API_TOKEN" \
+  _jira_curl -s -o /dev/null -X PUT \
     -H "Content-Type: application/json" \
     "$JIRA_BASE_URL/rest/api/2/issue/${key}?notifyUsers=false" \
     -d "{\"fields\": {\"assignee\": {\"name\": \"${JIRA_ASSIGNEE}\"}}}"
+}
+
+# Ensure JIRA_PROJECT_KEY is set, inferring from a known Jira key if needed.
+# Idempotent — does not override an already-set JIRA_PROJECT_KEY.
+# Usage: _jira_ensure_project_key "DASH-3373"
+_jira_ensure_project_key() {
+  local hint="$1"
+  [ -n "${JIRA_PROJECT_KEY:-}" ] && return 0
+  local inferred
+  inferred="$(_jira_extract_project_key "$hint")"
+  [ -n "$inferred" ] && export JIRA_PROJECT_KEY="$inferred"
 }
 
 # Resolve parent Epic key from --parent flag, plan jira.md, intake file,
