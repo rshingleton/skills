@@ -14,3 +14,9 @@ dispatch point for bearer/basic switching.
 `--dry-run` flag for safe preview, and HTTP error capture (non-2xx → stderr +
 exit 1). All 14 internal callers migrated. Dry-run example in
 `issue-tracker-jira.md`.
+
+## 2026-06-30 — `plan-it/SKILL.md` trim
+
+Extracted intake evaluation, grill, and scaffold sections into
+`INTAKE-EVALUATION.md`, `GRILL.md`, `SCAFFOLD.md`. Main SKILL.md reduced
+from 214 to 115 lines. No content changes — pure extraction.

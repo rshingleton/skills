@@ -1,72 +1,67 @@
-# Audit: Jira pipeline fixes & handoff template fix
+# Audit: all skills — issue→plan→implement flow
 
-Generated: repo audit — ad-hoc changes in a single session.
+Generated: repo audit — full survey of 28 skills across 4 buckets.
 
-## Scope
+## Core value
 
-4 files changed, 41 insertions, 8 deletions across two concerns:
+The **Doc Cycle** (`issue-it → plan-it → implement-it → audit-it → verify-it → commit-it`) is complete, self-consistent, and well-documented. Every skill chains correctly to the next; no dead ends or broken references. The incremental `--phase` sub-flow also has no gaps.
 
-| Concern | Files | Δ |
-|---------|-------|---|
-| Jira auth infrastructure | `jira-helpers.sh`, `load-jira-env.sh`, `.env.example` | +40 −8 |
-| Handoff temp-file template | `skills/productivity/handoff/SKILL.md` | +1 −1 |
+The **seam discipline** (interface vs implementation) is strong:
 
----
+| Seam | Interface | Consumer | Depth |
+|------|-----------|----------|-------|
+| `docs/issues/*.md` | YAML frontmatter + markdown body | `plan-it --from-issues` | Deep — single file protocol carries type, status, source, acceptance criteria |
+| `docs/planning/<id>/phase-N/ai-prompt.md` | Heading + scope + verification criteria + estimate | `implement-it` | Deep — agent derives all context from one file |
+| `docs/planning/<id>/jira.md` | Table rows (phase ↔ key) | `implement-it`, `verify-it`, `commit-it` | Shallow but justified — Jira keys are inherently tabular |
+| `_jira_*` shell functions | Callable bash functions | All skills sourcing jira-helpers.sh | Deep — ~500 lines of curl collapsed into 17 functions |
+| SKILL.md frontmatter | `name:` + `description:` with triggers | Agent dispatcher | Deep — description is the sole routing signal |
 
-## Process log
+## Accretion — none
 
-1. Identified that `jira-helpers.sh` hardcoded `-H "Authorization: Bearer $JIRA_API_TOKEN"` in every curl call (3 occurrences), and had no support for Basic auth.
-2. Added `_jira_curl` wrapper — centralized auth injection, respects `JIRA_AUTH_TYPE=basic|bearer`.
-3. Added `_jira_extract_project_key` and `_jira_ensure_project_key` — infer project key from any Jira key (DASH-2196 → DASH).
-4. Updated the 3 internal curl calls to use `_jira_curl`.
-5. Added `~/.config/env` to the env-search chain in `load-jira-env.sh`.
-6. Fixed `handoff/SKILL.md` mktemp template from `-t handoff-XXXXXX.md` (produces literal XXXXXX on BSD mktemp) to `mktemp /tmp/handoff-XXXXXX` (portable, replaces trailing X's).
-7. Synced the handoff fix to the installed copy at `~/.agents/skills/handoff/SKILL.md`.
+All 28 skills serve distinct purposes. No duplicate skills, no dead code. 3 deprecated skills (`to-epic`, `to-jiras`, `promote-to-jira`) are correctly excluded from the shipped skill index.
 
 ## Findings
 
-### Core value
+### 1. `plan-it/SKILL.md` exceeds write-a-skill 100-line guideline (214 lines)
 
-- `_jira_curl` centralises auth header construction in one place instead of 3 curl calls. If auth changes again, it's one function, not a grep across files.
-- `_jira_extract_project_key` + `_jira_ensure_project_key` remove the need to manually export `JIRA_PROJECT_KEY` when a known Jira key exists in context.
-- `handoff` mktemp fix eliminates the bug where files were created with literal `XXXXXX` in the name.
+The write-a-skill template says "Split into separate files when SKILL.md exceeds 100 lines." At 214 lines, `plan-it` is more than double the limit. It already offloads `JIRA.md`, `FROM-ISSUES.md`, `OUT-OF-SCOPE.md`, `AGENT-BRIEF.md`, and `REFERENCE.md` — but the main file remains long.
 
-### Accretion — none
+**Suggestion:** Extract the intake evaluation workflow (lines 86-124) into `INTAKE-EVALUATION.md`, the grill section (lines 127-137) into `GRILL.md`, and the scaffold section (lines 139-170) into `SCAFFOLD.md`. The main SKILL.md would then be a routing table with "Quick start" and "Core tenets."
 
-All additions are minimal and directly address identified gaps. No dead code, no over-engineered abstractions.
+### 2. `issue-it/SKILL.md` at 135 lines — borderline
 
-### Concerns
+Also over the 100-line guideline. Already has `INTAKE-TEMPLATE.md` and `EXAMPLES.md`.
 
-1. **Installed `jira-helpers.sh` not synced** — `~/.agents/skills/setup-internal-skills/scripts/jira-helpers.sh` and `load-jira-env.sh` still have the old code without `_jira_curl`, `_jira_extract_project_key`, or `~/.config/env` support. Consumers sourcing from the installed path (most consumer repos) won't benefit until synced.
+**Suggestion:** Extract the template reference and example walkthroughs into the existing supporting files. Main file should fit under 100 lines.
 
-2. ~~**Reference docs still have hardcoded auth** — `OPERATIONS.md`, `issue-tracker-jira.md`, `from-jira/COMMANDS.md`, and `plan-it/JIRA.md` all contain curl examples with inline `-H "Authorization: Bearer $JIRA_API_TOKEN"`.~~ **Resolved in `0002-consolidate-jira-api-helpers`.** All doc examples now call `_jira_*` helpers. Zero raw Bearer curls remain outside `_jira_curl` itself.
+### 3. `setup-internal-skills` is the deepest module — also the most complex
 
-### Simplification proposals
+186-line SKILL.md with 18 supporting files including shell scripts, templates, and reference docs. This is justified: it bootstraps the entire skills ecosystem across all consumer repos. But its surface area means changes here have the widest blast radius of any skill.
 
-- ~~**Auto-infer in `resolve_jira_parent_epic`** — add `_jira_ensure_project_key "$k"` after each successful key resolution in `resolve_jira_parent_epic`.~~ **Resolved in `0002-consolidate-jira-api-helpers`** — each key branch now calls `_jira_ensure_project_key`.
+### 4. `deprecated/` bucket has no README.md
 
-- ~~**Ship `_jira_curl` reference** — add a one-liner in `issue-tracker-jira.md` or `OPERATIONS.md` saying "All Jira curl calls: use `_jira_curl` from helpers instead of raw curl + auth header".~~ **Resolved** — all doc examples now use `_jira_*` helpers. The helper function table in `issue-tracker-jira.md` lists all available functions.
+3 skills live here (`to-epic`, `to-jiras`, `promote-to-jira`). Per AGENTS.md policy they are correctly excluded from the shipped index. A local README would help developers browsing the repo understand the graveyard convention.
 
-### Deletion candidates — none
+### 5. `personal/` bucket directory does not exist on disk
 
-## Test verification
+Referenced in AGENTS.md as a valid bucket but no `skills/personal/` directory exists. Harmless — it's a convention for users to create locally.
 
-| Check | Result |
-|-------|--------|
-| `bash -n jira-helpers.sh` | SYNTAX OK |
-| `bash -n load-jira-env.sh` | SYNTAX OK |
-| Source jira-helpers.sh | SOURCED OK |
-| `_jira_extract_project_key DASH-2196` | `DASH` |
-| `_jira_extract_project_key MT-123` | `MT` |
-| `_jira_extract_project_key ""` | `` |
-| `_jira_extract_project_key NOHASH` | `` |
-| `_jira_ensure_project_key DASH-3373` | sets `JIRA_PROJECT_KEY=DASH` |
-| `_jira_ensure_project_key` when already set | idempotent — no override |
-| `_jira_curl` with `JIRA_AUTH_TYPE=basic` | uses `-u ":$JIRA_API_TOKEN"` |
-| `_jira_curl` with default bearer | uses `-H "Authorization: Bearer $JIRA_API_TOKEN"` |
+### 6. Skill description quality is high
+
+All 28 SKILL.md files have valid frontmatter. 25/28 include "Use when" trigger keywords. The 3 deprecated skills omit triggers (acceptable — they should not be triggered).
+
+## Simplification proposals
+
+1. **Trim `plan-it/SKILL.md`** — extract intake eval, grill, and scaffold into separate files per the write-a-skill template guidance. Main file becomes an orchestrator with routing to sub-files.
+
+2. **Trim `issue-it/SKILL.md`** — extract template reference and examples into existing supporting files.
+
+3. **Add `deprecated/README.md`** — document the graveyard convention: skills moved here are not indexed, not triggered, and kept only for reference.
+
+## Deletion candidates — none
 
 ## Verdict
 
-**PASS** — no blocking findings. Contains one notable gap (installed helpers not synced) and minor suggestions.
+**PASS** — no blocking findings. The issue→plan→implement flow is complete, consistent, and well-documented. The architectural depth (seam discipline, file protocol interfaces, delegation patterns) is strong.
 
-**Next:** Sync installed copy at `~/.agents/skills/` via `/setup-internal-skills` or `scripts/link-skills.sh`, then `/commit-it` to stage and commit.
+**Next:** Pick a simplification proposal and run `/plan-it`, or `/implement-it` if already planned.
