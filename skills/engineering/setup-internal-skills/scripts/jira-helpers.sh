@@ -17,13 +17,66 @@
 _jira_split_usernames() { echo "${1//,/ }"; }
 
 # Centralized curl wrapper for Jira API calls.
+# Usage: _jira_curl <method> [--dry-run] [curl args...]
+#   method: GET, POST, PUT, DELETE
+#   --dry-run: print intended operation without executing
+#
 # Automatically adds auth header based on JIRA_AUTH_TYPE (bearer|basic).
+# Captures HTTP status code; non-2xx prints error to stderr and returns 1.
 # All Jira curl calls from helpers MUST use this function.
 _jira_curl() {
+  local method="$1" dry_run=0 auth_args=()
+  [ -z "$method" ] && return 1
+  shift
+
   case "${JIRA_AUTH_TYPE:-bearer}" in
-    basic) curl -u ":$JIRA_API_TOKEN" "$@" ;;
-    *) curl -H "Authorization: Bearer $JIRA_API_TOKEN" "$@" ;;
+    basic) auth_args=(-u ":$JIRA_API_TOKEN") ;;
+    *) auth_args=(-H "Authorization: Bearer $JIRA_API_TOKEN") ;;
   esac
+
+  # Scan for --dry-run and collect passthru args
+  local passthru=() url="" prev_arg=""
+  for arg in "$@"; do
+    if [ "$arg" = "--dry-run" ]; then
+      dry_run=1
+    else
+      passthru+=("$arg")
+      case "$arg" in
+        http*) [ -z "$url" ] && url="$arg" ;;
+      esac
+    fi
+  done
+
+  if [ "$dry_run" -eq 1 ]; then
+    echo "[DRY RUN] $method $url"
+    # Extract -d payload for display
+    local payload="" prev=""
+    for arg in "$@"; do
+      if [ "$prev" = "-d" ]; then payload="$arg"; break; fi
+      prev="$arg"
+    done
+    if [ -n "$payload" ]; then
+      echo "PAYLOAD: $(echo "$payload" | jq -c '{summary: .fields.summary, issuetype: .fields.issuetype}' 2>/dev/null || echo "$payload" | head -c 200)"
+    fi
+    return 0
+  fi
+
+  local response code body
+  response=$(curl -s -w "\n%{http_code}" -X "$method" "${auth_args[@]}" "${passthru[@]}" 2>/dev/null || true)
+  code=$(echo "$response" | tail -1)
+  body=$(echo "$response" | sed '$d')
+
+  if [ -z "$code" ]; then
+    echo "Jira API error: no response (connection failed)" >&2
+    return 1
+  fi
+  if [ "$code" -lt 200 ] || [ "$code" -ge 300 ]; then
+    echo "Jira API error ($code):" >&2
+    [ -n "$body" ] && echo "$body" | jq -r '.errorMessages // .message // "Unknown error"' >&2 2>/dev/null || echo "$body" | head -c 500 >&2
+    return 1
+  fi
+
+  echo "$body"
 }
 
 # Extract project key from a Jira issue key (e.g. DASH-2196 -> DASH).
@@ -43,7 +96,7 @@ _jira_remove_ignored_watchers() {
   fi
   for u in $users; do
     [ -z "$u" ] && continue
-    _jira_curl -s -o /dev/null -X DELETE \
+    _jira_curl DELETE -s -o /dev/null \
       "$JIRA_BASE_URL/rest/api/2/issue/${key}/watchers?username=${u}&notifyUsers=false" 2>/dev/null || true
   done
 }
@@ -54,10 +107,10 @@ _jira_add_watchers() {
   [ -z "${JIRA_WATCHER_USERNAME:-}" ] && return 0
   for u in $(_jira_split_usernames "$JIRA_WATCHER_USERNAME"); do
     [ -z "$u" ] && continue
-    _jira_curl -s -o /dev/null -X POST \
+    _jira_curl POST -s -o /dev/null \
       -H "Content-Type: application/json" \
-      -d "$(jq -n --arg u "$u" '$u')" \
-      "$JIRA_BASE_URL/rest/api/2/issue/${key}/watchers?notifyUsers=false" 2>/dev/null || true
+      "$JIRA_BASE_URL/rest/api/2/issue/${key}/watchers?notifyUsers=false" \
+      -d "$(jq -n --arg u "$u" '$u')" 2>/dev/null || true
   done
 }
 
@@ -74,7 +127,7 @@ _jira_apply_watcher_policy() {
 _jira_set_assignee() {
   local key="$1"
   [ -z "${JIRA_ASSIGNEE:-}" ] || [ -z "$key" ] && return 0
-  _jira_curl -s -o /dev/null -X PUT \
+  _jira_curl PUT -s -o /dev/null \
     -H "Content-Type: application/json" \
     "$JIRA_BASE_URL/rest/api/2/issue/${key}?notifyUsers=false" \
     -d "{\"fields\": {\"assignee\": {\"name\": \"${JIRA_ASSIGNEE}\"}}}"
@@ -172,11 +225,10 @@ _jira_wiki_body() {
 _jira_comment() {
   local key="$1" body="$2"
   [ -z "$key" ] || [ -z "$body" ] && return 1
-  _jira_curl -s -X POST \
+  _jira_curl POST -s \
     -H "Content-Type: application/json" \
     "$JIRA_BASE_URL/rest/api/2/issue/${key}/comment?notifyUsers=false" \
-    -d "$(jq -n --arg b "$body" '{body: $b}')" \
-    | jq -r '.id'
+    -d "$(jq -n --arg b "$body" '{body: $b}')" | jq -r '.id'
 }
 
 # Transition an issue to a target status.
@@ -185,10 +237,10 @@ _jira_comment() {
 _jira_transition() {
   local key="$1" target="$2" tid
   [ -z "$key" ] || [ -z "$target" ] && return 1
-  tid=$(_jira_curl -s "$JIRA_BASE_URL/rest/api/2/issue/${key}/transitions" \
+  tid=$(_jira_curl GET -s "$JIRA_BASE_URL/rest/api/2/issue/${key}/transitions" \
     | jq -r --arg t "$target" '.transitions[] | select(.to.name == $t) | .id' | head -1)
   [ -z "$tid" ] && return 1
-  _jira_curl -s -o /dev/null -X POST \
+  _jira_curl POST -s -o /dev/null \
     -H "Content-Type: application/json" \
     "$JIRA_BASE_URL/rest/api/2/issue/${key}/transitions?notifyUsers=false" \
     -d "$(jq -n --arg id "$tid" '{transition: {id: $id}}')"
@@ -203,7 +255,7 @@ _jira_create_epic() {
   [ -z "$project" ] || [ -z "$summary" ] && return 1
   [ -n "$desc_file" ] && body=$(cat "$desc_file" 2>/dev/null)
   local key
-  key=$(_jira_curl -s -X POST \
+  key=$(_jira_curl POST -s \
     -H "Content-Type: application/json" \
     "$JIRA_BASE_URL/rest/api/2/issue?notifyUsers=false" \
     -d "$(jq -n \
@@ -220,8 +272,7 @@ _jira_create_epic() {
           customfield_10881: $en,
           labels: ["ai-generated"]
         }
-      }')" \
-    | jq -r '.key')
+      }')" | jq -r '.key')
   [ -z "$key" ] || [ "$key" = "null" ] && return 1
   _jira_apply_watcher_policy "$key" create
   echo "$key"
@@ -256,11 +307,10 @@ _jira_create_task() {
     [ -n "$tt" ] && payload=$(echo "$payload" | jq --argjson tt "$tt" '.fields += $tt')
   fi
   local key
-  key=$(_jira_curl -s -X POST \
+  key=$(_jira_curl POST -s \
     -H "Content-Type: application/json" \
     "$JIRA_BASE_URL/rest/api/2/issue?notifyUsers=false" \
-    -d "$payload" \
-    | jq -r '.key')
+    -d "$payload" | jq -r '.key')
   [ -z "$key" ] || [ "$key" = "null" ] && return 1
   _jira_apply_watcher_policy "$key" create
   echo "$key"
@@ -273,7 +323,7 @@ _jira_create_task() {
 _jira_update_issue() {
   local key="$1" updates="$2"
   [ -z "$key" ] || [ -z "$updates" ] && return 1
-  _jira_curl -s -o /dev/null -X PUT \
+  _jira_curl PUT -s -o /dev/null \
     -H "Content-Type: application/json" \
     "$JIRA_BASE_URL/rest/api/2/issue/${key}?notifyUsers=false" \
     -d "$(jq -n --argjson u "$updates" '{fields: $u}')"
@@ -285,10 +335,10 @@ _jira_update_issue() {
 _jira_set_labels() {
   local key="$1" label new_labels; shift
   [ -z "$key" ] || [ $# -eq 0 ] && return 1
-  new_labels=$(_jira_curl -s "$JIRA_BASE_URL/rest/api/2/issue/${key}?fields=labels" \
+  new_labels=$(_jira_curl GET -s "$JIRA_BASE_URL/rest/api/2/issue/${key}?fields=labels" \
     | jq -r --argjson add "$(jq -n --args '$ARGS.positional' -- "$@")" \
       '.fields.labels + $add | unique')
-  _jira_curl -s -o /dev/null -X PUT \
+  _jira_curl PUT -s -o /dev/null \
     -H "Content-Type: application/json" \
     "$JIRA_BASE_URL/rest/api/2/issue/${key}?notifyUsers=false" \
     -d "$(jq -n --argjson l "$new_labels" '{fields: {labels: $l}}')"
@@ -305,7 +355,7 @@ _jira_set_labels() {
 _jira_fetch_issue() {
   local key="$1" fields="${2:-summary,description,issuetype,status,labels,created}"
   [ -z "$key" ] && return 1
-  _jira_curl -s "$JIRA_BASE_URL/rest/api/2/issue/${key}?fields=${fields}"
+  _jira_curl GET -s "$JIRA_BASE_URL/rest/api/2/issue/${key}?fields=${fields}"
 }
 
 # Fetch comments for an issue.
@@ -313,7 +363,7 @@ _jira_fetch_issue() {
 _jira_fetch_comments() {
   local key="$1"
   [ -z "$key" ] && return 1
-  _jira_curl -s "$JIRA_BASE_URL/rest/api/2/issue/${key}/comment"
+  _jira_curl GET -s "$JIRA_BASE_URL/rest/api/2/issue/${key}/comment"
 }
 
 # Search issues by JQL.
@@ -322,7 +372,7 @@ _jira_fetch_comments() {
 _jira_search() {
   local jql="$1" max="${2:-50}" fields="${3:-summary,key,created}"
   [ -z "$jql" ] && return 1
-  _jira_curl -s -G \
+  _jira_curl GET -s -G \
     --data-urlencode "jql=${jql}" \
     --data-urlencode "maxResults=${max}" \
     --data-urlencode "fields=${fields}" \

@@ -281,6 +281,12 @@ All operations delegate to `_jira_*` helpers (sourced via `load-jira-env.sh`):
 | Transition issue status | `_jira_transition "KEY-123" "Done"` |
 | Set assignee | `_jira_set_assignee "KEY-123"` |
 | Apply watcher policy | `_jira_apply_watcher_policy "KEY-123" create` (or `update`) |
+| **Dry-run any operation** | `_jira_curl POST --dry-run "$JIRA_BASE_URL/rest/api/2/issue" -d '{}'` |
+
+Dry-run: pass `--dry-run` as the second arg to `_jira_curl` to preview the
+method, URL, and truncated payload without executing. Works with any HTTP
+method. Not available on the higher-level helpers — call `_jira_curl` directly
+for dry-run.
 
 Issue `issuetype` values: `Task`, `Story`, `Bug`, `Epic`, `Sub-task`, `Improvement`.
 
