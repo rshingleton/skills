@@ -39,13 +39,13 @@ All additions are minimal and directly address identified gaps. No dead code, no
 
 1. **Installed `jira-helpers.sh` not synced** — `~/.agents/skills/setup-internal-skills/scripts/jira-helpers.sh` and `load-jira-env.sh` still have the old code without `_jira_curl`, `_jira_extract_project_key`, or `~/.config/env` support. Consumers sourcing from the installed path (most consumer repos) won't benefit until synced.
 
-2. **Reference docs still have hardcoded auth** — `OPERATIONS.md`, `issue-tracker-jira.md`, `from-jira/COMMANDS.md`, and `plan-it/JIRA.md` all contain curl examples with inline `-H "Authorization: Bearer $JIRA_API_TOKEN"`. Agents executing those steps bypass `_jira_curl`. Documented but not blocking — the reference blocks are for agents to read and execute, and agents will use whatever headers the doc specifies. If the Jira changes auth type, all these docs need patching too.
+2. ~~**Reference docs still have hardcoded auth** — `OPERATIONS.md`, `issue-tracker-jira.md`, `from-jira/COMMANDS.md`, and `plan-it/JIRA.md` all contain curl examples with inline `-H "Authorization: Bearer $JIRA_API_TOKEN"`.~~ **Resolved in `0002-consolidate-jira-api-helpers`.** All doc examples now call `_jira_*` helpers. Zero raw Bearer curls remain outside `_jira_curl` itself.
 
 ### Simplification proposals
 
-- **Auto-infer in `resolve_jira_parent_epic`** — add `_jira_ensure_project_key "$k"` after each successful key resolution in `resolve_jira_parent_epic`. Currently callers must remember to call it separately. Low risk, the function returns early if `JIRA_PROJECT_KEY` is already set.
+- ~~**Auto-infer in `resolve_jira_parent_epic`** — add `_jira_ensure_project_key "$k"` after each successful key resolution in `resolve_jira_parent_epic`.~~ **Resolved in `0002-consolidate-jira-api-helpers`** — each key branch now calls `_jira_ensure_project_key`.
 
-- **Ship `_jira_curl` reference** — add a one-liner in `issue-tracker-jira.md` or `OPERATIONS.md` saying "All Jira curl calls: use `_jira_curl` from helpers instead of raw curl + auth header" so agents coding new operations know to use the wrapper.
+- ~~**Ship `_jira_curl` reference** — add a one-liner in `issue-tracker-jira.md` or `OPERATIONS.md` saying "All Jira curl calls: use `_jira_curl` from helpers instead of raw curl + auth header".~~ **Resolved** — all doc examples now use `_jira_*` helpers. The helper function table in `issue-tracker-jira.md` lists all available functions.
 
 ### Deletion candidates — none
 

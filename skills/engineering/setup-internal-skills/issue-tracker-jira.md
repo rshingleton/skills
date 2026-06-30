@@ -82,17 +82,26 @@ All Jira shell helpers are in a single source-able script. They become available
 source ~/.agents/skills/setup-internal-skills/scripts/jira-helpers.sh
 ```
 
-| Function | Defined in | Use |
-|----------|------------|-----|
-| `_jira_apply_watcher_policy` | `jira-helpers.sh` | After every create / PUT / transition / comment |
-| `_jira_set_assignee` | `jira-helpers.sh` | Before implement / verify transitions when `JIRA_ASSIGNEE` set |
-| `resolve_jira_parent_epic` | `jira-helpers.sh` | Before `/plan-it --jira` creates |
-| `_jira_phase_key` | `jira-helpers.sh` | Read Jira key for current phase from `jira.md` |
-| `_jira_wiki_body` | `jira-helpers.sh` | Optional markdown → wiki sed helper |
-| `_jira_timetracking_fields` | `jira-helpers.sh` | Build `timetracking` object for `POST /issue` |
-| `_jira_hours_to_duration` | `jira-helpers.sh` | Convert number to Jira duration string |
-| `_jira_remove_ignored_watchers` | `jira-helpers.sh` | Remove watchers per policy |
-| `_jira_add_watchers` | `jira-helpers.sh` | Add watchers on creates |
+| Function | Use |
+|----------|------|
+| `_jira_require_env` | Validate `JIRA_BASE_URL` + `JIRA_API_TOKEN` are set |
+| `_jira_comment` | POST comment, `notifyUsers=false` |
+| `_jira_transition` | GET transitions → POST status change → watcher policy |
+| `_jira_create_epic` | POST a new Epic, watcher policy, echoes key |
+| `_jira_create_task` | POST a new Task (Epic Link, timetracking, assignee), echoes key |
+| `_jira_update_issue` | PUT partial field update, watcher policy |
+| `_jira_set_labels` | GET labels → append → PUT, watcher policy |
+| `_jira_fetch_issue` | GET issue JSON (selectable fields) |
+| `_jira_fetch_comments` | GET comments JSON |
+| `_jira_search` | GET JQL search (max results, field select) |
+| `_jira_set_assignee` | PUT assignee (no watcher policy — call separately) |
+| `_jira_apply_watcher_policy` | Remove ignored + optionally add watchers |
+| `_jira_phase_key` | Read Jira key for phase from `jira.md` |
+| `_jira_timetracking_fields` | Build `timetracking` JSON from hours |
+| `_jira_hours_to_duration` | Convert number to Jira duration string |
+| `_jira_wiki_body` | Markdown → Jira wiki markup (sed) |
+| `resolve_jira_parent_epic` | Resolve parent Epic from flags, env, or `jira.md` |
+| `_jira_ensure_project_key` | Infer `JIRA_PROJECT_KEY` from a known Jira key |
 
 ## Notification suppression (required on writes)
 
@@ -168,40 +177,14 @@ _jira_hours_to_duration 2.5  # → 150m
 _jira_timetracking_fields 4  # → {"timetracking":{"originalEstimate":"4h","remainingEstimate":"4h"}}
 ```
 
-### jq create (Task + Epic link + estimate + assignee)
+### Create a Task with Epic link + estimate + assignee
 
 ```bash
 EST_HOURS=$(awk -F': *' '/^estimate_hours:/{gsub(/[" \t]/,"",$2); print $2; exit}' \
   "docs/planning/${PLAN_ID}/phase-1/ai-prompt.md")
 [ -z "$EST_HOURS" ] && EST_HOURS="${JIRA_DEFAULT_ESTIMATE_HOURS:-}"
 
-PAYLOAD=$(jq -n \
-  --arg project "$JIRA_PROJECT_KEY" \
-  --arg summary "Phase 1 title" \
-  --arg body "$BODY" \
-  --arg epic "$EPIC_KEY" \
-  --arg assignee "${JIRA_ASSIGNEE:-}" \
-  '{
-    fields: ({
-      project: {key: $project},
-      summary: $summary,
-      description: $body,
-      issuetype: {name: "Task"},
-      customfield_10880: $epic,
-      labels: ["ai-generated"]
-    } + (if $assignee != "" then {assignee: {name: $assignee}} else {} end))
-  }')
-
-if [ -n "$EST_HOURS" ]; then
-  TIMETRACKING=$(_jira_timetracking_fields "$EST_HOURS")
-  PAYLOAD=$(echo "$PAYLOAD" | jq --argjson tt "$TIMETRACKING" \
-    '.fields + $tt')
-fi
-
-curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
-  -H "Content-Type: application/json" \
-  -X POST "$JIRA_BASE_URL/rest/api/2/issue?notifyUsers=false" \
-  -d "$PAYLOAD"
+_jira_create_task "$JIRA_PROJECT_KEY" "Phase 1 title" "$BODY_FILE" "$EPIC_KEY" "$EST_HOURS" "${JIRA_ASSIGNEE:-}"
 ```
 
 After POST, `_jira_apply_watcher_policy "$KEY" create`.
@@ -283,134 +266,23 @@ After `/plan-it --jira` creates an Epic, suggest adding `JIRA_DEFAULT_EPIC=<key>
 
 ## Conventions
 
-- **Create an issue** (normal — use a heredoc for the body):
-  ```bash
-  curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
-    -H "Content-Type: application/json" \
-    -X POST \
-    "$JIRA_BASE_URL/rest/api/2/issue?notifyUsers=false" \
-    -d '{
-      "fields": {
-        "project": {"key": "'"$JIRA_PROJECT_KEY"'"},
-        "summary": "Issue title",
-        "description": "Issue body in text or ADF",
-        "issuetype": {"name": "Task"}
-      }
-    }'
-  ```
+All operations delegate to `_jira_*` helpers (sourced via `load-jira-env.sh`):
 
-  Then apply watcher policy:
+| Operation | Helper |
+|-----------|--------|
+| Create a Task | `_jira_create_task "$JIRA_PROJECT_KEY" "summary" "body_file.md"` |
+| Create an Epic | `_jira_create_epic "$JIRA_PROJECT_KEY" "Epic title"` |
+| Create a Task linked to an Epic | `_jira_create_task "$JIRA_PROJECT_KEY" "summary" "body_file.md" "EPIC-123"` |
+| Read an issue | `_jira_fetch_issue "KEY-123"` |
+| Read issue comments | `_jira_fetch_comments "KEY-123"` |
+| List issues by JQL | `_jira_search "project = KEY AND status = Open" 20` |
+| List Tasks under an Epic | `_jira_search "cf[10880] = EPIC-123 AND issuetype = Task" 100` |
+| Comment on an issue | `_jira_comment "KEY-123" "Comment text"` |
+| Transition issue status | `_jira_transition "KEY-123" "Done"` |
+| Set assignee | `_jira_set_assignee "KEY-123"` |
+| Apply watcher policy | `_jira_apply_watcher_policy "KEY-123" create` (or `update`) |
 
-  ```bash
-  _jira_apply_watcher_policy "<NEW_KEY>" create
-  ```
-
-- **Create an issue with multi-line body** (use `jq` to build JSON safely):
-  ```bash
-  BODY=$(cat <<'ISSUEBODY'
-  h2. What
-
-  * Concrete behavior here
-
-  h2. Done when
-
-  * Testable outcome
-
-  h2. Blocked
-
-  None
-  ISSUEBODY
-  )
-  curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
-    -H "Content-Type: application/json" \
-    -X POST \
-    "$JIRA_BASE_URL/rest/api/2/issue?notifyUsers=false" \
-    -d "$(jq -n \
-      --arg project "$JIRA_PROJECT_KEY" \
-      --arg summary "Issue title" \
-      --arg body "$BODY" \
-      '{
-        fields: {
-          project: {key: $project},
-          summary: $summary,
-          description: $body,
-          issuetype: {name: "Task"},
-          labels: ["ai-generated"]
-        }
-      }')"
-  ```
-
-  Issue `issuetype` values: `Task`, `Story`, `Bug`, `Epic`, `Sub-task`, `Improvement`. See [Time estimates](#time-estimates-timetracking) for per-phase hours.
-
-- **Create an Epic**:
-  ```bash
-  curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
-    -H "Content-Type: application/json" \
-    -X POST \
-    "$JIRA_BASE_URL/rest/api/2/issue?notifyUsers=false" \
-    -d '{
-      "fields": {
-        "project": {"key": "'"$JIRA_PROJECT_KEY"'"},
-        "summary": "Epic title",
-        "description": "Epic body",
-        "issuetype": {"name": "Epic"},
-        "customfield_10881": "Epic name"
-      }
-    }'
-  ```
-
-- **Create a Task linked to an Epic**:
-  Add `"customfield_10880": "EPIC-123"` to the fields.
-
-- **Read an issue**:
-  ```bash
-  curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
-    "$JIRA_BASE_URL/rest/api/2/issue/<KEY>"
-  ```
-
-- **Read issue comments**:
-  ```bash
-  curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
-    "$JIRA_BASE_URL/rest/api/2/issue/<KEY>/comment"
-  ```
-
-- **List issues by JQL**:
-  ```bash
-  curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
-    "$JIRA_BASE_URL/rest/api/2/search?jql=project+%3D+$JIRA_PROJECT_KEY+AND+status+%3D+%22Open%22&maxResults=20"
-  ```
-
-- **List Tasks under an Epic** (sync back to local — full flow in [jira-epic-sync.md](jira-epic-sync.md)):
-  ```bash
-  curl -s -G -H "Authorization: Bearer $JIRA_API_TOKEN" \
-    --data-urlencode "jql=cf[10880] = EPIC-123 AND issuetype = Task ORDER BY created ASC" \
-    --data-urlencode "maxResults=100" \
-    --data-urlencode "fields=summary,key" \
-    "$JIRA_BASE_URL/rest/api/2/search"
-  ```
-
-- **Comment on an issue**:
-  ```bash
-  curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
-    -H "Content-Type: application/json" \
-    -X POST \
-    "$JIRA_BASE_URL/rest/api/2/issue/<KEY>/comment?notifyUsers=false" \
-    -d '{"body": "Comment text here"}'
-  ```
-
-- **Transition issue status**:
-  ```bash
-  TRANSITIONS=$(curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
-    "$JIRA_BASE_URL/rest/api/2/issue/<KEY>/transitions")
-  TID=$(echo "$TRANSITIONS" | jq -r '.transitions[] | select(.name == "<Target Status>") | .id')
-  curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
-    -H "Content-Type: application/json" \
-    -X POST \
-    "$JIRA_BASE_URL/rest/api/2/issue/<KEY>/transitions?notifyUsers=false" \
-    -d "{\"transition\": {\"id\": \"$TID\"}}"
-  ```
-
-  After transition, call `_jira_apply_watcher_policy "$KEY" update`.
+Issue `issuetype` values: `Task`, `Story`, `Bug`, `Epic`, `Sub-task`, `Improvement`.
 
 ## Triage state mapping
 
@@ -426,4 +298,4 @@ Delegate to `to-jira`: `/to-jira create <path>`. The raw API pattern (POST `/res
 
 ## When a skill says "fetch the relevant ticket"
 
-Run `curl` to GET the issue by key and parse with `jq`. Fetch comments separately.
+`_jira_fetch_issue "<KEY>"` to get issue JSON, `_jira_fetch_comments "<KEY>"` for comments. Parse with `jq`.

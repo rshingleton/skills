@@ -6,22 +6,7 @@ Each block assumes credentials are already sourced (see SKILL.md § Sourcing cre
 
 ```bash
 # (credentials)
-EPIC_KEY=$(curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
-  -H "Content-Type: application/json" \
-  -X POST \
-  "$JIRA_BASE_URL/rest/api/2/issue?notifyUsers=false" \
-  -d "$(jq -n \
-    --arg project "$JIRA_PROJECT_KEY" \
-    --arg summary "$1" \
-    '{
-      fields: {
-        project: {key: $project},
-        summary: $summary,
-        issuetype: {name: "Epic"},
-        labels: ["ai-generated"]
-      }
-    }')" | jq -r '.key')
-_jira_apply_watcher_policy "$EPIC_KEY" create
+EPIC_KEY=$(_jira_create_epic "$JIRA_PROJECT_KEY" "$1" "" "$1")
 ```
 
 Write `epic_key` to `jira.md` frontmatter. Report key.
@@ -37,12 +22,12 @@ Reads `docs/planning/<plan-id>/phase-<N>/ai-prompt.md` for title, scope, and `es
 PLAN_ID="$1" PHASE="$2"
 EPIC_KEY=$(awk -F': *' '/^epic_key:/{gsub(/[" \t]/,"",$2); print $2; exit}' "docs/planning/${PLAN_ID}/jira.md")
 EST_HOURS=$(grep -E '^estimate_hours:' "docs/planning/${PLAN_ID}/${PHASE}/ai-prompt.md" | awk '{print $2}')
-# POST Task with customfield_10880 = Epic key, timetracking from EST_HOURS
-# _jira_apply_watcher_policy "$KEY" create
-# Write key to jira.md phase row
+SUMMARY=$(head -1 "docs/planning/${PLAN_ID}/${PHASE}/ai-prompt.md" | sed 's/^# //')
+BODY_FILE="docs/planning/${PLAN_ID}/${PHASE}/ai-prompt.md"
+_jira_create_task "$JIRA_PROJECT_KEY" "$SUMMARY" "$BODY_FILE" "$EPIC_KEY" "$EST_HOURS" "${JIRA_ASSIGNEE:-}"
 ```
 
-If `JIRA_ASSIGNEE` is set, include it in the POST payload. After POST, write Jira key to `jira.md` phase row immediately.
+After POST, write Jira key to `jira.md` phase row immediately.
 
 ## `transition` — Transition an issue to a new status
 
@@ -56,15 +41,7 @@ If yes:
 
 ```bash
 # (credentials)
-TRANSITIONS=$(curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
-  "$JIRA_BASE_URL/rest/api/2/issue/$1/transitions")
-TARGET_ID=$(echo "$TRANSITIONS" | jq -r ".transitions[] | select(.to.name == \"$2\") | .id" | head -1)
-curl -s -o /dev/null -X POST \
-  -H "Authorization: Bearer $JIRA_API_TOKEN" \
-  -H "Content-Type: application/json" \
-  "$JIRA_BASE_URL/rest/api/2/issue/$1/transitions?notifyUsers=false" \
-  -d "$(jq -n --arg id "$TARGET_ID" '{transition: {id: $id}}')"
-_jira_apply_watcher_policy "$1" update
+_jira_transition "$1" "$2"
 ```
 
 If credentials are missing, report which key needs transition and suggest checking `.env`. **Continue** — missing Jira access is non-blocking.
@@ -85,9 +62,7 @@ If yes, ask for text (or present a draft): *"Post this comment to {KEY}? (y/edit
 
 ```bash
 # (credentials)
-# Run transition "$1" "Done" (or "Resolved")
-# If comment text provided, post via curl POST /issue/$1/comment?notifyUsers=false
-_jira_apply_watcher_policy "$1" update
+_jira_transition "$1" "Done"   # or "Resolved" — watcher policy applied inside
 ```
 
 ## `comment` — Add a comment to an issue
@@ -100,11 +75,7 @@ If y, post. If edit, take user's edited text. If skip, abort.
 
 ```bash
 # (credentials)
-curl -s -o /dev/null -X POST \
-  -H "Authorization: Bearer $JIRA_API_TOKEN" \
-  -H "Content-Type: application/json" \
-  "$JIRA_BASE_URL/rest/api/2/issue/$1/comment?notifyUsers=false" \
-  -d "$(jq -n --arg body "$2" '{body: $body}')"
+_jira_comment "$1" "$2"
 ```
 
 ## `assign` — Set assignee on an issue

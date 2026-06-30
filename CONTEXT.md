@@ -31,7 +31,7 @@ State machine (`intake` → `ready-for-plan` → `wontfix`) mapped to local inbo
 - **implement-it** / **verify-it** read phase Jira keys from **`jira.md`** (`_jira_phase_key` helper in [issue-tracker-jira.md](skills/engineering/setup-internal-skills/issue-tracker-jira.md)), not from intake files
 - **plan-it** `--jira --sync-only` re-pulls Epic Task keys into `jira.md` without re-grilling
 - **plan-it** handles intake evaluation and planning in one session — triage-style assessment then the grill
-- **to-jira** is the central Jira API handler — all skills (plan-it, implement-it, verify-it) delegate create/transition/resolve/comment/assign/watcher operations here; only `from-jira` reads FROM Jira directly
+- **to-jira** is the central Jira API handler — all skills (plan-it, implement-it, verify-it) delegate create/transition/resolve/comment/assign/watcher operations here; only `from-jira` reads FROM Jira directly. API operations are callable `_jira_*` functions in `jira-helpers.sh` (sourced via `load-jira-env.sh`)
 
 ## Flagged ambiguities
 

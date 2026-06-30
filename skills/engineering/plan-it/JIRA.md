@@ -42,9 +42,7 @@ Create or update `docs/planning/<plan-id>/jira.md`. **Always document the parent
 When `epic_key` is resolved, **GET** the Epic once and fill `epic_summary` + the **Parent Epic** section:
 
 ```bash
-curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
-  "$JIRA_BASE_URL/rest/api/2/issue/CDS-109?fields=summary" \
-  | jq -r '.fields.summary'
+_jira_fetch_issue "CDS-109" "summary" | jq -r '.fields.summary'
 ```
 
 Template:

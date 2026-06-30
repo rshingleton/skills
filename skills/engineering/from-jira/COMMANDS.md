@@ -17,11 +17,9 @@ source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh
 ## Fetch the issue and comments
 
 ```bash
-ISSUE=$(curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
-  "$JIRA_BASE_URL/rest/api/2/issue/$JIRA_KEY?fields=summary,description,issuetype,status,labels,created")
+ISSUE=$(_jira_fetch_issue "$JIRA_KEY" "summary,description,issuetype,status,labels,created")
 
-COMMENTS=$(curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
-  "$JIRA_BASE_URL/rest/api/2/issue/$JIRA_KEY/comment")
+COMMENTS=$(_jira_fetch_comments "$JIRA_KEY")
 
 SUMMARY=$(echo "$ISSUE" | jq -r '.fields.summary')
 ISSUE_TYPE=$(echo "$ISSUE" | jq -r '.fields.issuetype.name')

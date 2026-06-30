@@ -24,11 +24,7 @@ source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh
 EPIC_KEY="CDS-109"
 JQL="cf[10880] = ${EPIC_KEY} AND issuetype = Task ORDER BY created ASC"
 
-curl -s -G -H "Authorization: Bearer $JIRA_API_TOKEN" \
-  --data-urlencode "jql=${JQL}" \
-  --data-urlencode "maxResults=100" \
-  --data-urlencode "fields=summary,key,created" \
-  "$JIRA_BASE_URL/rest/api/2/search" \
+_jira_search "$JQL" 100 "summary,key,created" \
   | jq -r '.issues[] | [.key, .fields.summary] | @tsv'
 ```
 

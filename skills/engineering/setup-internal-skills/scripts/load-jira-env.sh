@@ -60,3 +60,40 @@ fi
 if [ -n "${_jira_env_loaded}" ] && [ "${JIRA_ENV_VERBOSE:-0}" = "1" ]; then
   echo "Loaded Jira env from ${_jira_env_loaded}" >&2
 fi
+
+# Validate required env vars. If missing and interactive, prompt for setup.
+if ! _jira_require_env 2>/dev/null; then
+  if [ -n "${JIRA_ENV_SILENT:-}" ]; then
+    : # caller suppressed prompts — exit silently
+  elif [ -t 0 ] && [ -t 1 ]; then
+    echo "" >&2
+    echo "Jira credentials are needed for issue operations." >&2
+    echo "Enter values or press Ctrl-C to skip (non-blocking)." >&2
+    echo "" >&2
+    echo -n "JIRA_BASE_URL [https://jira.example.com]: " >&2
+    read -r input_url
+    JIRA_BASE_URL="${input_url:-https://jira.example.com}"
+    echo -n "JIRA_API_TOKEN (input hidden): " >&2
+    read -rs input_token
+    echo "" >&2
+    JIRA_API_TOKEN="${input_token}"
+    echo -n "JIRA_PROJECT_KEY (e.g. CDS, MT): " >&2
+    read -r input_project
+    JIRA_PROJECT_KEY="${input_project}"
+    if [ -n "$JIRA_API_TOKEN" ]; then
+      export JIRA_BASE_URL JIRA_API_TOKEN JIRA_PROJECT_KEY
+      echo "" >&2
+      echo "Tip: save these to ~/.config/ai-skills/.env (see .env.example for format):" >&2
+      echo "  cat >> ~/.config/ai-skills/.env <<- 'EOF'" >&2
+      echo "  JIRA_BASE_URL=${JIRA_BASE_URL}" >&2
+      echo "  JIRA_API_TOKEN=<your-token>" >&2
+      echo "  JIRA_PROJECT_KEY=${JIRA_PROJECT_KEY}" >&2
+      echo "  EOF" >&2
+    else
+      echo "No token provided — Jira operations disabled for this session." >&2
+    fi
+  else
+    echo "Jira credentials missing. Set JIRA_BASE_URL and JIRA_API_TOKEN in a .env file." >&2
+    echo "See .env.example for all available variables." >&2
+  fi
+fi

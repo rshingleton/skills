@@ -96,24 +96,24 @@ _jira_ensure_project_key() {
 # Usage: resolve_jira_parent_epic "<--parent or empty>" "<plan-id or slug or empty>"
 resolve_jira_parent_epic() {
   local flag_parent="$1" id="$2" k=""
-  if [ -n "$flag_parent" ]; then echo "$flag_parent"; return; fi
+  if [ -n "$flag_parent" ]; then _jira_ensure_project_key "$flag_parent"; echo "$flag_parent"; return; fi
   if [ -n "$id" ] && [ -f "docs/planning/${id}/jira.md" ]; then
     k=$(awk -F': *' '/^epic_key:/{gsub(/[" \t]/,"",$2); print $2; exit}' "docs/planning/${id}/jira.md")
-    [ -n "$k" ] && echo "$k" && return
+    [ -n "$k" ] && { _jira_ensure_project_key "$k"; echo "$k"; return; }
   fi
   if [ -n "$id" ] && [ -f "docs/issues/${id}.md" ]; then
     k=$(awk -F': *' '/^jira_key:/{gsub(/[" \t]/,"",$2); print $2; exit}' "docs/issues/${id}.md")
-    [ -n "$k" ] && echo "$k" && return
+    [ -n "$k" ] && { _jira_ensure_project_key "$k"; echo "$k"; return; }
   fi
   if [ -n "$id" ] && [ -f "docs/issues/${id}/epic.md" ]; then
     k=$(awk -F': *' '/^jira_key:/{gsub(/[" \t]/,"",$2); print $2; exit}' "docs/issues/${id}/epic.md")
-    [ -n "$k" ] && echo "$k" && return
+    [ -n "$k" ] && { _jira_ensure_project_key "$k"; echo "$k"; return; }
   fi
-  if [ -n "${JIRA_DEFAULT_EPIC:-}" ]; then echo "$JIRA_DEFAULT_EPIC"; return; fi
+  if [ -n "${JIRA_DEFAULT_EPIC:-}" ]; then _jira_ensure_project_key "$JIRA_DEFAULT_EPIC"; echo "$JIRA_DEFAULT_EPIC"; return; fi
   if [ -f docs/agents/issue-tracker.md ]; then
     k=$(grep -E '^\*\*default_epic:\*\*|^default_epic:' docs/agents/issue-tracker.md \
       | sed -n 's/.*`\([^`]*\)`.*/\1/p' | head -1)
-    [ -n "$k" ] && echo "$k" && return
+    [ -n "$k" ] && { _jira_ensure_project_key "$k"; echo "$k"; return; }
   fi
 }
 
@@ -160,4 +160,196 @@ _jira_timetracking_fields() {
 _jira_wiki_body() {
   sed -e 's/^## /h2. /' -e 's/^### /h3. /' \
       -e 's/^- \[[ xX]\] /* /' -e 's/^- /* /' "$1"
+}
+
+# ---------------------------------------------------------------------------
+# Write operations
+# ---------------------------------------------------------------------------
+
+# Post a comment on an issue. notifyUsers=false.
+# Usage: _jira_comment <key> <body>
+# Returns: comment ID on stdout
+_jira_comment() {
+  local key="$1" body="$2"
+  [ -z "$key" ] || [ -z "$body" ] && return 1
+  _jira_curl -s -X POST \
+    -H "Content-Type: application/json" \
+    "$JIRA_BASE_URL/rest/api/2/issue/${key}/comment?notifyUsers=false" \
+    -d "$(jq -n --arg b "$body" '{body: $b}')" \
+    | jq -r '.id'
+}
+
+# Transition an issue to a target status.
+# Usage: _jira_transition <key> <status_name>
+# Silent if status not found. Applies watcher policy on success.
+_jira_transition() {
+  local key="$1" target="$2" tid
+  [ -z "$key" ] || [ -z "$target" ] && return 1
+  tid=$(_jira_curl -s "$JIRA_BASE_URL/rest/api/2/issue/${key}/transitions" \
+    | jq -r --arg t "$target" '.transitions[] | select(.to.name == $t) | .id' | head -1)
+  [ -z "$tid" ] && return 1
+  _jira_curl -s -o /dev/null -X POST \
+    -H "Content-Type: application/json" \
+    "$JIRA_BASE_URL/rest/api/2/issue/${key}/transitions?notifyUsers=false" \
+    -d "$(jq -n --arg id "$tid" '{transition: {id: $id}}')"
+  _jira_apply_watcher_policy "$key" update
+}
+
+# Create a new Epic.
+# Usage: _jira_create_epic <project_key> <summary> [desc_file] [epic_name]
+# If epic_name omitted, defaults to summary. Echoes the new issue key on stdout.
+_jira_create_epic() {
+  local project="$1" summary="$2" desc_file="${3:-}" epic_name="${4:-$summary}" body=""
+  [ -z "$project" ] || [ -z "$summary" ] && return 1
+  [ -n "$desc_file" ] && body=$(cat "$desc_file" 2>/dev/null)
+  local key
+  key=$(_jira_curl -s -X POST \
+    -H "Content-Type: application/json" \
+    "$JIRA_BASE_URL/rest/api/2/issue?notifyUsers=false" \
+    -d "$(jq -n \
+      --arg p "$project" \
+      --arg s "$summary" \
+      --arg b "$body" \
+      --arg en "$epic_name" \
+      '{
+        fields: {
+          project: {key: $p},
+          summary: $s,
+          description: $b,
+          issuetype: {name: "Epic"},
+          customfield_10881: $en,
+          labels: ["ai-generated"]
+        }
+      }')" \
+    | jq -r '.key')
+  [ -z "$key" ] || [ "$key" = "null" ] && return 1
+  _jira_apply_watcher_policy "$key" create
+  echo "$key"
+}
+
+# Create a new Task (optionally under an Epic, with estimate and assignee).
+# Usage: _jira_create_task <project_key> <summary> <body_file> [epic_key] [hours] [assignee]
+# Echoes the new issue key on stdout.
+_jira_create_task() {
+  local project="$1" summary="$2" body_file="$3" epic_key="${4:-}" hours="${5:-}" assignee="${6:-}" body="" payload=""
+  [ -z "$project" ] || [ -z "$summary" ] && return 1
+  [ -n "$body_file" ] && body=$(cat "$body_file" 2>/dev/null)
+  payload=$(jq -n \
+    --arg p "$project" \
+    --arg s "$summary" \
+    --arg b "$body" \
+    --arg e "$epic_key" \
+    --arg a "$assignee" \
+    '{
+      fields: ({
+        project: {key: $p},
+        summary: $s,
+        description: $b,
+        issuetype: {name: "Task"},
+        labels: ["ai-generated"]
+      } + (if $e != "" then {customfield_10880: $e} else {} end)
+       + (if $a != "" then {assignee: {name: $a}} else {} end))
+    }')
+  if [ -n "$hours" ]; then
+    local tt
+    tt=$(_jira_timetracking_fields "$hours") || true
+    [ -n "$tt" ] && payload=$(echo "$payload" | jq --argjson tt "$tt" '.fields += $tt')
+  fi
+  local key
+  key=$(_jira_curl -s -X POST \
+    -H "Content-Type: application/json" \
+    "$JIRA_BASE_URL/rest/api/2/issue?notifyUsers=false" \
+    -d "$payload" \
+    | jq -r '.key')
+  [ -z "$key" ] || [ "$key" = "null" ] && return 1
+  _jira_apply_watcher_policy "$key" create
+  echo "$key"
+}
+
+# Partial update of issue fields.
+# Usage: _jira_update_issue <key> <json_updates>
+# json_updates is a jq-compatible object to merge into fields.
+# Example: _jira_update_issue KEY-123 '{assignee: {name: "user"}}'
+_jira_update_issue() {
+  local key="$1" updates="$2"
+  [ -z "$key" ] || [ -z "$updates" ] && return 1
+  _jira_curl -s -o /dev/null -X PUT \
+    -H "Content-Type: application/json" \
+    "$JIRA_BASE_URL/rest/api/2/issue/${key}?notifyUsers=false" \
+    -d "$(jq -n --argjson u "$updates" '{fields: $u}')"
+  _jira_apply_watcher_policy "$key" update
+}
+
+# Add labels to an issue (appends, does not replace).
+# Usage: _jira_set_labels <key> <label> [label...]
+_jira_set_labels() {
+  local key="$1" label new_labels; shift
+  [ -z "$key" ] || [ $# -eq 0 ] && return 1
+  new_labels=$(_jira_curl -s "$JIRA_BASE_URL/rest/api/2/issue/${key}?fields=labels" \
+    | jq -r --argjson add "$(jq -n --args '$ARGS.positional' -- "$@")" \
+      '.fields.labels + $add | unique')
+  _jira_curl -s -o /dev/null -X PUT \
+    -H "Content-Type: application/json" \
+    "$JIRA_BASE_URL/rest/api/2/issue/${key}?notifyUsers=false" \
+    -d "$(jq -n --argjson l "$new_labels" '{fields: {labels: $l}}')"
+  _jira_apply_watcher_policy "$key" update
+}
+
+# ---------------------------------------------------------------------------
+# Read operations
+# ---------------------------------------------------------------------------
+
+# Fetch an issue by key.
+# Usage: _jira_fetch_issue <key> [fields]
+# Default fields: summary,description,issuetype,status,labels,created
+_jira_fetch_issue() {
+  local key="$1" fields="${2:-summary,description,issuetype,status,labels,created}"
+  [ -z "$key" ] && return 1
+  _jira_curl -s "$JIRA_BASE_URL/rest/api/2/issue/${key}?fields=${fields}"
+}
+
+# Fetch comments for an issue.
+# Usage: _jira_fetch_comments <key>
+_jira_fetch_comments() {
+  local key="$1"
+  [ -z "$key" ] && return 1
+  _jira_curl -s "$JIRA_BASE_URL/rest/api/2/issue/${key}/comment"
+}
+
+# Search issues by JQL.
+# Usage: _jira_search <jql> [max_results] [fields]
+# Default max_results: 50. Default fields: summary,key,created.
+_jira_search() {
+  local jql="$1" max="${2:-50}" fields="${3:-summary,key,created}"
+  [ -z "$jql" ] && return 1
+  _jira_curl -s -G \
+    --data-urlencode "jql=${jql}" \
+    --data-urlencode "maxResults=${max}" \
+    --data-urlencode "fields=${fields}" \
+    "$JIRA_BASE_URL/rest/api/2/search"
+}
+
+# ---------------------------------------------------------------------------
+# Environment validation
+# ---------------------------------------------------------------------------
+
+# Check that required Jira env vars are set. Prints diagnostics if missing.
+# Usage: _jira_require_env
+# Returns 0 if all required vars are present, 1 if any are missing.
+_jira_require_env() {
+  local missing=0
+  if [ -z "${JIRA_BASE_URL:-}" ]; then
+    echo "JIRA_BASE_URL is not set" >&2
+    missing=1
+  fi
+  if [ -z "${JIRA_API_TOKEN:-}" ]; then
+    echo "JIRA_API_TOKEN is not set" >&2
+    missing=1
+  fi
+  if [ "$missing" -eq 1 ]; then
+    echo "Set these in a .env file (repo root, ~/.agents/.env, or ~/.config/ai-skills/.env) and source load-jira-env.sh" >&2
+    echo "Or export them directly in your shell." >&2
+    return 1
+  fi
+  return 0
 }
