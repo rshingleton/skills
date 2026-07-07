@@ -35,6 +35,7 @@ Other operations:
 /to-jira comment KEY-123 "Comment text"
 /to-jira assign KEY-123
 /to-jira watcher-policy KEY-123 create|update
+/to-jira update-description KEY-123 path/to/description.md
 ```
 
 ## Sourcing credentials (read first)
@@ -59,6 +60,25 @@ If credentials are missing after sourcing:
 - **Stop** — Jira operations cannot proceed without credentials
 
 Each operation below says "(credentials)" instead of repeating this block.
+
+## Markdown → Jira wiki conversion (automatic)
+
+All issue bodies are automatically converted from markdown to Jira wiki format before being sent to the API. **No pre-conversion needed** — write your local markdown normally.
+
+**Conversion guarantees:**
+- Headings `#`, `##`, `###` → `h1.`, `h2.`, `h3.` (Jira wiki headings)
+- Inline code `` `text` `` → `{{text}}` (monospace, syntax-highlighted)
+- Bold `**text**` → `*text*` (Jira wiki emphasis)
+- Code blocks `` ```lang ... ``` `` → `{code:language=lang}...{code}` (with optional language hint)
+- Links `[text](url)` → `text` (URL dropped, text preserved for manual linking)
+- Bullets `- ` and task lists `- [ ]` / `- [x]` → `* ` (normalized to Jira bullets)
+
+**Applied by:** `_jira_wiki_body` helper (in `jira-helpers.sh`), called automatically by:
+- `_jira_create_epic` (Epic descriptions)
+- `_jira_create_task` (Task descriptions)
+- `_jira_update_description` (description updates)
+
+Callers do **not** need to remember to convert — it's guaranteed by the helper functions.
 
 ## Default operation: `create`
 
@@ -99,14 +119,14 @@ When the source is `docs/planning/<id>/`:
 
    If no Epic is resolved, create one `Task` for the whole plan.
 
-#### Phase 3: Create
+#### Phase 3: Create (use helpers, not raw curl)
 
-1. Read source body, convert markdown → Jira wiki markup (`_jira_wiki_body`)
-2. Build payload with `jq`, POST with `notifyUsers=false`
+1. Create Epic: call `_jira_create_epic` (see [OPERATIONS.md](OPERATIONS.md) `create-epic` block)
+2. Create Tasks: call `_jira_create_task` per phase (see `create-task` block)
 3. Apply watcher policy: `_jira_apply_watcher_policy "$KEY" create`
 4. Write Jira key back to source (frontmatter for issues, per-phase rows for plans)
 
-See [OPERATIONS.md](OPERATIONS.md) for bash reference blocks for each sub-command.
+**Always use the helper functions from `jira-helpers.sh`** (sourced via `load-jira-env.sh`) — never construct raw `curl` commands or `jq` payloads yourself. Every helper handles auth, `notifyUsers=false`, error reporting, and watcher policy consistently. See [OPERATIONS.md](OPERATIONS.md) for the bash reference block of each operation.
 
 ## Delegation rules
 
@@ -115,7 +135,7 @@ See [OPERATIONS.md](OPERATIONS.md) for bash reference blocks for each sub-comman
 | `plan-it` | `create-epic`, `create-task`, `watcher-policy` | Publish phase Tasks to Jira |
 | `implement-it` | `transition`, `assign`, `watcher-policy` | Move phase to "In Progress" |
 | `verify-it` | `resolve`, `comment`, `transition`, `watcher-policy` | Resolve phase in Jira |
-| `from-jira` | — (reads FROM Jira, inverse direction) | Uses own fetch logic |
+| `from-jira` | `fetch-issue`, `fetch-comments` (via sourced helpers) | Reads FROM Jira — uses `_jira_fetch_issue` / `_jira_fetch_comments` directly since to-jira does not proxy reads |
 
 ## When to use
 

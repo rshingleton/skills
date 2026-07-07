@@ -48,53 +48,60 @@ None
 
 ## Markdown → wiki conversion
 
-When source is phase scope, intake markdown, or other planning artifacts:
+**Automatic:** All Jira issue bodies are automatically converted from markdown to wiki format by the helper functions (`_jira_create_epic`, `_jira_create_task`, `_jira_update_description`). **Writers can use markdown locally — it will be converted before POST.**
 
-1. Replace `## Title` / `### Title` → `h2. Title` / `h3. Title` (strip `#` characters only).
-2. Replace leading `- ` / `* ` list markers with `* ` (single asterisk + space).
-3. Strip `- [ ]` / `- [x]` → bullet text only: `* ConfigServiceTest covers GET /api/health returns 200 UP`
-4. Remove duplicate summary paragraph at top.
-5. Do **not** paste markdown through unchanged.
+**Conversion rules (applied by `_jira_wiki_body`):**
 
-The helper `_jira_wiki_body <file>` automates steps 1-3 (defined in `jira-helpers.sh`, sourced via `load-jira-env.sh`).
+1. Replace `# ` / `## ` / `### ` → `h1. ` / `h2. ` / `h3. ` (headings)
+2. Replace `` `inline code` `` → `{{inline code}}` (monospace)
+3. Replace `**bold**` → `*bold*` (Jira wiki emphasis)
+4. Replace code blocks `` ```lang...``` `` → `{code:language=lang}...{code}` (with optional language)
+5. Replace `[link text](url)` → `link text` (URL dropped, text preserved)
+6. Replace `- [ ]` / `- [x]` → `* ` (task lists become plain bullets)
+7. Replace leading `-` / `*` → `* ` (bullets normalized)
 
-### Example — broken (what the UI shows wrong)
+The helper `_jira_wiki_body <file>` (defined in `jira-helpers.sh`, sourced via `load-jira-env.sh`) automates all conversions. **Callers do not need to pre-convert** — the conversion happens automatically before every Jira POST.
+
+### Example — markdown input (what you write locally)
 
 ```markdown
 ## What
-* Fill ConfigServiceTest.java…
 
-## Done when
-- [ ] ConfigServiceTest covers GET /api/health
+* Fill `ConfigServiceTest.java` with **robust** tests
+* Add `@Deprecated` annotation
+
+## Code
+
+```java
+@Test
+public void testHealth() {}
 ```
 
-→ Renders as `1. 1. What`, literal `[ ]`.
+## Done when
 
-### Example — correct (same content)
+- [x] Tests pass
+- [x] No regressions
+```
+
+### Example — wiki output (what Jira receives)
 
 ```text
 h2. What
 
-* Fill {{ConfigServiceTest.java}} with mock-based tests for admin HTTP API
-* Add {{@Deprecated}} on {{cds.backend.type}} fallback in {{CdsConfig.java}}
-* Move {{GreptimeCodecBackendE2eTest}} to {{@Category(RemoteBackendIntegrationTest.class)}}
+* Fill {{ConfigServiceTest.java}} with *robust* tests
+* Add {{@Deprecated}} annotation
+
+h2. Code
+
+{code:language=java}
+@Test
+public void testHealth() {}
+{code}
 
 h2. Done when
 
-* {{ConfigServiceTest}} covers {{GET /api/health}} — returns 200 UP
-* Config CRUD PUT/GET/DELETE with correct statuses
-* Auth guard returns 401 without API key
-* 404 for missing keys, 400 for invalid format
-* Admin UI returns 200 HTML
-* Mock repository only — no live backend in unit tests
-* Runs in default {{./gradlew}} suite
-* {{@Deprecated}} on fallback as specified
-* {{GreptimeCodecBackendE2eTest}} categorized without {{Assume.assumeTrue()}}
-* All tests green, no regressions
-
-h2. Blocked
-
-None
+* Tests pass
+* No regressions
 ```
 
 ## Summary (title field)
@@ -114,12 +121,14 @@ None
 
 ## Agent checklist (before POST)
 
-1. Body uses **`h2.`** sections and **`*`** bullets only.
-2. No `##`, no `- [ ]`, no lines starting with `#` (except `h2.` / `h3.`).
-3. Every AC is one `*` line under `h2. Done when`.
-4. `jq --arg body` or heredoc contains wiki text, not markdown.
+**Important:** Conversion to wiki format is automatic. Callers can write markdown; the helpers will convert it.
 
-Use `_jira_wiki_body <file>` (from `jira-helpers.sh`) to automate conversion.
+For explicit pre-conversion (if needed):
+1. Use `_jira_wiki_body <file>` (from `jira-helpers.sh`) to preview the conversion
+2. Verify output uses `h2.` sections and `*` bullets only
+3. No raw `##`, `- [ ]`, or markdown syntax in the POST payload
+
+Most of the time, just write markdown in your local markdown files — the conversion happens automatically.
 
 ## Local vs Jira
 

@@ -63,6 +63,8 @@ If yes, ask for text (or present a draft): *"Post this comment to {KEY}? (y/edit
 ```bash
 # (credentials)
 _jira_transition "$1" "Done"   # or "Resolved" — watcher policy applied inside
+# If a resolution comment was provided:
+_jira_comment "$1" "$2"
 ```
 
 ## `comment` — Add a comment to an issue
@@ -86,6 +88,44 @@ _jira_set_assignee "$1"
 ```
 
 Does **not** apply watcher policy — caller should run `watcher-policy` separately.
+
+## `update-description` — Replace issue description (wiki-converted)
+
+```bash
+# (credentials)
+_jira_update_description "$1" "$2"
+```
+
+`$1` is the issue key (e.g. `KEY-123`), `$2` is the path to a markdown file. Content is converted through `_jira_wiki_body` before being sent.
+
+Example — fix DASH-4222 description (was posted as raw markdown, fix with wiki markup):
+
+Source file (`some-plan/phase-1/ai-prompt.md`):
+```markdown
+## Goal
+
+Clean up AmpSystemMonitorStatusHistory tables.
+
+## Phase 1
+
+Reduce retention from 60 to 30 days.
+```
+
+After conversion via `_jira_wiki_body`, Jira receives:
+
+```text
+h2. Goal
+
+Clean up AmpSystemMonitorStatusHistory tables.
+
+h2. Phase 1
+
+Reduce retention from 60 to 30 days.
+```
+
+```bash
+_jira_update_description DASH-4222 docs/planning/some-plan/phase-1/ai-prompt.md
+```
 
 ## `watcher-policy` — Apply watcher policy
 

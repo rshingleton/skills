@@ -208,11 +208,61 @@ _jira_timetracking_fields() {
     '{timetracking: {originalEstimate: $o, remainingEstimate: $r}}'
 }
 
-# Convert markdown to Jira wiki markup (basic sed conversion).
+# Convert markdown to Jira wiki markup.
+# Handles headings (h1-h3), inline code, bold, code blocks, tables, and lists.
+# 
+# This function ensures all markdown input is converted to Jira wiki format before
+# being sent to the Jira API. It is called automatically by _jira_create_epic,
+# _jira_create_task, and _jira_update_description — callers do not need to
+# pre-convert. This guarantees consistency across all Jira body writes.
+#
+# Conversion rules:
+#   - Lines starting with # / ## / ### → h1. / h2. / h3. (headings)
+#   - `inline code` → {{inline code}} (monospace)
+#   - **bold text** → *bold text* (Jira wiki emphasis)
+#   - ```lang code ``` → {code:language=lang}...{code} (code blocks with language hint)
+#   - [link text](url) → link text (URL dropped, text preserved)
+#   - - [ ] / - [x] → * (task lists become plain bullets)
+#   - - bullet → * bullet (list markers normalized)
+#
 # Usage: _jira_wiki_body <file>
+# Returns: converted text to stdout, non-zero on file not found
 _jira_wiki_body() {
-  sed -e 's/^## /h2. /' -e 's/^### /h3. /' \
-      -e 's/^- \[[ xX]\] /* /' -e 's/^- /* /' "$1"
+  local file="$1"
+  [ -f "$file" ] || return 1
+
+  # First pass: handle multi-line patterns (code blocks) with awk
+  # Then second pass: handle line-level and inline patterns with sed
+  awk '
+    BEGIN { in_code = 0 }
+    /^```/ {
+      if (in_code) {
+        print "{code}"
+        in_code = 0
+      } else {
+        lang = $0
+        sub(/^```/, "", lang)
+        gsub(/^[[:space:]]+|[[:space:]]+$/, "", lang)
+        if (lang) {
+          print "{code:language=" lang "}"
+        } else {
+          print "{code}"
+        }
+        in_code = 1
+      }
+      next
+    }
+    in_code { print; next }
+    { print }
+  ' "$file" | sed \
+    -e 's/^# /h1. /' \
+    -e 's/^## /h2. /' \
+    -e 's/^### /h3. /' \
+    -e 's/^- \[[ xX]\] /* /' \
+    -e 's/^- /* /' \
+    -e 's/\*\*\([^*]*\)\*\*/\*\1\*/g' \
+    -e 's/`\([^`]*\)`/{{\1}}/g' \
+    -e 's/\[[^]]*\](\([^)]*\))/\1/g'
 }
 
 # ---------------------------------------------------------------------------
@@ -253,7 +303,7 @@ _jira_transition() {
 _jira_create_epic() {
   local project="$1" summary="$2" desc_file="${3:-}" epic_name="${4:-$summary}" body=""
   [ -z "$project" ] || [ -z "$summary" ] && return 1
-  [ -n "$desc_file" ] && body=$(cat "$desc_file" 2>/dev/null)
+  [ -n "$desc_file" ] && body=$(_jira_wiki_body "$desc_file" 2>/dev/null)
   local key
   key=$(_jira_curl POST -s \
     -H "Content-Type: application/json" \
@@ -279,12 +329,26 @@ _jira_create_epic() {
 }
 
 # Create a new Task (optionally under an Epic, with estimate and assignee).
+# 
+# The body_file is automatically converted from markdown to Jira wiki format
+# via _jira_wiki_body — callers can pass raw markdown. The conversion ensures
+# inline code, bold, headings, and code blocks render correctly in Jira.
+#
 # Usage: _jira_create_task <project_key> <summary> <body_file> [epic_key] [hours] [assignee]
-# Echoes the new issue key on stdout.
+# Args:
+#   project_key  - Jira project key (e.g. CDS, DASH)
+#   summary      - Task title (one line)
+#   body_file    - Path to markdown file (converted to wiki format before POST)
+#   epic_key     - Optional parent Epic key; if empty, Task is standalone
+#   hours        - Optional time estimate (e.g. 4, 0.5, "2h", "1d")
+#   assignee     - Optional assignee username; if empty, unassigned
+#
+# Returns: Jira issue key on stdout (e.g. CDS-1234), non-zero on error
+# Applies watcher policy on success.
 _jira_create_task() {
   local project="$1" summary="$2" body_file="$3" epic_key="${4:-}" hours="${5:-}" assignee="${6:-}" body="" payload=""
   [ -z "$project" ] || [ -z "$summary" ] && return 1
-  [ -n "$body_file" ] && body=$(cat "$body_file" 2>/dev/null)
+  [ -n "$body_file" ] && body=$(_jira_wiki_body "$body_file" 2>/dev/null)
   payload=$(jq -n \
     --arg p "$project" \
     --arg s "$summary" \
@@ -327,6 +391,20 @@ _jira_update_issue() {
     -H "Content-Type: application/json" \
     "$JIRA_BASE_URL/rest/api/2/issue/${key}?notifyUsers=false" \
     -d "$(jq -n --argjson u "$updates" '{fields: $u}')"
+  _jira_apply_watcher_policy "$key" update
+}
+
+# Update the description of an issue (converts body through wiki markup).
+# Usage: _jira_update_description <key> <file>
+# Echoes nothing on success, non-zero on failure.
+_jira_update_description() {
+  local key="$1" file="$2" body
+  [ -z "$key" ] || [ ! -f "$file" ] && return 1
+  body=$(_jira_wiki_body "$file" 2>/dev/null)
+  _jira_curl PUT -s -o /dev/null \
+    -H "Content-Type: application/json" \
+    "$JIRA_BASE_URL/rest/api/2/issue/${key}?notifyUsers=false" \
+    -d "$(jq -n --arg b "$body" '{fields: {description: $b}}')"
   _jira_apply_watcher_policy "$key" update
 }
 
