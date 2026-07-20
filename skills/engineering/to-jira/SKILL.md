@@ -3,7 +3,8 @@ name: to-jira
 description: >
   Central Jira operation handler. All skills delegate Jira API calls here
   instead of duplicating curl commands — create, transition, resolve,
-  comment, assign, and watcher-policy. Reads docs/issues/<slug>.md or
+  comment, assign, and watcher-policy. Automatically uses Jira MCP connector
+  when available, falls back to curl/bash helpers. Reads docs/issues/<slug>.md or
   docs/planning/<id>/ and creates Jira issues from local artifacts.
   Use when user says to-jira, push to jira, create jira, make jira,
   create jira from issue, or promote to jira.
@@ -13,7 +14,17 @@ description: >
 
 Central Jira operation handler. **All other skills delegate Jira API operations here** — no skill sources credentials or curls Jira directly.
 
-The helper functions in `setup-internal-skills/scripts/jira-helpers.sh` remain the canonical implementation; this skill is the **orchestration layer** that calls them.
+**Default: Jira MCP connector preferred**
+
+When available and authenticated, all operations automatically use the **Jira MCP connector**:
+- ✅ No credential setup needed (OAuth handled automatically)
+- ✅ Better error handling and retries
+- ✅ Markdown → Jira wiki conversion built-in
+- ✅ All `to-jira` commands work the same way
+
+**Fallback: Curl/bash helpers**
+
+If the connector is unavailable, operations fall back to bash helper functions from `setup-internal-skills/scripts/jira-helpers.sh`. Both paths are transparent to callers — they invoke `/to-jira` the same way. See [OPERATIONS.md](OPERATIONS.md) for implementation details.
 
 ## Quick start
 
@@ -38,9 +49,57 @@ Other operations:
 /to-jira update-description KEY-123 path/to/description.md
 ```
 
+## Connector availability
+
+This skill automatically uses the **Jira MCP connector** when available and authenticated. The connector provides:
+
+- **Authenticated access** — OAuth handled automatically, no credential setup needed
+- **Better error handling** — Built-in retries and clearer error messages
+- **Markdown support** — Descriptions are converted to Jira wiki format automatically
+- **Fallback** — If the connector is unavailable, operations fall back to curl/bash helpers
+
+### Setup: Add Jira MCP connector globally
+
+Run these commands once to register the connectors:
+
+```bash
+claude mcp add --transport http jira https://your-jira-mcp-server.example.com/mcp
+claude mcp add --transport http confluence https://your-confluence-mcp-server.example.com/mcp
+```
+
+This creates `~/.claude/.mcp.json` with the server URLs. The connectors will be available to all Claude Code CLI sessions across all projects.
+
+### Authentication
+
+Once added, authenticate the connector via Claude Code CLI:
+
+**Interactive setup (recommended):**
+```bash
+claude /mcp
+```
+
+Then:
+1. Select "Manage MCP servers"
+2. Find "Jira" in the list
+3. Click "Authenticate" 
+4. Complete the OAuth flow in your browser
+5. Return to Claude Code — credentials are cached locally
+
+**Alternative: First use**
+- Just try calling `/to-jira` or any Jira operation
+- If not authenticated, Claude Code will prompt you to authorize
+- Complete OAuth in browser
+- Credentials cache for future sessions
+
+**Desktop app users:**
+- Authenticate in Claude desktop (UI button)
+- CLI sessions will auto-detect and use those cached credentials
+
+See [OPERATIONS.md](OPERATIONS.md) for connector tool signatures and comparison with bash helpers.
+
 ## Sourcing credentials (read first)
 
-Every operation needs Jira credentials. Source once:
+When using curl/bash helpers, source credentials once:
 
 ```bash
 source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh
@@ -59,7 +118,7 @@ If credentials are missing after sourcing:
 - Suggest checking `.env` at the repo root or `~/.config/ai-skills/.env`
 - **Stop** — Jira operations cannot proceed without credentials
 
-Each operation below says "(credentials)" instead of repeating this block.
+Each operation below says "(credentials)" instead of repeating this block. When using the connector, credentials are not required.
 
 ## Markdown → Jira wiki conversion (automatic)
 
