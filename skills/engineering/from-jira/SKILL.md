@@ -13,6 +13,8 @@ Creates a `docs/planning/<id>/` plan from an existing Jira issue — no local in
 
 This is the **read direction** (Jira → local). For the write direction (local → Jira), use [`to-jira`](../to-jira/SKILL.md).
 
+**Uses Jira MCP connector when available** — automatically prefers `jira_get_issue` over bash helpers. Requires connector setup (see [`to-jira` § Connector availability](../to-jira/SKILL.md#connector-availability)).
+
 ## Quick start
 
 ```text
