@@ -14,11 +14,11 @@ Intake: `docs/issues/` (`/issue-it`). Plans: `docs/planning/<id>/` (`/plan-it` a
 
 ### Triage labels
 
-Three states: `intake` → `ready-for-plan` → `wontfix`. See `~/.agents/skills/setup-internal-skills/triage-labels.md`.
+Three states: `intake` → `ready-for-plan` → `wontfix`. See `~/.agents/skills/setup-internal-skills/triage-labels.md` (or `~/.claude/skills/setup-internal-skills/triage-labels.md` for Claude Code).
 
 ### Domain docs
 
-Single-context. See `~/.agents/skills/setup-internal-skills/domain.md`.
+Single-context. See `~/.agents/skills/setup-internal-skills/domain.md` (or `~/.claude/skills/setup-internal-skills/domain.md` for Claude Code).
 
 ## Doc Cycle
 
@@ -26,4 +26,4 @@ Single-context. See `~/.agents/skills/setup-internal-skills/domain.md`.
 
 ## Codebase reference
 
-`/doc-it` — `docs/reference/` (as-is maps) and `docs/reference-audit/` (tech debt, testing, architecture, follow-ups). Optional: file selected findings in `docs/issues/` via `~/.agents/skills/setup-internal-skills/audit-to-issues.md`. Not a substitute for the Doc Cycle after a feature ships.
+`/doc-it` — `docs/reference/` (as-is maps) and `docs/reference-audit/` (tech debt, testing, architecture, follow-ups). Optional: file selected findings in `docs/issues/` via `~/.agents/skills/setup-internal-skills/audit-to-issues.md` (or `~/.claude/skills/setup-internal-skills/audit-to-issues.md` for Claude Code). Not a substitute for the Doc Cycle after a feature ships.

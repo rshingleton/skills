@@ -6,7 +6,7 @@ Instructions for this repository. **Commit this file.** Point every agent host h
 |------|---------------------|
 | **Cursor** | Native **`AGENTS.md`** ([docs](https://cursor.com/docs/context/rules)); optional `.cursor/rules/` for scoped rules |
 | **GitHub Copilot** | `.github/copilot-instructions.md` (tool-specific; should link here) |
-| **Claude Code** | `CLAUDE.md` (pointer + `.claude-plugin/plugin.json`) |
+| **Claude Code** | `CLAUDE.md` (pointer). Skills: `~/.claude/skills/` (global, installed via `scripts/skills.sh`). Plugin: `.claude-plugin/plugin.json` |
 | **Gemini / agy** | `AGENTS.md` (shared standard) — Gemini migrating to `agy` CLI. Skills: workspace `<project>/.agents/skills/` (preferred), global `~/.gemini/antigravity-cli/skills/`, shared `~/.gemini/skills/` |
 | **OpenCode** | `AGENTS.md` + optional `opencode.json` |
 
@@ -41,7 +41,7 @@ Under `skills/`:
 
 1. Every shipped skill in `engineering/` or `productivity/` needs:
    - A linked entry in the top-level [README.md](README.md)
-   - An entry in [.claude-plugin/plugin.json](.claude-plugin/plugin.json) (Claude Code)
+    - An entry in [.claude-plugin/plugin.json](.claude-plugin/plugin.json) (Claude Code plugin, not skill discovery) — skills are consumed via `~/.claude/skills/`
 2. Each bucket has a [README.md](skills/engineering/README.md) listing its skills (name → `SKILL.md`).
 3. Domain language for cross-skill terms: [CONTEXT.md](CONTEXT.md).
 4. When adding skills, follow [write-a-skill](skills/productivity/write-a-skill/SKILL.md).

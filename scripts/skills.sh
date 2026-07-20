@@ -5,7 +5,7 @@ set -euo pipefail
 # Internal Skills Installer
 # ============================================================================
 # Clones from Bitbucket (VPN or on-site; no auth for read) and symlinks skills
-# into ~/.agents/skills.
+# into ~/.agents/skills (OpenCode/Cursor/Gemini) and ~/.claude/skills (Claude Code).
 #
 # Canonical repo: https://github.com/rshingleton/skills.git
 #
@@ -21,6 +21,7 @@ REPO_URL="https://github.com/rshingleton/skills.git"
 RAW_INSTALL_URL="https://raw.githubusercontent.com/rshingleton/skills/main/scripts/skills.sh"
 DEFAULT_BRANCH="${DEFAULT_BRANCH:-main}"
 SKILLS_DEST="${SKILLS_DEST:-$HOME/.agents/skills}"
+CLAUDE_SKILLS_DEST="${CLAUDE_SKILLS_DEST:-$HOME/.claude/skills}"
 CLONE_DIR="${SKILLS_CLONE_DIR:-$HOME/.local/share/ai-skills}"
 CLEANUP_LEGACY="${CLEANUP_LEGACY:-0}"
 
@@ -31,8 +32,9 @@ for arg in "$@"; do
 done
 
 echo "==> Internal Skills Installer"
-echo "    Install target: $SKILLS_DEST"
-echo "    Clone cache:    $CLONE_DIR"
+echo "    OpenCode/Cursor target:  $SKILLS_DEST"
+echo "    Claude Code target:      $CLAUDE_SKILLS_DEST"
+echo "    Clone cache:             $CLONE_DIR"
 echo ""
 
 mkdir -p "$(dirname "$CLONE_DIR")"
@@ -53,31 +55,39 @@ if [ "$CLEANUP_LEGACY" = "1" ]; then
   echo ""
 fi
 
-mkdir -p "$SKILLS_DEST"
+link_skills() {
+  local dest="$1"
+  local label="$2"
+  mkdir -p "$dest"
+  find "$CLONE_DIR/skills" -name SKILL.md \
+    -not -path '*/node_modules/*' \
+    -not -path '*/deprecated/*' \
+    -not -path '*/in-progress/*' \
+    -not -path '*/personal/*' \
+    -print0 |
+  while IFS= read -r -d '' skill_md; do
+    src="$(dirname "$skill_md")"
+    name="$(basename "$src")"
+    target="$dest/$name"
 
-find "$CLONE_DIR/skills" -name SKILL.md \
-  -not -path '*/node_modules/*' \
-  -not -path '*/deprecated/*' \
-  -not -path '*/in-progress/*' \
-  -not -path '*/personal/*' \
-  -print0 |
-while IFS= read -r -d '' skill_md; do
-  src="$(dirname "$skill_md")"
-  name="$(basename "$src")"
-  target="$SKILLS_DEST/$name"
+    if [ -e "$target" ] && [ ! -L "$target" ]; then
+      rm -rf "$target"
+    fi
 
-  if [ -e "$target" ] && [ ! -L "$target" ]; then
-    rm -rf "$target"
-  fi
+    ln -sfn "$src" "$target"
+    echo "  [$label] linked $name"
+  done
+}
 
-  ln -sfn "$src" "$target"
-  echo "  linked $name"
-done
+echo "==> Linking skills..."
+link_skills "$SKILLS_DEST" "agents"
+link_skills "$CLAUDE_SKILLS_DEST" "claude"
 
 echo ""
 echo "==> Install complete."
-echo "    Skills installed to: $SKILLS_DEST"
-echo "    Source clone:        $CLONE_DIR"
+echo "    OpenCode/Cursor:  $SKILLS_DEST"
+echo "    Claude Code:      $CLAUDE_SKILLS_DEST"
+echo "    Source clone:     $CLONE_DIR"
 echo ""
 echo "==> Next steps:"
 if [ -f "$CLONE_DIR/scripts/load-jira-env.sh" ]; then

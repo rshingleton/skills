@@ -8,7 +8,7 @@ This repo is the **internal ai-skills monorepo**. When editing here:
 
 - Follow `AGENTS.md` for bucket layout and README / plugin.json maintenance rules.
 - Skills live under `skills/**/SKILL.md` — do not inline skill bodies into this file.
-- Shipped skills must appear in [README.md](../README.md) and [.claude-plugin/plugin.json](../.claude-plugin/plugin.json).
+- Shipped skills must appear in [README.md](../README.md) and [.claude-plugin/plugin.json](../.claude-plugin/plugin.json) (plugin manifest — not skill discovery; skills are consumed via `~/.claude/skills/` or `~/.agents/skills/`).
 
 Install skills into `~/.agents/skills` with [scripts/skills.sh](../scripts/skills.sh) or [scripts/link-skills.sh](../scripts/link-skills.sh). In application repos, run `/setup-internal-skills` once.
 

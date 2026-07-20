@@ -47,6 +47,10 @@ If **missing** and the team uses Copilot, offer to create from [copilot-instruct
 
 ## Claude Code
 
+**Skill locations:** `~/.claude/skills/` (global) or `.claude/skills/` (per-project). The skills installer (`scripts/skills.sh` / `scripts/link-skills.sh`) populates `~/.claude/skills/` from the monorepo's skills automatically — no manual symlink needed.
+
+When running `setup-internal-skills` on a project repo, check whether the user has installed skills globally (`~/.claude/skills/` existing with skills). If not, recommend running `scripts/skills.sh` or `scripts/link-skills.sh` from the skills repo.
+
 If `CLAUDE.md` exists and is more than a short pointer to `AGENTS.md`, warn about duplication.
 
 If missing and user uses Claude, offer a pointer file only:
@@ -54,6 +58,7 @@ If missing and user uses Claude, offer a pointer file only:
 ```markdown
 # Claude Code
 
+Skills: `~/.claude/skills/` (global, installed via `scripts/skills.sh`).
 See [AGENTS.md](./AGENTS.md).
 ```
 

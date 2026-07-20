@@ -35,8 +35,9 @@ In **application repos** (after `/setup-internal-skills`), `AGENTS.md` also hold
 ## Claude Code
 
 1. [CLAUDE.md](../CLAUDE.md) points at `AGENTS.md`.
-2. [.claude-plugin/plugin.json](../.claude-plugin/plugin.json) lists skill paths for the plugin marketplace / project skills.
-3. Legacy workflows that only read `CLAUDE.md` still work via the pointer.
+2. Skills are installed to `~/.claude/skills/` by [scripts/skills.sh](../scripts/skills.sh) or [scripts/link-skills.sh](../scripts/link-skills.sh) (both `~/.agents/skills/` and `~/.claude/skills/` are populated).
+3. [.claude-plugin/plugin.json](../.claude-plugin/plugin.json) is for Claude Code plugins (agents, hooks, MCP), not skill discovery.
+4. Legacy workflows that only read `CLAUDE.md` still work via the pointer.
 
 ---
 

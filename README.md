@@ -26,7 +26,7 @@ Instructions use the open **`AGENTS.md`** format (OpenCode, Cursor, Copilot, and
 | OpenCode | [opencode.json](./opencode.json) |
 | Cursor | [.cursor/rules/](./.cursor/rules/) |
 | GitHub Copilot | [.github/copilot-instructions.md](./.github/copilot-instructions.md) |
-| Claude Code | [CLAUDE.md](./CLAUDE.md) + [.claude-plugin/plugin.json](./.claude-plugin/plugin.json) |
+| Claude Code | [CLAUDE.md](./CLAUDE.md). Skills installed to `~/.claude/skills/` via [scripts/skills.sh](scripts/skills.sh). Plugin: [.claude-plugin/plugin.json](./.claude-plugin/plugin.json) |
 
 ## Quickstart (30-second setup)
 

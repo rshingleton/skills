@@ -30,7 +30,7 @@ Read whatever exists; don't assume:
 - **Open standard:** `AGENTS.md`, `opencode.json`
 - **Cursor:** `.cursor/rules/*.mdc`, legacy `.cursorrules` (Cursor also loads root `AGENTS.md` — see [PLATFORM-AUDIT.md](./PLATFORM-AUDIT.md))
 - **Copilot:** `.github/copilot-instructions.md` (read full file if present)
-- **Claude:** `CLAUDE.md` (pointer only — see PLATFORM-AUDIT.md)
+- **Claude:** `CLAUDE.md` (pointer only — see PLATFORM-AUDIT.md). Skills: `~/.claude/skills/` (global) or `.claude/skills/` (per-project). Skills installed via `scripts/skills.sh` or `scripts/link-skills.sh` now populate both `~/.agents/skills/` and `~/.claude/skills/`
 - **Gemini / agy:** no config file needed — loads `AGENTS.md` natively. Gemini migrating to `agy` CLI. Skills: `<project>/.agents/skills/` (workspace, preferred for agy — other tools use `~/.agents/skills/` instead), `~/.gemini/antigravity-cli/skills/`, `~/.gemini/skills/`
 - `CONTEXT.md`, `CONTEXT-MAP.md`, `docs/adr/`, `src/*/docs/adr/`
 - `docs/agents/issue-tracker.md` — prior setup output? (only file written here)
@@ -93,7 +93,7 @@ Report the inventory table from PLATFORM-AUDIT (what exists, what will change).
 
 **OpenCode (optional):** if `opencode.json` exists and the team uses OpenCode, merge `instructions` to include `AGENTS.md`. Otherwise skip.
 
-**Claude:** pointer-only `CLAUDE.md` if missing and user wants it — never duplicate `AGENTS.md` body.
+**Claude:** pointer-only `CLAUDE.md` if missing and user wants it — never duplicate `AGENTS.md` body. Skills installed via `scripts/skills.sh` or `scripts/link-skills.sh` live in both `~/.agents/skills/` and `~/.claude/skills/` — the installer handles this automatically.
 
 **Gemini / agy:** no tool-specific file needed — `AGENTS.md` is read natively. Gemini migrating to `agy` (antigravity) CLI. Skills: workspace `<project>/.agents/skills/` (agy-preferred — distinct from other tools' `~/.agents/skills/`), `~/.gemini/antigravity-cli/skills/`, `~/.gemini/skills/`. Ensure `## Agent skills` block is present.
 
@@ -143,11 +143,11 @@ Intake: `docs/issues/` (`/issue-it`). Plans: `docs/planning/` (`/plan-it` evalua
 
 ### Triage labels
 
-Three states: `intake` → `ready-for-plan` → `wontfix`. See `~/.agents/skills/setup-internal-skills/triage-labels.md`.
+Three states: `intake` → `ready-for-plan` → `wontfix`. See `~/.agents/skills/setup-internal-skills/triage-labels.md` (or `~/.claude/skills/setup-internal-skills/triage-labels.md` for Claude Code).
 
 ### Domain docs
 
-[single-context | multi-context]. See `~/.agents/skills/setup-internal-skills/domain.md`.
+[single-context | multi-context]. See `~/.agents/skills/setup-internal-skills/domain.md` (or `~/.claude/skills/setup-internal-skills/domain.md` for Claude Code).
 ```
 
 For **Jira** tracker, say "Jira REST API"; plans use `docs/planning/<id>/jira.md` via `/plan-it --jira`.
@@ -157,10 +157,10 @@ Seed files (per-repo config only — canonical docs reference installed skill pa
 - Local → copy [issue-tracker-local.md](./issue-tracker-local.md) to `docs/agents/issue-tracker.md`
 - Jira → copy [issue-tracker-jira.md](./issue-tracker-jira.md) to `docs/agents/issue-tracker.md`. Point users at `~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh` for credentials + helpers.
 
-Do **not** copy `triage-labels.md`, `domain.md`, `jira-helpers.sh`, `jira-notifications.md`, or `jira-description-style.md` to `docs/agents/`. Skills read these directly from the installed skills path (`~/.agents/skills/setup-internal-skills/`). When Jira is the tracker, add this note to `docs/agents/issue-tracker.md`:
+Do **not** copy `triage-labels.md`, `domain.md`, `jira-helpers.sh`, `jira-notifications.md`, or `jira-description-style.md` to `docs/agents/`. Skills read these directly from the installed skills path (`~/.agents/skills/setup-internal-skills/` or `~/.claude/skills/setup-internal-skills/` for Claude Code). When Jira is the tracker, add this note to `docs/agents/issue-tracker.md`:
 
 ```
-Canonical docs: `~/.agents/skills/setup-internal-skills/` (jira-helpers.sh, jira-notifications.md, jira-description-style.md, triage-labels.md, domain.md)
+Canonical docs: `~/.agents/skills/setup-internal-skills/` or `~/.claude/skills/setup-internal-skills/` (jira-helpers.sh, jira-notifications.md, jira-description-style.md, triage-labels.md, domain.md)
 ```
 
 When choosing local, create `docs/issues/` if missing and seed [docs-issues-README.md](./docs-issues-README.md) as `docs/issues/README.md`.
@@ -179,7 +179,7 @@ Tell the user setup is complete.
 >
 > Email/ServiceNow: [SCENARIO-EMAIL-SERVICENOW.md](./SCENARIO-EMAIL-SERVICENOW.md). Unfamiliar codebase: `/doc-it`.
 
-**If Jira chosen:** remind them to set `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` (shell export or `.env` per [issue-tracker-jira.md](./issue-tracker-jira.md#loading-credentials)), plus optional `JIRA_DEFAULT_EPIC`, `JIRA_ASSIGNEE`, `JIRA_DEFAULT_ESTIMATE_HOURS`, or `default_epic` in `docs/agents/issue-tracker.md`, and optional watcher env vars (`~/.agents/skills/setup-internal-skills/jira-notifications.md`).
+**If Jira chosen:** remind them to set `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` (shell export or `.env` per [issue-tracker-jira.md](./issue-tracker-jira.md#loading-credentials)), plus optional `JIRA_DEFAULT_EPIC`, `JIRA_ASSIGNEE`, `JIRA_DEFAULT_ESTIMATE_HOURS`, or `default_epic` in `docs/agents/issue-tracker.md`, and optional watcher env vars (`~/.agents/skills/setup-internal-skills/jira-notifications.md` or `~/.claude/skills/setup-internal-skills/jira-notifications.md` for Claude Code).
 
 They can edit `docs/agents/issue-tracker.md` and `AGENTS.md` later; re-run setup to switch trackers.
 
