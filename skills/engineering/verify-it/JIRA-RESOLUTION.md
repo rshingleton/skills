@@ -5,7 +5,13 @@ Called from the main workflow when any phase row in `jira.md` has a Jira key.
 ## Prerequisites
 
 - Read `docs/agents/issue-tracker.md` for local conventions (create `docs/agents/` via `/setup-internal-skills` if missing)
-- Delegate all API calls to [`to-jira`](../to-jira/SKILL.md) — do not source credentials or curl Jira directly
+- Source the connector bridge directly for all API calls -- do not curl Jira directly, and do not
+  depend on the `/to-jira` skill being available:
+
+  ```bash
+  source scripts/jira-connector-bridge.sh
+  jira_bridge_detect
+  ```
 
 ## Scope
 
@@ -18,9 +24,9 @@ Called from the main workflow when any phase row in `jira.md` has a Jira key.
 
 For each key to resolve:
 
-1. If `JIRA_ASSIGNEE` is set: `/to-jira assign <KEY>` (does not apply watcher policy).
-2. **Prompt for resolution comment:** draft a concise Jira resolution comment from the phase summary (2-4 sentences covering what was delivered — deliverables only, no references to planning docs or audit reports). Present it to the user as a suggestion: *"Post this resolution comment to {KEY}? (y/edit/skip)"*. If they edit, use their text. If y: `/to-jira comment <KEY> "<comment>"`.
-3. **Resolve:** ask *"Resolve {KEY}? (y/n)"* per key. If yes: `/to-jira resolve <KEY> "Done"` (transitions + applies watcher policy).
+1. If `JIRA_ASSIGNEE` is set: `jira_bridge_call assign <KEY> "$JIRA_ASSIGNEE"`.
+2. **Prompt for resolution comment:** draft a concise Jira resolution comment from the phase summary (2-4 sentences covering what was delivered — deliverables only, no references to planning docs or audit reports). Present it to the user as a suggestion: *"Post this resolution comment to {KEY}? (y/edit/skip)"*. If they edit, use their text. If y: `jira_bridge_call comment <KEY> "<comment>"`.
+3. **Resolve:** ask *"Resolve {KEY}? (y/n)"* per key. If yes: `jira_bridge_call transition <KEY> "Done"` (then post the comment from step 2, if provided).
 
 ## Edge cases
 

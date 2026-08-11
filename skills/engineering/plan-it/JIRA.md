@@ -87,16 +87,24 @@ No parent Epic — phase Tasks are standalone in $JIRA_PROJECT_KEY.
 
 ## Publish flow
 
-Delegate all Jira API operations to [`to-jira`](../to-jira/SKILL.md):
+Use the connector bridge for all Jira API operations (routes to MCP or bash helpers transparently):
 
-1. **Source env** — `source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh`. Needed for plan-it's own local operations (resolve parent Epic, read `jira.md`). `to-jira` also sources credentials separately for its API calls.
-2. **Resolve parent Epic** — `resolve_jira_parent_epic "<--parent or empty>" "<plan-id>"`
-3. **Sync-only early exit** — If `--sync-only`: run [jira-epic-sync.md](../setup-internal-skills/jira-epic-sync.md), then stop
-4. **Create Epic** (if no parent) — `/to-jira create-epic "<Plan Title>" <plan-id>`
-5. **Ask about title prefix** — before creating tasks, ask:
-   > Prefix phase titles with plan name in Jira? E.g. **"Auth v2: Implement login form"** instead of **"Implement login form"** (y/N)
-6. **Create Tasks** — For each `phase-N` without a Jira row: `/to-jira create-task <plan-id> phase-N`
-7. **Write `jira.md`** — **Parent Epic** section + phase table with keys from step 6
+```bash
+source scripts/jira-connector-bridge.sh
+jira_bridge_detect  # Detects connector availability
+```
+
+Then execute the flow:
+
+1. Source env: source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh (needed for plan-it's own local operations to resolve parent Epic and read jira.md)
+2. Resolve parent Epic: resolve_jira_parent_epic "<--parent or empty>" "<plan-id>"
+3. Sync-only early exit: If --sync-only, run jira-epic-sync.md then stop
+4. Create Epic (if no parent): jira_bridge_call create-epic "$JIRA_PROJECT_KEY" "<Plan Title>" "<Description>" (echoes MCP call if connector available, or invokes _jira_create_epic if not)
+5. Ask about title prefix before creating tasks: "Prefix phase titles with plan name in Jira? E.g. Auth v2: Implement login form instead of Implement login form (y/N)"
+6. Create Tasks: For each phase-N without a Jira row, jira_bridge_call create-task "$JIRA_PROJECT_KEY" "$SUMMARY" "$BODY_FILE" "$EPIC_KEY" "$EST_HOURS" "${JIRA_ASSIGNEE}"
+7. Write jira.md with Parent Epic section and phase table with keys from step 6
+
+See to-jira/OPERATIONS.md for the full bridge interface and both connector and bash examples.
 
 ## Small plan (≤3 phases)
 

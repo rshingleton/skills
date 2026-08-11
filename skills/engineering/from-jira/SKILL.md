@@ -13,7 +13,7 @@ Creates a `docs/planning/<id>/` plan from an existing Jira issue — no local in
 
 This is the **read direction** (Jira → local). For the write direction (local → Jira), use [`to-jira`](../to-jira/SKILL.md).
 
-**Uses Jira MCP connector when available** — automatically prefers `jira_get_issue` over bash helpers. Requires connector setup (see [`to-jira` § Connector availability](../to-jira/SKILL.md#connector-availability)).
+**Connector-first approach:** Detects Jira MCP connector availability and routes to MCP tools when available; falls back to bash helpers if unavailable. Requires connector setup (see [`to-jira` § Connector availability](../to-jira/SKILL.md#connector-availability)).
 
 ## Quick start
 
@@ -26,9 +26,9 @@ This is the **read direction** (Jira → local). For the write direction (local 
 
 ### 1. Resolve the Jira key
 
-See [COMMANDS.md](COMMANDS.md) for bash: key extraction, credential sourcing, and issue fetch.
+See [`to-jira` OPERATIONS.md](../to-jira/OPERATIONS.md) for key extraction, the bridge fetch calls, and the bash fallback.
 
-From a bare key (`CDS-142`) or URL (`https://.../browse/CDS-142`), extract the key, then source credentials and fetch the issue.
+From a bare key (`CDS-142`) or URL (`https://.../browse/CDS-142`), extract the key, then fetch the issue via the bridge.
 
 ### 2. Present to user
 

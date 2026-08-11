@@ -35,12 +35,17 @@ Flag ambiguities to the Planning Agent (Architect) via the user — do not guess
 
 **Jira (optional)** — infer plan `{ID}` from `ai-prompt.md` path. Resolve key from **`docs/planning/{ID}/jira.md`** → `## Phase tasks` row (or `_jira_phase_key`; Epic context in `## Parent Epic`).
 
-Delegate all Jira API operations to [`to-jira`](../to-jira/SKILL.md) — implement-it does not source credentials or curl Jira directly.
+Source the connector bridge directly for Jira API operations -- implement-it does not curl Jira
+directly, and does not depend on the `/to-jira` skill being available:
 
-If the phase row has a key, delegate to `to-jira`:
-1. If `JIRA_ASSIGNEE` is set and the issue has no existing assignee: `/to-jira assign <KEY>` (set assignee before moving to In Progress)
-2. `/to-jira transition <KEY> "In Progress"`
-3. `/to-jira watcher-policy <KEY> update`
+```bash
+source scripts/jira-connector-bridge.sh
+jira_bridge_detect
+```
+
+If the phase row has a key:
+1. If `JIRA_ASSIGNEE` is set and the issue has no existing assignee: `jira_bridge_call assign <KEY> "$JIRA_ASSIGNEE"` (set assignee before moving to In Progress)
+2. `jira_bridge_call transition <KEY> "In Progress"`
 
 If the row is empty, tell the user to run `/plan-it --jira {ID}` or `--sync-only` — do not guess keys.
 
