@@ -3,8 +3,8 @@ name: plan-it
 description: >
   Doc Cycle — plan phase. Grill, scaffold phases, draft ADRs, optional Jira
   (jira.md), start from intake (--from-issues), re-sync Jira keys
-  (--jira --sync-only). Jira API operations delegate to
-  [to-jira](../to-jira/SKILL.md) — no direct curl. Use when a feature,
+  (--jira --sync-only). Publish operations source the connector bridge
+  directly — no direct curl. Use when a feature,
   bugfix, or change needs structured scoping, or when user says plan-it,
   plan, --from-issues, design, or architecture.
 ---
