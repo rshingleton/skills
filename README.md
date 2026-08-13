@@ -8,25 +8,26 @@ Agent skills tailored to my daily engineering workflow: refactoring existing cod
 
 ### Purpose
 
-Each skill is a focused workflow in `SKILL.md` that an agent loads when invoked by name (for example `/plan-it` or `/commit-it`). Together they cover alignment and shared vocabulary (`/grill-with-docs`, `/grill-me`), intake and planning (`/issue-it`, `/plan-it`), implementation with tests (`/implement-it`, `/tdd`, `/diagnose`), independent audit (`/audit-it`), durable documentation after a plan (`/verify-it`), and **baseline codebase reference** (`/doc-it` → `docs/reference/` and `docs/reference-audit/`). Engineering skills target day-to-day code work; productivity skills cover general workflow. The [skill map](#skill-map--planning-slicing-executing) and [reference](#reference) sections list everything that ships in this repo.
+Each skill is a focused workflow in `SKILL.md` that an agent loads when invoked by name (for example `/plan-it` or `/commit-it`). Together they cover alignment and shared vocabulary (`/grill-with-docs`, `/grill-me`), intake and planning (`/issue-it`, `/plan-it`), implementation with tests (`/implement-it`, `/tdd`, `/diagnose`), independent audit (`/audit-it`), durable documentation after a plan (`/verify-it`), closing out the work (`/commit-it`), and **baseline codebase reference** (`/doc-it` → `docs/reference/` and `docs/reference-audit/`). Engineering skills target day-to-day code work; productivity skills cover general workflow. The [skill map](#skill-map--planning-slicing-executing) and [reference](#reference) sections list everything that ships in this repo.
 
 ### Usage guidelines
 
-1. **Install once** on your machine using the [quickstart](#quickstart-30-second-setup) below. Skills land in `~/.agents/skills` and work across Cursor, Copilot, OpenCode, and other agents.
+1. **Install once** on your machine using the [quickstart](#quickstart-30-second-setup) below. Skills land in `~/.agents/skills` (and `~/.claude/skills` for Claude Code) — loaded natively by Cursor, OpenCode, Gemini/agy, and Claude Code. Copilot doesn't load `SKILL.md` automatically; it gets a pointer to `AGENTS.md` instead (see [Agent platforms](#agent-platforms)).
 2. **Configure each application repo** with `/setup-internal-skills`. That seeds `AGENTS.md`, `docs/agents/`, intake inbox `docs/issues/`, and plans under `docs/planning/`.
 3. **Compose skills for the task.** You are not required to run a fixed pipeline. Capture work in the **inbox** (`/issue-it` or audit skills → [audit-to-issues](./skills/engineering/setup-internal-skills/audit-to-issues.md)), then **`/plan-it --from-issues` evaluates and grills** before scaffolding. The **Doc Cycle** is `/plan-it` → `/implement-it` (each phase) → `/audit-it` → `/verify-it` → `/commit-it`. Optional Jira phase keys: `/plan-it --jira` → `jira.md`.
 4. **Keep humans in the loop.** Treat agent output as a draft. Read diffs, run tests, and check spec fit before merge. Skills like `/audit-it` and `/internal-compliance` support review; they do not replace it.
 
 ## Agent platforms
 
-Instructions use the open **`AGENTS.md`** format (OpenCode, Cursor, Copilot, and other agents). See [AGENTS.md](./AGENTS.md) and [docs/AGENT-PLATFORMS.md](./docs/AGENT-PLATFORMS.md).
+Instructions use the open **`AGENTS.md`** format, loaded natively by every tool in the table below except Copilot. See [AGENTS.md](./AGENTS.md) and [docs/AGENT-PLATFORMS.md](./docs/AGENT-PLATFORMS.md).
 
 | Tool | Config |
 |------|--------|
 | OpenCode | [opencode.json](./opencode.json) |
 | Cursor | [.cursor/rules/](./.cursor/rules/) |
-| GitHub Copilot | [.github/copilot-instructions.md](./.github/copilot-instructions.md) |
+| GitHub Copilot | [.github/copilot-instructions.md](./.github/copilot-instructions.md) — points at `AGENTS.md`; does not load `SKILL.md` automatically |
 | Claude Code | [CLAUDE.md](./CLAUDE.md). Skills installed to `~/.claude/skills/` via [scripts/skills.sh](scripts/skills.sh). Plugin: [.claude-plugin/plugin.json](./.claude-plugin/plugin.json) |
+| Gemini / agy | Loads `AGENTS.md` natively — no config file needed. See [docs/AGENT-PLATFORMS.md](./docs/AGENT-PLATFORMS.md#gemini-agy-antigravity) for skill-path details |
 
 ## Quickstart (30-second setup)
 
@@ -244,7 +245,7 @@ At plan creation, `--from-issues` **moves** inbox files to `docs/planning/<id>/s
 | | `/implement-it` | `/audit-it` | `/verify-it` | `/commit-it` |
 |---|---|---|---|---|
 | **Does** | TDD per plan phase | Phase audit (spec, standards, compliance, architecture) | Durable docs after audit PASS | Commit locally, ask before push |
-| **Jira** | Assignee + In Progress when `JIRA_ASSIGNEE` set | — | Assignee + close (transition to "Resolved") | — |
+| **Jira** | Assignee + In Progress when `JIRA_ASSIGNEE` set | — | Assignee + close (transition to "Done") | — |
 
 **Doc Cycle (plan-it–driven):** `/plan-it` → `/implement-it` (each phase) → `/audit-it` → `/verify-it` → `/commit-it`
 
@@ -294,7 +295,7 @@ Skills I use daily for code work.
 - **[setup-internal-skills](./skills/engineering/setup-internal-skills/SKILL.md)** — Per-repo config; **default** local issues in `docs/issues/`. Run once per repo.
 - **[tdd](./skills/engineering/tdd/SKILL.md)** — Test-driven development with red-green-refactor loop.
 - **[issue-it](./skills/engineering/issue-it/SKILL.md)** — Pre-plan intake under `docs/issues/`.
-- **[to-jira](./skills/engineering/to-jira/SKILL.md)** — Central Jira handler: create, transition, resolve, comment, assign. Other skills delegate here.
+- **[to-jira](./skills/engineering/to-jira/SKILL.md)** — Ad-hoc Jira handler and bridge reference: create, transition, resolve, comment, assign. Other skills source the connector bridge directly rather than delegating here.
 - **[from-jira](./skills/engineering/from-jira/SKILL.md)** — Create a Doc Cycle plan from a Jira issue — no inbox step.
 - **[verify-it](./skills/engineering/verify-it/SKILL.md)** — Doc Cycle verify phase. Finalizes ADRs, CONTEXT.md, changelog, and planning cleanup. Optionally close Jira issues.
 - **[zoom-out](./skills/engineering/zoom-out/SKILL.md)** — Get broader context on unfamiliar code.

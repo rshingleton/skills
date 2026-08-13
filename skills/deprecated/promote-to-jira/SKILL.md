@@ -5,7 +5,7 @@ description: DEPRECATED — use /plan-it --jira instead.
 
 # Deprecated
 
-Use **[plan-it](../engineering/plan-it/SKILL.md)**:
+Use **[plan-it](../../engineering/plan-it/SKILL.md)**:
 
 ```text
 /plan-it --jira <plan-id>

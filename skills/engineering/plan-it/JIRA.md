@@ -2,7 +2,7 @@
 
 Jira keys for a Doc Cycle plan live in **`docs/planning/<plan-id>/jira.md`** only — not in `docs/issues/` task trees or scattered phase frontmatter.
 
-**All Jira API operations delegate to `to-jira`** ([to-jira](../to-jira/SKILL.md)) — plan-it does not source credentials or curl Jira directly.
+**Publish operations use the connector bridge directly** (see [Publish flow](#publish-flow) below) — plan-it does not source credentials or curl Jira directly. The small-plan single-Task shortcut delegates to [`to-jira`](../to-jira/SKILL.md)'s own `create` flow (see [Small plan](#small-plan-3-phases)), since that flow already handles the multi-phase-to-single-Task logic.
 
 ## Invocations
 

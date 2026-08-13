@@ -4,7 +4,7 @@ Use when Jira already has Tasks under an Epic but **`docs/planning/<plan-id>/jir
 
 **Invocation:** `/plan-it <plan-id> --jira --sync-only` on an **existing** plan (skips grill/rescaffold). Does **not** update remote Jira description text — keys in `jira.md` only.
 
-For **creating** new Tasks (not just syncing), see [JIRA.md](../../plan-it/JIRA.md) — the publish flow creates Epic + Tasks and writes `jira.md`.
+For **creating** new Tasks (not just syncing), see [JIRA.md](../plan-it/JIRA.md) — the publish flow creates Epic + Tasks and writes `jira.md`.
 
 ## When to run
 
@@ -42,7 +42,7 @@ Never assign one Jira key to two phases.
 ## 4. Write `jira.md`
 
 1. Set frontmatter `epic_key` and `epic_summary` (GET Epic `summary` when possible).
-2. Write **`## Parent Epic`** table — key, summary, browse link, `parent_source` ([JIRA.md](../../plan-it/JIRA.md)).
+2. Write **`## Parent Epic`** table — key, summary, browse link, `parent_source` ([JIRA.md](../plan-it/JIRA.md)).
 3. Update **`## Phase tasks`** table — one row per phase:
 
 ```markdown

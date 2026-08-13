@@ -60,17 +60,17 @@ jira_key:
 ---
 ```
 
-**Status flow (inbox only):** `intake` → `ready-for-plan` → (plan-it moves to `sources/`, status `in-plan`). See [issue-it](../../issue-it/SKILL.md).
+**Status flow (inbox only):** `intake` → `ready-for-plan` → (plan-it moves to `sources/`, status `in-plan`). See [issue-it](../issue-it/SKILL.md).
 
 Intake evaluation: **`/plan-it --from-issues`** updates `status` and `## Comments` per `~/.agents/skills/setup-internal-skills/triage-labels.md`. Capture new items with **`/issue-it`** (same file shape).
 
 ## Capture intake
 
-**`/issue-it`** — creates `docs/issues/<slug>.md` only. See [INTAKE-TEMPLATE.md](../../issue-it/INTAKE-TEMPLATE.md).
+**`/issue-it`** — creates `docs/issues/<slug>.md` only. See [INTAKE-TEMPLATE.md](../issue-it/INTAKE-TEMPLATE.md).
 
 ## Plan from intake
 
-**`/plan-it --from-issues`** — reads inbox, scaffolds plan, **moves** each file to `docs/planning/<id>/sources/`, updates README `## Sources`. See [FROM-ISSUES.md](../../plan-it/FROM-ISSUES.md).
+**`/plan-it --from-issues`** — reads inbox, scaffolds plan, **moves** each file to `docs/planning/<id>/sources/`, updates README `## Sources`. See [FROM-ISSUES.md](../plan-it/FROM-ISSUES.md).
 
 ## Jira during Doc Cycle
 

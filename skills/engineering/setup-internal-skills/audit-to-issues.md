@@ -42,7 +42,7 @@ source: audit-it
 
 ## File content
 
-Use [INTAKE-TEMPLATE.md](../../issue-it/INTAKE-TEMPLATE.md). In **Notes**, always link the audit anchor:
+Use [INTAKE-TEMPLATE.md](../issue-it/INTAKE-TEMPLATE.md). In **Notes**, always link the audit anchor:
 
 ```markdown
 ## Notes
