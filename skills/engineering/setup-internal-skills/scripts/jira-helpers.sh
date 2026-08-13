@@ -119,7 +119,10 @@ _jira_add_watchers() {
 _jira_apply_watcher_policy() {
   local key="$1" mode="${2:-create}"
   _jira_remove_ignored_watchers "$key"
-  [ "$mode" = "create" ] && _jira_add_watchers "$key"
+  if [ "$mode" = "create" ]; then
+    _jira_add_watchers "$key"
+  fi
+  return 0
 }
 
 # Set assignee on an issue. Does NOT call watcher policy — call

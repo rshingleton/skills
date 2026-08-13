@@ -32,6 +32,19 @@ _assert_contains() {
   fi
 }
 
+_assert_not_contains() {
+  local haystack="$1" needle="$2" desc="$3"
+  if [[ "$haystack" != *"$needle"* ]]; then
+    echo "PASS" >> "$RESULTS_FILE"
+  else
+    {
+      echo "FAIL: $desc"
+      echo "  expected NOT to contain: $needle"
+      echo "  actual: $haystack"
+    } >> "$RESULTS_FILE"
+  fi
+}
+
 _assert_eq() {
   local actual="$1" expected="$2" desc="$3"
   if [ "$actual" = "$expected" ]; then
@@ -166,6 +179,10 @@ test_connector_transition() {
     "connector transition: fetches available transitions first"
   _assert_contains "$out" "jira_transition_issue" \
     "connector transition: pipes into transition_issue"
+  _assert_contains "$out" '.[] | select(.name ==' \
+    "connector transition: filters a bare array on .name (the MCP tool's own shape has no .to)"
+  _assert_not_contains "$out" '.transitions[]' \
+    "connector transition: must not assume a .transitions[] wrapper"
 }
 
 test_connector_fetch_issue() {

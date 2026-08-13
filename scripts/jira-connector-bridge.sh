@@ -213,7 +213,7 @@ jira_bridge_transition() {
 
   if [ "$USE_CONNECTOR" = "true" ]; then
     local call="CONNECTOR: mcp__jira__jira_get_transitions --issue_key '$issue_key'"
-    call+=" | jq -r \".transitions[] | select(.name == \\\"$status\\\") | .id\" | head -1"
+    call+=" | jq -r \".[] | select(.name == \\\"$status\\\") | .id\" | head -1"
     call+=" | xargs -I {} mcp__jira__jira_transition_issue --issue_key '$issue_key'"
     call+=" --transition_id '{}'"
     echo "$call"
