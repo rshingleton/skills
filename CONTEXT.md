@@ -1,30 +1,39 @@
-# Matt Pocock Skills
+# ai-skills
 
-A collection of agent skills (slash commands and behaviors) loaded by Claude Code. Skills are organized into buckets and consumed by per-repo configuration emitted by `/setup-matt-pocock-skills`.
+A collection of agent skills (slash commands and behaviors) for engineering workflows. Skills are organized into buckets and consumed by per-repo configuration emitted by `/setup-internal-skills`.
+
+Canonical repo: [ai-skills](https://github.com/rshingleton/skills.git) on GitHub. Descended from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT License).
 
 ## Language
 
 **Issue tracker**:
-The tool that hosts a repo's issues: GitHub Issues, Linear, a local `.scratch/` markdown convention, or similar. Skills like `to-tickets`, `to-spec`, and `triage` read from and write to it.
+Pre-plan **inbox** under `docs/issues/` (local markdown); optional Jira for published plans in `jira.md`. Capture: `/issue-it` or [audit-to-issues](skills/engineering/setup-internal-skills/audit-to-issues.md). Plan: `/plan-it` (always grills; `--from-issues` moves intake to `sources/`). Execution: `/implement-it` / `/verify-it` per `docs/agents/issue-tracker.md`.
 _Avoid_: backlog manager, backlog backend, issue host
 
-**Issue**:
-A single tracked unit of work inside an **Issue tracker**: a bug, task, spec, or slice produced by `to-tickets`.
-_Avoid_: ticket (use only when quoting external systems that call them tickets, or for a **Decision ticket**, see below)
+**Issue (intake)**:
+A single pre-plan item — bug, defer, todo, or feature request as one `docs/issues/<slug>.md` file. `/plan-it --from-issues` **moves** it to `docs/planning/<id>/sources/` so the inbox stays unplanned-only.
+_Avoid_: using "issue" for a plan phase or Jira task
 
-**Decision ticket**:
-A `wayfinder` unit: a child **Issue** of a `wayfinder:map` holding a *question* whose resolution is a decision, not a slice of a build to execute. The **decision** qualifier is what keeps it distinct from an implementation ticket; `wayfinder` introduces the term, then uses "ticket".
+**Plan**:
+Doc Cycle orchestration under `docs/planning/<id>/` — phases, `ai-prompt.md`, ADR draft. Produced by `/plan-it`. Optional **`jira.md`** maps phases to Jira keys.
+
+**Epic** (Jira):
+Jira Epic issue linking phase Tasks. Referenced in `jira.md` as `epic_key`. Not a duplicate spec file under `docs/issues/`.
+_Avoid_: PRD, product requirements document
 
 **Triage role**:
-A canonical state-machine label applied to an **Issue** during triage (e.g. `needs-triage`, `ready-for-afk`). Each role maps to a real label string in the **Issue tracker** via `docs/agents/triage-labels.md`.
+State machine (`intake` → `ready-for-plan` → `wontfix`) mapped to local inbox `status:` or Jira labels by `/plan-it` intake evaluation. See `~/.agents/skills/setup-internal-skills/triage-labels.md`.
 
 ## Relationships
 
-- An **Issue tracker** holds many **Issues**
-- An **Issue** carries one **Triage role** at a time
-- A **Decision ticket** is an **Issue** (a child of a `wayfinder:map`)
+- **Issue tracker** holds intake **Issues** until planned
+- A **Plan** holds moved intake under **`sources/`**, lists them in README `## Sources`, and owns **`jira.md`** when published to Jira
+- **implement-it** / **verify-it** read phase Jira keys from **`jira.md`** (`_jira_phase_key` helper in [issue-tracker-jira.md](skills/engineering/setup-internal-skills/issue-tracker-jira.md)), not from intake files
+- **plan-it** `--jira --sync-only` re-pulls Epic Task keys into `jira.md` without re-grilling
+- **plan-it** handles intake evaluation and planning in one session — triage-style assessment then the grill
+- **plan-it**, **implement-it**, **verify-it**, and **from-jira** each source `scripts/jira-connector-bridge.sh` directly for their own Jira operations rather than delegating to `to-jira` as a skill -- **to-jira** remains the ad-hoc entry point for one-off operations and the canonical reference for the bridge interface (see `to-jira/OPERATIONS.md`). API operations are callable `_jira_*` functions in `jira-helpers.sh` (sourced via `load-jira-env.sh`)
 
 ## Flagged ambiguities
 
-- "backlog" was previously used to mean both the *tool* hosting issues and the *body of work* inside it. Resolved: the tool is the **Issue tracker**; "backlog" is no longer used as a domain term.
-- "backlog backend" / "backlog manager". Resolved: collapsed into **Issue tracker**.
+- "backlog" — resolved: use **Issue tracker** for the tool; intake files for pre-plan work.
+- Plan phase tasks under `docs/issues/.../tasks/` — **retired**; use `docs/planning/` + `jira.md` only.

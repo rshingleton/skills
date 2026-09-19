@@ -1,89 +1,122 @@
-<p>
-  <a href="https://www.aihero.dev/s/skills-newsletter">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://res.cloudinary.com/total-typescript/image/upload/v1777382277/skills-repo-dark_2x.png">
-      <source media="(prefers-color-scheme: light)" srcset="https://res.cloudinary.com/total-typescript/image/upload/v1777382277/skill-repo-light_2x.png">
-      <img alt="Skills" src="https://res.cloudinary.com/total-typescript/image/upload/v1777382277/skill-repo-light_2x.png" width="369">
-    </picture>
-  </a>
-</p>
+# ai-skills
 
-# Skills For Real Engineers
+**Canonical repository:** [https://github.com/rshingleton/skills.git](https://github.com/rshingleton/skills.git)
 
-[![skills.sh](https://skills.sh/b/mattpocock/skills)](https://skills.sh/mattpocock/skills)
+Agent skills tailored to my daily engineering workflow: refactoring existing codebases, adding features, and addressing tech debt across projects tracked in git and Jira. The `issue-it` intake skill, the broader Doc Cycle (`plan-it` → `implement-it` → `audit-it` → `verify-it` → `commit-it`), and introspective skills (`doc-it`, `zoom-out`, `improve-codebase-architecture`) grew out of real needs I hit working with codebases I didn't have full architectural knowledge of.
 
-My agent skills that I use every day to do real engineering - not vibe coding.
+**Agent-assisted coding is becoming more mainstream.** Teams use coding agents for implementation, exploration, and documentation with growing acceptance in day-to-day engineering. These skills are not a substitute for engineering judgment. They are meant to **supplement** knowledge and practice, not replace it. The successful engineer uses agents to move faster on well-understood work, then applies **eyes-on** review: read the diff, run the tests, question the design. Manual auditing of agent-produced code is **always** recommended before anything ships.
 
-Developing real applications is hard. Approaches like GSD, BMAD, and Spec-Kit try to help by owning the process. But while doing so, they take away your control and make bugs in the process hard to resolve.
+### Purpose
 
-These skills are designed to be small, easy to adapt, and composable. They work with any model. They're based on decades of engineering experience. Hack around with them. Make them your own. Enjoy.
+Each skill is a focused workflow in `SKILL.md` that an agent loads when invoked by name (for example `/plan-it` or `/commit-it`). Together they cover alignment and shared vocabulary (`/grill-with-docs`, `/grill-me`), intake and planning (`/issue-it`, `/plan-it`), implementation with tests (`/implement-it`, `/tdd`, `/diagnose`), independent audit (`/audit-it`), durable documentation after a plan (`/verify-it`), closing out the work (`/commit-it`), and **baseline codebase reference** (`/doc-it` → `docs/reference/` and `docs/reference-audit/`). Engineering skills target day-to-day code work; productivity skills cover general workflow. The [skill map](#skill-map--planning-slicing-executing) and [reference](#reference) sections list everything that ships in this repo.
 
-If you want to keep up with changes to these skills, and any new ones I create, you can join ~60,000 other devs on my newsletter:
+### Usage guidelines
 
-[Sign Up To The Newsletter](https://www.aihero.dev/s/skills-newsletter)
+1. **Install once** on your machine using the [quickstart](#quickstart-30-second-setup) below. Skills land in `~/.agents/skills` (and `~/.claude/skills` for Claude Code) — loaded natively by Cursor, OpenCode, Gemini/agy, and Claude Code. Copilot doesn't load `SKILL.md` automatically; it gets a pointer to `AGENTS.md` instead (see [Agent platforms](#agent-platforms)).
+2. **Configure each application repo** with `/setup-internal-skills`. That seeds `AGENTS.md`, `docs/agents/`, intake inbox `docs/issues/`, and plans under `docs/planning/`.
+3. **Compose skills for the task.** You are not required to run a fixed pipeline. Capture work in the **inbox** (`/issue-it` or audit skills → [audit-to-issues](./skills/engineering/setup-internal-skills/audit-to-issues.md)), then **`/plan-it --from-issues` evaluates and grills** before scaffolding. The **Doc Cycle** is `/plan-it` → `/implement-it` (each phase) → `/audit-it` → `/verify-it` → `/commit-it`. Optional Jira phase keys: `/plan-it --jira` → `jira.md`.
+   - **Using Jira?** Stick with `/plan-it` → `/implement-it` → `/audit-it` → `/verify-it` → `/commit-it`, with `/to-jira`/`/from-jira` as the Jira bridge.
+   - **Not using Jira** (GitHub Issues, Linear, or local tracking)? `/to-spec` → `/to-tickets` is the tracker-agnostic equivalent of the intake/planning step — synthesize the conversation into a spec, then slice it into tracer-bullet tickets on whatever tracker you've configured. The two paths aren't meant to be mixed on the same piece of work.
+   - **Work bigger than one plan/session?** `/wayfinder` maps it as a set of decision tickets you resolve one at a time — a companion for scoping ahead of `/plan-it`, not a replacement for it.
+4. **Keep humans in the loop.** Treat agent output as a draft. Read diffs, run tests, and check spec fit before merge. Skills like `/audit-it` and `/internal-compliance` support review; they do not replace it.
 
-## Installation (30-second setup)
+## Agent platforms
 
-Two ways in, two philosophies. **The [Claude Code plugin](https://code.claude.com/docs/en/plugins)** installs the whole set as a managed, read-only bundle that updates when I ship, so you subscribe rather than fork. **[skills.sh](https://skills.sh/mattpocock/skills)** copies editable skill files into your project, so you can hack on them and make them your own. Pick one: installing both leaves you with every skill twice.
+Instructions use the open **`AGENTS.md`** format, loaded natively by every tool in the table below except Copilot. See [AGENTS.md](./AGENTS.md) and [docs/AGENT-PLATFORMS.md](./docs/AGENT-PLATFORMS.md).
 
-### 1. Get the skills
+| Tool | Config |
+|------|--------|
+| OpenCode | [opencode.json](./opencode.json) |
+| Cursor | [.cursor/rules/](./.cursor/rules/) |
+| GitHub Copilot | [.github/copilot-instructions.md](./.github/copilot-instructions.md) — points at `AGENTS.md`; does not load `SKILL.md` automatically |
+| Claude Code | [CLAUDE.md](./CLAUDE.md). Skills installed to `~/.claude/skills/` via [scripts/skills.sh](scripts/skills.sh). Plugin: [.claude-plugin/plugin.json](./.claude-plugin/plugin.json) |
+| Gemini / agy | Loads `AGENTS.md` natively — no config file needed. See [docs/AGENT-PLATFORMS.md](./docs/AGENT-PLATFORMS.md#gemini-agy-antigravity) for skill-path details |
 
-<details>
-<summary><strong>Claude Code</strong></summary>
+## Quickstart (30-second setup)
 
-```bash
-claude plugins install mattpocock-skills
-```
+### Option A — one-liner (recommended)
 
-Or, from inside a session:
-
-```
-/plugin install mattpocock-skills
-```
-
-It's in Claude Code's official marketplace, so there's nothing to add first, and updates arrive automatically.
-
-</details>
-
-<details>
-<summary><strong>Codex, and other agents</strong></summary>
+Installs into `~/.agents/skills` and caches a clone at `~/.local/share/ai-skills`:
 
 ```bash
-npx skills@latest add mattpocock/skills
+bash <(curl -fsSL 'https://raw.githubusercontent.com/rshingleton/skills/main/scripts/skills.sh')
 ```
 
-Pick the skills you want, and which coding agents to install them on. **The installer lets you choose which skills to take, so make sure `setup-matt-pocock-skills` is one of them.**
+Re-run the same command anytime to pull `main` and refresh symlinks.
 
-A native Codex plugin is on the roadmap (see [`.agents/adr/0002-ship-as-a-claude-code-plugin.md`](./.agents/adr/0002-ship-as-a-claude-code-plugin.md)).
-
-</details>
-
-<details>
-<summary><strong>For tinkerers</strong></summary>
-
-Use the same installer, on any agent, including Claude Code:
+**Migrating from Matt Pocock / custom `implement`, `verify`, `audit-engineering`?** Preview removals, then install with cleanup:
 
 ```bash
-npx skills@latest add mattpocock/skills
+# Preview what will be deleted from ~/.agents/skills
+bash <(curl -fsSL 'https://raw.githubusercontent.com/rshingleton/skills/main/scripts/cleanup-legacy-skills.sh')
+
+# Remove legacy folders, then install internal skills
+CLEANUP_LEGACY=1 bash <(curl -fsSL 'https://raw.githubusercontent.com/rshingleton/skills/main/scripts/skills.sh')
 ```
 
-It writes the skills into your repo as ordinary files you own and can edit. Nothing updates behind your back; pull my latest changes when you want them with `npx skills update`.
+Or from a clone: `bash scripts/cleanup-legacy-skills.sh` (dry-run) / `bash scripts/cleanup-legacy-skills.sh --yes`.
 
-</details>
+### Option B — from a git clone
 
-### 2. Run `/setup-matt-pocock-skills`
+```bash
+git clone https://github.com/rshingleton/skills.git
+cd skills
+bash scripts/skills.sh
+```
 
-In your agent, run it once per repo. It will:
+### Jira credentials (when using Jira skills)
 
-- Ask you which issue tracker you want to use (GitHub, Linear, or local files)
-- Ask you what labels you apply to tickets when you triage them (`/triage` uses labels)
-- Ask you where you want to save any docs we create
+Skills that call the Jira API need `JIRA_BASE_URL`, `JIRA_API_TOKEN`, and `JIRA_PROJECT_KEY`. Use either exports or a `.env` file (see [.env.example](./.env.example)).
 
-### 3. Bam - you're ready to go.
+**Optional variables** (loaded by [load-jira-env.sh](./scripts/load-jira-env.sh); not used for Bearer auth except where noted):
+
+| Variable | Purpose |
+|----------|---------|
+| `JIRA_DEFAULT_EPIC` | Parent Epic for `/plan-it --jira` when `--parent` is omitted ([details](./skills/engineering/setup-internal-skills/issue-tracker-jira.md#default-epic-optional)) |
+| `JIRA_WATCHER_IGNORE` | Comma-separated usernames to **remove** from watchers after each write (`DELETE`) |
+| `JIRA_WATCHER_USERNAME` | Comma-separated usernames to **add** as watchers after each create (`POST`) |
+| `JIRA_EMAIL` | If `JIRA_WATCHER_IGNORE` is unset, remove the PAT owner (`${JIRA_EMAIL%%@*}`) after writes — doc-manager pattern |
+| `JIRA_ASSIGNEE` | Jira username for `assignee` on agent creates and Doc Cycle updates (`/implement-it`, `/verify-it`) |
+| `JIRA_DEFAULT_ESTIMATE_HOURS` | Default hours on Jira Task **create** (`/plan-it --jira`) when no per-phase `estimate_hours` |
+| `JIRA_AUTH_TYPE` | `bearer` (default) or `basic` — auth style for Jira API calls |
+
+Watcher policy and `notifyUsers=false`: [jira-notifications.md](./skills/engineering/setup-internal-skills/jira-notifications.md). Jira descriptions: [jira-description-style.md](./skills/engineering/setup-internal-skills/jira-description-style.md) (**wiki markup**, not markdown). Re-sync phase ↔ keys: `/plan-it <plan-id> --jira --sync-only` ([jira-epic-sync.md](./skills/engineering/setup-internal-skills/jira-epic-sync.md)).
+
+**Option 1: `.env` file (recommended)**
+
+```bash
+mkdir -p ~/.config/ai-skills
+cp .env.example ~/.config/ai-skills/.env   # from your ai-skills clone
+# Edit ~/.config/ai-skills/.env and set JIRA_API_TOKEN
+
+source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh
+```
+
+A `.env` in the **application repo root** takes precedence over user-wide files when you run the loader from that repo. Also supported: `~/.agents/.env`, `~/.config/ai-skills/.env`. Override the path with `JIRA_ENV_FILE=/path/to/.env`.
+
+**Option 2: shell exports**
+
+```bash
+export JIRA_BASE_URL="https://jira.example.com"
+export JIRA_API_TOKEN="your-jira-pat"
+export JIRA_PROJECT_KEY="your-project-key"
+```
+
+Agents running Jira `curl` commands should `source` the loader (or read the `.env` file) before calling the API. API patterns and `notifyUsers=false`: [issue-tracker-jira.md](./skills/engineering/setup-internal-skills/issue-tracker-jira.md). Watcher suppression: [jira-notifications.md](./skills/engineering/setup-internal-skills/jira-notifications.md).
+
+### Configure application repos
+
+Run `/setup-internal-skills` in your **application repo** (in Cursor, Copilot, or OpenCode). It will:
+   - Write **`AGENTS.md`** and `docs/agents/` (open format; intake in `docs/issues/`, plans in `docs/planning/`)
+   - Optionally add `opencode.json`, Copilot instructions, or Cursor rules
+   - Ask about triage labels and domain doc layout
+   - Check for `CONTRIBUTING.md` and `SECURITY_POLICY.md`
+
+You are ready to invoke skills in that repo.
 
 ## Why These Skills Exist
 
-I built these skills as a way to fix common failure modes I see with Claude Code, Codex, and other coding agents.
+These skills fix common failure modes I see with coding agents.
 
 ### #1: The Agent Didn't Do What I Want
 
@@ -141,7 +174,7 @@ It's hard to explain how powerful this is. It might be the single coolest techni
 
 ### #3: The Code Doesn't Work
 
-> "Always take small, deliberate steps. The rate of feedback is your speed limit. Never take on a task that’s too big."
+> "Always take small, deliberate steps. The rate of feedback is your speed limit. Never take on a task that's too big."
 >
 > David Thomas & Andrew Hunt, [The Pragmatic Programmer](https://www.amazon.co.uk/Pragmatic-Programmer-Anniversary-Journey-Mastery/dp/B0833F1T3V)
 
@@ -155,7 +188,7 @@ For automated tests, a red-green-refactor loop is critical. This is where the ag
 
 I've built a **[`/tdd`](./skills/engineering/tdd/SKILL.md) skill** you can slot into any project. It encourages red-green-refactor and gives the agent plenty of guidance on what makes good and bad tests.
 
-For debugging, I've also built a **[`/diagnosing-bugs`](./skills/engineering/diagnosing-bugs/SKILL.md)** skill that wraps best debugging practices into a disciplined loop, gated phase by phase.
+For debugging, I've also built a **[`/diagnose`](./skills/engineering/diagnose/SKILL.md)** skill that wraps best debugging practices into a simple loop.
 
 ### #4: We Built A Ball Of Mud
 
@@ -173,59 +206,129 @@ For debugging, I've also built a **[`/diagnosing-bugs`](./skills/engineering/dia
 
 This is built in to every layer of these skills:
 
-- [`/to-spec`](./skills/engineering/to-spec/SKILL.md) quizzes you about which modules you're touching before creating a spec
+- [`/plan-it`](./skills/engineering/plan-it/SKILL.md) quizzes you about which modules you're touching before creating a plan
+- [`/issue-it`](./skills/engineering/issue-it/SKILL.md) captures inbox intake; [`/plan-it`](./skills/engineering/plan-it/SKILL.md) always grills, then scaffolds phases and optional `jira.md`
+- [`/zoom-out`](./skills/engineering/zoom-out/SKILL.md) gives a quick chat map of unfamiliar code
+- [`/doc-it`](./skills/engineering/doc-it/SKILL.md) writes durable `docs/reference/` and a sliced `docs/reference-audit/` (tech debt, testing, architecture) when you need a real baseline
 
-And crucially, [`/improve-codebase-architecture`](./skills/engineering/improve-codebase-architecture/SKILL.md) surveys a codebase for deepening opportunities and hands you the candidates. I recommend running it on your codebase once every few days. It is a survey, not a rescue: on a genuinely old codebase it will find real candidates, but it won't untangle the mud for you.
+[`/improve-codebase-architecture`](./skills/engineering/improve-codebase-architecture/SKILL.md) grills one deepening candidate; pair it with `/doc-it` when the repo needs both maps and a written backlog.
 
 ### Summary
 
 Software engineering fundamentals matter more than ever. These skills are my best effort at condensing these fundamentals into repeatable practices, to help you ship the best apps of your career. Enjoy.
 
-## Reference
+## About this fork
 
-These split on one axis: who can invoke them. **User-invoked** skills are reachable only when you type them (e.g. `/grill-me`); their job is to orchestrate. **Model-invoked** skills can be invoked by you _or_ reached for automatically by the agent when the task fits; they hold the reusable discipline. A user-invoked skill may invoke model-invoked skills, but never another user-invoked one.
+This repository is a fork tailored to my specific development workflow. After using the original skills for several weeks I found myself modifying and adding skills to match how I actually work — refactoring existing codebases, adding features, and addressing tech debt. Most requests come through Bitbucket, Jira, and a few other intake sources; the `issue-it` skill and the broader Doc Cycle (`plan-it` → `implement-it` → `audit-it` → `verify-it` → `commit-it`) grew out of that pattern. The introspective skills (`doc-it`, `zoom-out`, `improve-codebase-architecture`) are especially useful when picking up unfamiliar or legacy code — they build a map before you start changing things. Everything here works for me; it may or may not fit your setup, but the intent is to share a concrete, opinionated toolset rather than a generic framework.
+
+## Issue tracking — three layers
+
+| Layer | Path | Skills |
+|-------|------|--------|
+| **Inbox** | `docs/issues/*.md` | `/issue-it` (capture), audit → [audit-to-issues](./skills/engineering/setup-internal-skills/audit-to-issues.md) |
+| **Plan** | `docs/planning/<id>/` | `/plan-it` — **always grills**, then phases + `sources/` (moved intake) |
+| **Jira map** | `docs/planning/<id>/jira.md` | `/plan-it --jira` only — not issue-it |
+
+At plan creation, `--from-issues` **moves** inbox files to `docs/planning/<id>/sources/` so the inbox stays unplanned-only. Phase Tasks and time estimates (`estimate_hours`, `timetracking`) are set when publishing Jira.
+
+**Intake evaluation is built into plan-it.** `/plan-it --from-issues` handles both evaluation and planning in one session. Items at `status: intake` get triage-style assessment (codebase exploration, reproduction, clarifying questions) before the grill. Items at `ready-for-plan` go straight to the grill. No separate `/triage` step needed.
+
+## Skill map — planning, slicing, executing
+
+| | `/issue-it` | `/plan-it` |
+|---|---|---|
+| **Purpose** | Capture intake only | Evaluate intake + grill + scaffold phases; publish Jira map |
+| **Output** | `docs/issues/<slug>.md` | `docs/planning/<id>/` + `sources/` + `jira.md` |
+| **When** | New bug, defer, todo, feature | Plan design; **phase Jira** via `--jira` only |
+| **Flags** | — | `--from-issues`, `--jira`, `--jira --sync-only`, `--parent` |
+
+**Execution & close:**
+
+| | `/implement-it` | `/audit-it` | `/verify-it` | `/commit-it` |
+|---|---|---|---|---|
+| **Does** | TDD per plan phase | Phase audit (spec, standards, compliance, architecture) | Durable docs after audit PASS | Commit locally, ask before push |
+| **Jira** | Assignee + In Progress when `JIRA_ASSIGNEE` set | — | Assignee + close (transition to "Done") | — |
+
+**Doc Cycle (plan-it–driven):** `/plan-it` → `/implement-it` (each phase) → `/audit-it` → `/verify-it` → `/commit-it`
+
+**Codebase reference (onboarding or unfamiliar repo):**
+
+| Skill | Writes | Use when |
+|-------|--------|----------|
+| **`/doc-it`** | `docs/reference/` + `docs/reference-audit/` | Baseline maps plus sliced audit (`tech-debt.md`, `testing.md`, `architecture.md`, `follow-ups.md`). Two phases in one skill. |
+| `/zoom-out` | *(chat only)* | Quick orientation; no files. |
+| `/audit-it` (repo) | `docs/AUDIT.md` | Tech-debt / simplification lens after you already know the repo. |
+| `/verify-it` | ADRs, `CONTEXT.md`, changelog | **After** implementation of a plan, not discovery. |
+
+**Typical flows:**
+
+```
+Ad-hoc plan:     /plan-it  →  grill  →  phases  →  Doc Cycle
+Intake → plan:   /issue-it  →  /plan-it --from-issues  →  Doc Cycle
+With Jira:       …  →  /plan-it --from-issues --jira  →  implement-it  →  audit-it  →  verify-it  →  commit-it
+Incremental:     …  →  implement phase-N  →  audit-it --phase phase-N  →  verify-it --phase phase-N  →  …  →  full audit  →  full verify  →  commit-it
+Audit backlog:   /doc-it  →  audit-to-issues  →  /plan-it --from-issues
+Re-sync Jira:    /plan-it <id> --jira --sync-only   (keys in jira.md only)
+Jira → plan:     /from-jira CDS-142                  (fetch Jira → grill → scaffold plan)
+Issue → Jira:    /to-jira docs/issues/bug.md          (push single intake item to Jira)
+Unfamiliar repo: /doc-it  →  follow-ups  →  issue-it / plan-it --from-issues
+```
+
+**Email / ServiceNow (org):** paste request in project repo → `/issue-it` → review `docs/issues/<slug>.md` → `/plan-it --from-issues` → `/plan-it <id> --jira [--parent EPIC]` (override `.env` default Epic). See [SCENARIO-EMAIL-SERVICENOW.md](./skills/engineering/setup-internal-skills/SCENARIO-EMAIL-SERVICENOW.md).
+
+Deprecated: `/to-epic`, `/to-jiras`, `/promote-to-jira`, `/issue-it --jira` — use `/to-jira` or `/plan-it --jira` instead ([issue-it](./skills/engineering/issue-it/SKILL.md)).
+
+## Reference
 
 ### Engineering
 
 Skills I use daily for code work.
 
-**User-invoked**
-
-- **[ask-matt](./skills/engineering/ask-matt/SKILL.md)**: Ask which skill or flow fits your situation. A router over the user-invoked skills in this repo.
-- **[grill-with-docs](./skills/engineering/grill-with-docs/SKILL.md)**: Grilling session that also builds your project's domain model, sharpening terminology and updating `CONTEXT.md` and ADRs inline.
-- **[triage](./skills/engineering/triage/SKILL.md)**: Move issues through a state machine of triage roles.
-- **[improve-codebase-architecture](./skills/engineering/improve-codebase-architecture/SKILL.md)**: Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through whichever one you pick.
-- **[setup-matt-pocock-skills](./skills/engineering/setup-matt-pocock-skills/SKILL.md)**: Configure this repo for the engineering skills (issue tracker, triage labels, domain doc layout). Run once per repo before using the other engineering skills.
-- **[to-spec](./skills/engineering/to-spec/SKILL.md)**: Turn the current conversation into a spec and publish it to the issue tracker. No interview, just synthesizes what you've already discussed.
-- **[to-tickets](./skills/engineering/to-tickets/SKILL.md)**: Break any plan, spec, or conversation into a set of tracer-bullet tickets, each declaring its blocking edges, written as text in a local file, or as native blocking links on a real tracker.
-- **[implement](./skills/engineering/implement/SKILL.md)**: Build the work described by a spec or set of tickets, driving `/tdd` at pre-agreed seams and closing out with `/code-review` before committing.
-- **[wayfinder](./skills/engineering/wayfinder/SKILL.md)**: Plan a huge chunk of work, more than one agent session can hold, as a shared map of decision tickets on the issue tracker, and resolve them one at a time until the way to the destination is clear.
-
-**Model-invoked**
-
-- **[prototype](./skills/engineering/prototype/SKILL.md)**: Build a throwaway prototype to answer a design question, either a single shareable HTML file for state/logic questions, or several radically different UI variations toggleable from one route.
-- **[diagnosing-bugs](./skills/engineering/diagnosing-bugs/SKILL.md)**: Disciplined diagnosis loop for hard bugs and performance regressions: build a feedback loop that goes red on this bug → minimise → hypothesise → instrument → fix → regression-test.
-- **[research](./skills/engineering/research/SKILL.md)**: Investigate a question against high-trust primary sources and capture the findings as a cited Markdown file in the repo, run as a background agent.
-- **[tdd](./skills/engineering/tdd/SKILL.md)**: Test-driven development with a red-green-refactor loop. Builds features or fixes bugs one vertical slice at a time.
-- **[domain-modeling](./skills/engineering/domain-modeling/SKILL.md)**: Actively build and sharpen a project's domain model: challenge terms against the glossary, stress-test with edge-case scenarios, and update `CONTEXT.md` and ADRs inline.
-- **[codebase-design](./skills/engineering/codebase-design/SKILL.md)**: Shared discipline and vocabulary for designing deep modules: a lot of behaviour behind a small interface, placed at a clean seam, testable through that interface.
-- **[code-review](./skills/engineering/code-review/SKILL.md)**: Two-axis review of the diff since a fixed point: **Standards** (does it follow the repo's coding standards, plus a Fowler smell baseline?) and **Spec** (does it faithfully implement the originating issue/spec?), run as parallel sub-agents so neither pollutes the other.
-- **[resolving-merge-conflicts](./skills/engineering/resolving-merge-conflicts/SKILL.md)**: Work through an in-progress git merge or rebase conflict hunk by hunk, resolving by intent traced to each side's primary source, then finish the operation (never `--abort`).
-- **[wizard](./skills/engineering/wizard/SKILL.md)**: Generate an interactive bash wizard that walks a human through steps only they can perform: provisioning infrastructure, setting up credentials or CI secrets, walking an unfamiliar third-party dashboard, or running a one-off migration or cutover.
+- **[audit-it](./skills/engineering/audit-it/SKILL.md)** — Doc Cycle audit phase; repo reviews write `docs/AUDIT.md`. Gates verify-it.
+- **[commit-it](./skills/engineering/commit-it/SKILL.md)** — Doc Cycle close phase; commit locally, push only after user approval.
+- **[diagnose](./skills/engineering/diagnose/SKILL.md)** — Disciplined diagnosis loop for hard bugs and performance regressions.
+- **[doc-it](./skills/engineering/doc-it/SKILL.md)** — **Baseline codebase documentation:** Phase 1 writes `docs/reference/`. Phase 2 writes `docs/reference-audit/` (`tech-debt.md`, `testing.md`, `architecture.md`, `follow-ups.md`, index `README.md`). Not `/verify-it` or `/zoom-out`.
+- **[grill-with-docs](./skills/engineering/grill-with-docs/SKILL.md)** — Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates `CONTEXT.md` and ADRs inline.
+- **[implement-it](./skills/engineering/implement-it/SKILL.md)** — Doc Cycle implement phase. TDD with repo standards. Transitions Jira to "In Progress" on start.
+- **[improve-codebase-architecture](./skills/engineering/improve-codebase-architecture/SKILL.md)** — Find deepening opportunities in a codebase, informed by `CONTEXT.md` and `docs/adr/`; optional intake issues via [audit-to-issues](./skills/engineering/setup-internal-skills/audit-to-issues.md).
+- **[internal-compliance](./skills/engineering/internal-compliance/SKILL.md)** — Pre-flight compliance check against internal security linting rules before finalizing any PR.
+- **[plan-it](./skills/engineering/plan-it/SKILL.md)** — Doc Cycle plan phase. Always grills; phases, ADRs, `--from-issues` (moves intake to `sources/`), optional Jira → `jira.md`.
+- **[prototype](./skills/engineering/prototype/SKILL.md)** — Build a throwaway prototype to flesh out a design.
+- **[research](./skills/engineering/research/SKILL.md)** — Delegate reading legwork to a background agent: investigate a question against primary sources and capture the findings as a Markdown file.
+- **[resolving-merge-conflicts](./skills/engineering/resolving-merge-conflicts/SKILL.md)** — Resolve an in-progress git merge/rebase conflict.
+- **[setup-internal-skills](./skills/engineering/setup-internal-skills/SKILL.md)** — Per-repo config; **default** local issues in `docs/issues/`. Run once per repo.
+- **[tdd](./skills/engineering/tdd/SKILL.md)** — Test-driven development with red-green-refactor loop.
+- **[to-spec](./skills/engineering/to-spec/SKILL.md)** — Tracker-agnostic alternative to `/plan-it` for GitHub/Linear/local-tracked repos: turn the current conversation into a spec and publish it, no interview, just synthesis.
+- **[to-tickets](./skills/engineering/to-tickets/SKILL.md)** — Pairs with `/to-spec`: break a plan, spec, or conversation into tracer-bullet tickets with declared blocking edges, published to the configured tracker.
+- **[issue-it](./skills/engineering/issue-it/SKILL.md)** — Pre-plan intake under `docs/issues/`.
+- **[to-jira](./skills/engineering/to-jira/SKILL.md)** — Ad-hoc Jira handler and bridge reference: create, transition, resolve, comment, assign. Other skills source the connector bridge directly rather than delegating here.
+- **[from-jira](./skills/engineering/from-jira/SKILL.md)** — Create a Doc Cycle plan from a Jira issue — no inbox step.
+- **[verify-it](./skills/engineering/verify-it/SKILL.md)** — Doc Cycle verify phase. Finalizes ADRs, CONTEXT.md, changelog, and planning cleanup. Optionally close Jira issues.
+- **[wayfinder](./skills/engineering/wayfinder/SKILL.md)** — Plan work bigger than one session as a shared map of decision tickets, resolved one at a time. Complements `/plan-it`, doesn't replace it.
+- **[wizard](./skills/engineering/wizard/SKILL.md)** — Generate an interactive bash wizard for steps only a human can perform: provisioning infra, credentials/CI secrets, unfamiliar third-party dashboards, one-off migrations.
+- **[zoom-out](./skills/engineering/zoom-out/SKILL.md)** — Get broader context on unfamiliar code.
 
 ### Productivity
 
 General workflow tools, not code-specific.
 
-**User-invoked**
+- **[caveman](./skills/productivity/caveman/SKILL.md)** — Ultra-compressed communication mode. Cuts token usage ~75% by dropping filler while keeping full technical accuracy.
+- **[grill-me](./skills/productivity/grill-me/SKILL.md)** — Get relentlessly interviewed about a plan or design until every branch of the decision tree is resolved.
+- **[handoff](./skills/productivity/handoff/SKILL.md)** — Compact the current conversation into a handoff document so another agent can continue the work.
+- **[teach](./skills/productivity/teach/SKILL.md)** — Teach the user a new skill or concept, within this workspace.
+- **[to-questionnaire](./skills/productivity/to-questionnaire/SKILL.md)** — Turn a decision you can't fully answer into a questionnaire for someone else to fill in.
+- **[wait-what](./skills/productivity/wait-what/SKILL.md)** — Flag that the last message didn't land, and ask for a re-pitch.
+- **[write-a-skill](./skills/productivity/write-a-skill/SKILL.md)** — Create new skills with proper structure, progressive disclosure, and bundled resources.
+- **[writing-for-agents](./skills/productivity/writing-for-agents/SKILL.md)** — Reference for writing any document an agent consumes: a skill, `AGENTS.md`/`CLAUDE.md`, or a doc reached by a pointer.
 
-- **[grill-me](./skills/productivity/grill-me/SKILL.md)**: Get relentlessly interviewed about a plan or design until every branch of the design tree is resolved.
-- **[handoff](./skills/productivity/handoff/SKILL.md)**: Compact the current conversation into a handoff document so another agent can continue the work.
-- **[teach](./skills/productivity/teach/SKILL.md)**: Teach the user a new skill or concept over multiple sessions, using the current directory as a stateful teaching workspace.
-- **[to-questionnaire](./skills/productivity/to-questionnaire/SKILL.md)**: Turn a decision you can't answer alone into a Markdown questionnaire for the one person who can, filled in async, or together over a meeting. It grills you about the send (who it's for, what you need back), not the subject.
-- **[wait-what](./skills/productivity/wait-what/SKILL.md)**: Fire this the moment a message doesn't land. The agent re-pitches it with the context you're missing, in plain English, using your `CONTEXT.md` vocabulary.
+## Credits
 
-**Model-invoked**
+This is a **highly modified fork** of [mattpocock/skills](https://github.com/mattpocock/skills) (MIT License), originally created by [Matt Pocock](https://github.com/mattpocock).
 
-- **[grilling](./skills/productivity/grilling/SKILL.md)**: Interview the user relentlessly about a plan, decision, or idea until every branch of the design tree is resolved. The reusable interview primitive behind `grill-me`, `grill-with-docs`, `triage`, `wayfinder` and `improve-codebase-architecture`.
-- **[writing-for-agents](./skills/productivity/writing-for-agents/SKILL.md)**: Writing documents for agents: skills, AGENTS.md/CLAUDE.md, and any doc an agent reaches by a pointer.
+**Fork maintainer:** Russ Shingleton ([@rshingleton](https://github.com/rshingleton))
+
+This is a personal tool built for my workflow. Questions and feedback are welcome — I'll do my best to respond when I can.
+
+### License
+
+This fork carries forward the original MIT License. See [LICENSE](./LICENSE).
