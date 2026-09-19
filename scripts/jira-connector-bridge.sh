@@ -17,17 +17,30 @@
 # 3. Fall back to bash helpers if connector unavailable
 # 4. Provide unified interface for all Jira operations
 #
-# DESIGN DECISION: the echo pattern
+# DESIGN DECISION: the echo pattern, and no hardcoded connector name
 #
 # When the connector is available, jira_bridge_call does not invoke the MCP tool itself --
-# it ECHOES the tool invocation as a string, e.g.:
-#   CONNECTOR: mcp__jira__jira_create_issue --project_key 'DASH' ...
+# it ECHOES a bare operation as a string, e.g.:
+#   CONNECTOR: jira_create_issue --project_key 'DASH' ...
 #
-# Why: this script runs as bash. Bash cannot call an MCP tool -- only the agent's own
-# execution context can. Skills source this bridge to get routing decisions and argument
-# construction for free, then the agent reads the "CONNECTOR: ..." line from the function's
-# output and executes that tool call itself. This is intentional, not a stopgap -- do not
-# "fix" it to call the tool directly; that call has to happen one layer up, in the agent.
+# Why echo instead of calling directly: this script runs as bash. Bash cannot call an MCP
+# tool -- only the agent's own execution context can. Skills source this bridge to get
+# routing decisions and argument construction for free, then the agent reads the
+# "CONNECTOR: ..." line from the function's output and executes that tool call itself.
+# This is intentional, not a stopgap -- do not "fix" it to call the tool directly; that
+# call has to happen one layer up, in the agent.
+#
+# Why no "mcp__<server-name>__" prefix: MCP tool names follow the pattern
+# mcp__<server-name>__<tool>, and <server-name> is whatever the connector happens to be
+# registered or provisioned as in a given environment -- a locally-registered
+# `claude mcp add` server can be named anything, and an account-level/org-provisioned
+# connector's name isn't chosen by this script at all. Bash has no way to discover the
+# real name, so hardcoding one specific guess (e.g. "jira") would silently fail to route
+# for anyone whose connector is named differently. Instead, the bridge echoes the bare
+# operation name and leaves it to the agent to match it against whichever Jira-related
+# MCP tool is actually present in its current tool list, whatever that tool happens to be
+# called. This works the same way in every environment without baking in any
+# environment-specific naming.
 #
 # In the bash path (USE_CONNECTOR=false), there is no such indirection: jira_bridge_call
 # invokes the real `_jira_*` helper function directly, which curls the Jira API and returns
@@ -129,7 +142,7 @@ jira_bridge_create_epic() {
   if [ "$USE_CONNECTOR" = "true" ]; then
     # Connector path: call MCP tool
     # This will be invoked by the agent context; skill itself just provides instructions
-    local call="CONNECTOR: mcp__jira__jira_create_issue"
+    local call="CONNECTOR: jira_create_issue"
     call+=" --project_key '$project_key' --summary '$summary' --issue_type 'Epic'"
     call+=" --description '${description}' --additional_fields '{}'"
     echo "$call"
@@ -155,7 +168,7 @@ jira_bridge_create_task() {
     local description=$(cat "$body_file" 2>/dev/null || echo "")
     local fields="{\"epicKey\": \"$epic_key\", \"timetracking\":"
     fields+=" {\"originalEstimate\": \"${est_hours}h\", \"remainingEstimate\": \"${est_hours}h\"}}"
-    local call="CONNECTOR: mcp__jira__jira_create_issue"
+    local call="CONNECTOR: jira_create_issue"
     call+=" --project_key '$project_key' --summary '$summary' --issue_type 'Task'"
     call+=" --description '$description' --assignee '${assignee}' --additional_fields '$fields'"
     echo "$call"
@@ -176,7 +189,7 @@ jira_bridge_fetch_issue() {
   local issue_key="$1" fields="${2:-summary,description,issuetype,status,labels,created}"
 
   if [ "$USE_CONNECTOR" = "true" ]; then
-    echo "CONNECTOR: mcp__jira__jira_get_issue --issue_key '$issue_key'" \
+    echo "CONNECTOR: jira_get_issue --issue_key '$issue_key'" \
       "--fields '$fields'"
   else
     if ! source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh 2>/dev/null; then
@@ -194,7 +207,7 @@ jira_bridge_fetch_comments() {
   local issue_key="$1"
 
   if [ "$USE_CONNECTOR" = "true" ]; then
-    echo "CONNECTOR: mcp__jira__jira_get_issue --issue_key '$issue_key'" \
+    echo "CONNECTOR: jira_get_issue --issue_key '$issue_key'" \
       "--include 'comments'"
   else
     if ! source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh 2>/dev/null; then
@@ -212,9 +225,9 @@ jira_bridge_transition() {
   local issue_key="$1" status="$2"
 
   if [ "$USE_CONNECTOR" = "true" ]; then
-    local call="CONNECTOR: mcp__jira__jira_get_transitions --issue_key '$issue_key'"
+    local call="CONNECTOR: jira_get_transitions --issue_key '$issue_key'"
     call+=" | jq -r \".[] | select(.name == \\\"$status\\\") | .id\" | head -1"
-    call+=" | xargs -I {} mcp__jira__jira_transition_issue --issue_key '$issue_key'"
+    call+=" | xargs -I {} jira_transition_issue --issue_key '$issue_key'"
     call+=" --transition_id '{}'"
     echo "$call"
   else
@@ -233,7 +246,7 @@ jira_bridge_comment() {
   local issue_key="$1" body="$2"
 
   if [ "$USE_CONNECTOR" = "true" ]; then
-    echo "CONNECTOR: mcp__jira__jira_add_comment --issue_key '$issue_key'" \
+    echo "CONNECTOR: jira_add_comment --issue_key '$issue_key'" \
       "--body '$body'"
   else
     if ! source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh 2>/dev/null; then
@@ -251,7 +264,7 @@ jira_bridge_assign() {
   local issue_key="$1" assignee="${2:-${JIRA_ASSIGNEE:-}}"
 
   if [ "$USE_CONNECTOR" = "true" ]; then
-    echo "CONNECTOR: mcp__jira__jira_assign_issue --issue_key '$issue_key'" \
+    echo "CONNECTOR: jira_assign_issue --issue_key '$issue_key'" \
       "--assignee '${assignee}'"
   else
     if ! source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh 2>/dev/null; then
@@ -269,7 +282,7 @@ jira_bridge_get_transitions() {
   local issue_key="$1"
 
   if [ "$USE_CONNECTOR" = "true" ]; then
-    echo "CONNECTOR: mcp__jira__jira_get_transitions --issue_key '$issue_key'"
+    echo "CONNECTOR: jira_get_transitions --issue_key '$issue_key'"
   else
     if ! source ~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh 2>/dev/null; then
       source skills/engineering/setup-internal-skills/scripts/load-jira-env.sh || {

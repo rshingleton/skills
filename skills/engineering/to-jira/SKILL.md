@@ -69,9 +69,11 @@ This skill automatically uses the **Jira MCP connector** when available and auth
 
 The bridge (`scripts/jira-connector-bridge.sh`) runs as bash, which cannot call an MCP tool
 directly -- only the agent's own execution context can. So when the connector is available,
-`jira_bridge_call` doesn't invoke the tool itself; it **echoes the tool invocation as a string**
-(e.g. `CONNECTOR: mcp__jira__jira_create_issue --project_key '...' ...`), and the
-agent reads that line and executes the call. This is intentional, not a workaround to fix later.
+`jira_bridge_call` doesn't invoke the tool itself; it **echoes a bare operation as a string**
+(e.g. `CONNECTOR: jira_create_issue --project_key '...' ...`), with no `mcp__<server-name>__`
+prefix -- the bridge has no way to know what a given environment's connector is named, so it
+leaves that match-up to the agent, which reads that line and calls whichever Jira MCP tool is
+actually present in its tool list. This is intentional, not a workaround to fix later.
 
 In the bash fallback path, there's no such indirection: the bridge calls the real `_jira_*`
 helper directly, which curls the API and returns actual data. Callers invoke `jira_bridge_call`
@@ -86,7 +88,7 @@ claude mcp add --transport http jira https://your-jira-mcp-server.example.com/mc
 claude mcp add --transport http confluence https://your-confluence-mcp-server.example.com/mcp
 ```
 
-This creates `~/.claude/.mcp.json` with the server URLs. The connectors will be available to all Claude Code CLI sessions across all projects.
+This creates `~/.claude/.mcp.json` with the server URLs. The connectors will be available to all Claude Code CLI sessions across all projects. The server name (`jira`, `confluence`, or anything else) is your choice — the bridge matches on operation, not on server name, so it works the same whether you register locally like this or the connector is provisioned for you at the account/org level.
 
 ### Authentication
 

@@ -13,7 +13,11 @@ claude mcp add --transport http jira https://your-jira-mcp-server.example.com/mc
 claude mcp add --transport http confluence https://your-confluence-mcp-server.example.com/mcp
 ```
 
-This creates `~/.claude/.mcp.json` with the server URLs.
+This creates `~/.claude/.mcp.json` with the server URLs. The server name (`jira`,
+`confluence`, or anything else) is your choice and doesn't matter to the bridge — some
+environments provision the connector at the account/org level instead of via `claude mcp
+add` at all. Either way, the bridge never hardcodes a server name; see the "no hardcoded
+connector name" note in `scripts/jira-connector-bridge.sh`.
 
 ### 2. Authenticate via Claude Code CLI
 
@@ -142,8 +146,10 @@ helper directly.
 the markdown description as-is, no manual conversion needed.
 
 ```bash
-mcp__jira__jira_update_issue --issue_key "$1" --fields '{"description": "'"$(cat "$2")"'"}'
+jira_update_issue --issue_key "$1" --fields '{"description": "'"$(cat "$2")"'"}'
 ```
+
+(The actual tool name in your tool list will be `mcp__<your-connector-name>__jira_update_issue` — match on the operation, not the prefix. See "no hardcoded connector name" in `scripts/jira-connector-bridge.sh`.)
 
 **Bash fallback:** curl has no automatic conversion, so the helper runs content through
 `_jira_wiki_body` before sending (`## Goal` becomes `h2. Goal`):
@@ -154,18 +160,21 @@ _jira_update_description "$1" "$2"   # $1 = issue key, $2 = path to a markdown f
 
 ## Connector tool reference
 
-Direct MCP tool names, for advanced use or when bypassing the bridge:
+MCP tool operations, for advanced use or when bypassing the bridge. These are bare
+operation names, not full tool names — the bridge never hardcodes a connector/server
+name (see `scripts/jira-connector-bridge.sh`). Match each operation against whichever
+`mcp__<your-connector-name>__<operation>` tool is actually in your tool list:
 
-| Operation | MCP tool | Key parameters |
+| Operation | MCP tool operation | Key parameters |
 |---|---|---|
-| `create-epic` | `mcp__jira__jira_create_issue` | `project_key`, `summary`, `issue_type: "Epic"`, `description` |
-| `create-task` | `mcp__jira__jira_create_issue` | as above, `issue_type: "Task"`, `additional_fields: {epicKey}` |
-| `transition` | `mcp__jira__jira_transition_issue` | `issue_key`, `transition_id` (from `jira_get_transitions`) |
-| `comment` | `mcp__jira__jira_add_comment` | `issue_key`, `body` (markdown) |
-| `assign` | `mcp__jira__jira_assign_issue` | `issue_key`, `assignee` |
-| `get-transitions` | `mcp__jira__jira_get_transitions` | `issue_key` |
-| `fetch-issue` | `mcp__jira__jira_get_issue` | `issue_key`, optional `fields`, `include` |
-| `update-description` (no bridge) | `mcp__jira__jira_update_issue` | `issue_key`, `fields: {description}` |
+| `create-epic` | `jira_create_issue` | `project_key`, `summary`, `issue_type: "Epic"`, `description` |
+| `create-task` | `jira_create_issue` | as above, `issue_type: "Task"`, `additional_fields: {epicKey}` |
+| `transition` | `jira_transition_issue` | `issue_key`, `transition_id` (from `jira_get_transitions`) |
+| `comment` | `jira_add_comment` | `issue_key`, `body` (markdown) |
+| `assign` | `jira_assign_issue` | `issue_key`, `assignee` |
+| `get-transitions` | `jira_get_transitions` | `issue_key` |
+| `fetch-issue` | `jira_get_issue` | `issue_key`, optional `fields`, `include` |
+| `update-description` (no bridge) | `jira_update_issue` | `issue_key`, `fields: {description}` |
 
 **Bash helpers still needed for:** `update-description`'s wiki conversion (bash path only) and
 OSS/offline environments without connector access.

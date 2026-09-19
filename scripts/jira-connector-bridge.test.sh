@@ -147,7 +147,7 @@ test_connector_create_epic() {
   JIRA_MCP_CONNECTOR_AVAILABLE=true jira_bridge_detect
   local out
   out=$(jira_bridge_call create-epic "DASH" "My Epic" "Epic description")
-  _assert_contains "$out" "CONNECTOR: mcp__jira__jira_create_issue" \
+  _assert_contains "$out" "CONNECTOR: jira_create_issue" \
     "connector create-epic: echoes the create-issue MCP tool"
   _assert_contains "$out" "--project_key 'DASH'" "connector create-epic: quotes project_key"
   _assert_contains "$out" "--summary 'My Epic'" "connector create-epic: quotes summary"
@@ -190,7 +190,7 @@ test_connector_fetch_issue() {
   JIRA_MCP_CONNECTOR_AVAILABLE=true jira_bridge_detect
   local out
   out=$(jira_bridge_call fetch-issue "DASH-1" "summary,status")
-  _assert_contains "$out" "CONNECTOR: mcp__jira__jira_get_issue" \
+  _assert_contains "$out" "CONNECTOR: jira_get_issue" \
     "connector fetch-issue: echoes get_issue"
   _assert_contains "$out" "--fields 'summary,status'" \
     "connector fetch-issue: fields parameter is included"
@@ -210,7 +210,7 @@ test_connector_fetch_comments() {
   JIRA_MCP_CONNECTOR_AVAILABLE=true jira_bridge_detect
   local out
   out=$(jira_bridge_call fetch-comments "DASH-1")
-  _assert_contains "$out" "CONNECTOR: mcp__jira__jira_get_issue" \
+  _assert_contains "$out" "CONNECTOR: jira_get_issue" \
     "connector fetch-comments: echoes get_issue"
   _assert_contains "$out" "--include 'comments'" \
     "connector fetch-comments: requests the comments expansion"
@@ -221,7 +221,7 @@ test_connector_comment() {
   JIRA_MCP_CONNECTOR_AVAILABLE=true jira_bridge_detect
   local out
   out=$(jira_bridge_call comment "DASH-1" "Looks good")
-  _assert_contains "$out" "CONNECTOR: mcp__jira__jira_add_comment" \
+  _assert_contains "$out" "CONNECTOR: jira_add_comment" \
     "connector comment: echoes add_comment"
   _assert_contains "$out" "--body 'Looks good'" "connector comment: quotes the body"
 }
@@ -231,7 +231,7 @@ test_connector_assign() {
   JIRA_MCP_CONNECTOR_AVAILABLE=true jira_bridge_detect
   local out
   out=$(jira_bridge_call assign "DASH-1" "user@example.com")
-  _assert_contains "$out" "CONNECTOR: mcp__jira__jira_assign_issue" \
+  _assert_contains "$out" "CONNECTOR: jira_assign_issue" \
     "connector assign: echoes assign_issue"
   _assert_contains "$out" "--assignee 'user@example.com'" "connector assign: quotes the assignee"
 }

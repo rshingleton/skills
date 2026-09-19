@@ -25,12 +25,15 @@ Skip the bridge when you already know the connector is available and want the to
 without the echo indirection:
 
 ```bash
-mcp__jira__jira_create_issue \
+mcp__<your-connector-name>__jira_create_issue \
   --project_key "OSS" \
   --summary "My Task" \
   --issue_type "Task" \
   --description "Task description"
 ```
+
+(`<your-connector-name>` is whatever your Jira MCP connector is registered/provisioned as
+in this environment -- the bridge never hardcodes it, see `scripts/jira-connector-bridge.sh`.)
 
 ## Via bash helpers (OSS/offline)
 
@@ -50,8 +53,8 @@ the connector-path echo strings or the bash-fallback helpers.
 
 **Env needed:**
 
-- Connector path: the Jira MCP connector tools (`mcp__jira__*`) available in
-  the current session.
+- Connector path: a Jira MCP connector's tools (`mcp__<connector-name>__jira_*`, whatever
+  the connector is named in this environment) available in the current session.
 - Bash path: `JIRA_BASE_URL` and `JIRA_API_TOKEN` (or `JIRA_AUTH_TYPE=basic` credentials), sourced
   via `~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh`.
 

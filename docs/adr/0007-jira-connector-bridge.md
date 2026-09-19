@@ -4,6 +4,12 @@ Status: Accepted
 Date: 2026-07-29
 Author: Russell Shingleton
 Execution Notes:
+- Amended: the echoed connector call originally included a hardcoded `mcp__jira__` prefix,
+  assuming every connector would be registered under the server name `jira`. This was wrong in
+  general — a connector's `mcp__<server-name>__` prefix is whatever it happens to be
+  registered/provisioned as in a given environment, which bash cannot discover. The bridge now
+  echoes the bare operation (`jira_create_epic`, not `mcp__jira__jira_create_epic`) and leaves
+  the agent to match it against whichever Jira MCP tool is actually present in its tool list.
 - Superseded in part by ADR-0008 (jira-bridge-simplify): to-jira.sh removed entirely rather than
   kept as a wrapper; COMMANDS.md deleted and merged into to-jira/OPERATIONS.md rather than kept
   as a separate bridge-usage doc
@@ -68,7 +74,7 @@ jira_bridge_call comment "$JIRA_KEY" "Fixed in commit abc123"
 
 If MCP connector is available, `jira_bridge_call` **echoes**:
 ```
-CONNECTOR: mcp__jira__jira_create_epic --project_key "DASH" --summary "..." ...
+CONNECTOR: jira_create_epic --project_key "DASH" --summary "..." ...
 ```
 
 The agent reads this echo and executes the tool in its own context.
