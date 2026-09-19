@@ -39,6 +39,15 @@ One-way bridges between local artifacts and Jira:
 
 For per-phase Jira Task creation, use `/plan-it --jira` instead.
 
+## Tracker-agnostic alternative (no Jira)
+
+Not using Jira? `to-spec` → `to-tickets` covers the same intake/planning ground as `plan-it` → Jira bridge, against GitHub Issues, Linear, or local tracking instead. Don't mix the two paths on the same piece of work.
+
+| Skill | Role |
+|-------|------|
+| [to-spec](./to-spec/SKILL.md) | Turn the current conversation into a spec and publish it to the project issue tracker — no interview, just synthesis. |
+| [to-tickets](./to-tickets/SKILL.md) | Break a plan, spec, or conversation into tracer-bullet tickets with declared blocking edges, published to the configured tracker. |
+
 ## Other engineering skills
 
 - **[diagnose](./diagnose/SKILL.md)** — Disciplined diagnosis loop for hard bugs and performance regressions.
@@ -46,6 +55,10 @@ For per-phase Jira Task creation, use `/plan-it --jira` instead.
 - **[improve-codebase-architecture](./improve-codebase-architecture/SKILL.md)** — Find deepening opportunities; optional intake via [audit-to-issues](./setup-internal-skills/audit-to-issues.md).
 - **[internal-compliance](./internal-compliance/SKILL.md)** — Pre-flight compliance check against internal security linting rules before finalizing any PR.
 - **[prototype](./prototype/SKILL.md)** — Build a throwaway prototype to flesh out a design.
+- **[research](./research/SKILL.md)** — Delegate reading legwork to a background agent: investigate a question against primary sources, capture findings as a Markdown file.
+- **[resolving-merge-conflicts](./resolving-merge-conflicts/SKILL.md)** — Resolve an in-progress git merge/rebase conflict.
 - **[setup-internal-skills](./setup-internal-skills/SKILL.md)** — Scaffold `AGENTS.md`, `docs/agents/`, and optional OpenCode/Copilot/Cursor config. **Default:** local issues in `docs/issues/`. Jira setup seeds `docs/agents/issue-tracker.md` only; canonical docs (jira-notifications.md, jira-description-style.md, jira-helpers.sh, triage-labels.md, domain.md) are read from `~/.agents/skills/setup-internal-skills/`.
 - **[tdd](./tdd/SKILL.md)** — Test-driven development with red-green-refactor loop.
+- **[wayfinder](./wayfinder/SKILL.md)** — Plan work bigger than one session as a shared map of decision tickets, resolved one at a time. Complements `plan-it`, doesn't replace it.
+- **[wizard](./wizard/SKILL.md)** — Generate an interactive bash wizard for steps only a human can perform (infra, credentials, one-off migrations).
 - **[zoom-out](./zoom-out/SKILL.md)** — Get broader context on unfamiliar code.

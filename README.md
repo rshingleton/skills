@@ -15,6 +15,9 @@ Each skill is a focused workflow in `SKILL.md` that an agent loads when invoked 
 1. **Install once** on your machine using the [quickstart](#quickstart-30-second-setup) below. Skills land in `~/.agents/skills` (and `~/.claude/skills` for Claude Code) — loaded natively by Cursor, OpenCode, Gemini/agy, and Claude Code. Copilot doesn't load `SKILL.md` automatically; it gets a pointer to `AGENTS.md` instead (see [Agent platforms](#agent-platforms)).
 2. **Configure each application repo** with `/setup-internal-skills`. That seeds `AGENTS.md`, `docs/agents/`, intake inbox `docs/issues/`, and plans under `docs/planning/`.
 3. **Compose skills for the task.** You are not required to run a fixed pipeline. Capture work in the **inbox** (`/issue-it` or audit skills → [audit-to-issues](./skills/engineering/setup-internal-skills/audit-to-issues.md)), then **`/plan-it --from-issues` evaluates and grills** before scaffolding. The **Doc Cycle** is `/plan-it` → `/implement-it` (each phase) → `/audit-it` → `/verify-it` → `/commit-it`. Optional Jira phase keys: `/plan-it --jira` → `jira.md`.
+   - **Using Jira?** Stick with `/plan-it` → `/implement-it` → `/audit-it` → `/verify-it` → `/commit-it`, with `/to-jira`/`/from-jira` as the Jira bridge.
+   - **Not using Jira** (GitHub Issues, Linear, or local tracking)? `/to-spec` → `/to-tickets` is the tracker-agnostic equivalent of the intake/planning step — synthesize the conversation into a spec, then slice it into tracer-bullet tickets on whatever tracker you've configured. The two paths aren't meant to be mixed on the same piece of work.
+   - **Work bigger than one plan/session?** `/wayfinder` maps it as a set of decision tickets you resolve one at a time — a companion for scoping ahead of `/plan-it`, not a replacement for it.
 4. **Keep humans in the loop.** Treat agent output as a draft. Read diffs, run tests, and check spec fit before merge. Skills like `/audit-it` and `/internal-compliance` support review; they do not replace it.
 
 ## Agent platforms
@@ -291,12 +294,18 @@ Skills I use daily for code work.
 - **[internal-compliance](./skills/engineering/internal-compliance/SKILL.md)** — Pre-flight compliance check against internal security linting rules before finalizing any PR.
 - **[plan-it](./skills/engineering/plan-it/SKILL.md)** — Doc Cycle plan phase. Always grills; phases, ADRs, `--from-issues` (moves intake to `sources/`), optional Jira → `jira.md`.
 - **[prototype](./skills/engineering/prototype/SKILL.md)** — Build a throwaway prototype to flesh out a design.
+- **[research](./skills/engineering/research/SKILL.md)** — Delegate reading legwork to a background agent: investigate a question against primary sources and capture the findings as a Markdown file.
+- **[resolving-merge-conflicts](./skills/engineering/resolving-merge-conflicts/SKILL.md)** — Resolve an in-progress git merge/rebase conflict.
 - **[setup-internal-skills](./skills/engineering/setup-internal-skills/SKILL.md)** — Per-repo config; **default** local issues in `docs/issues/`. Run once per repo.
 - **[tdd](./skills/engineering/tdd/SKILL.md)** — Test-driven development with red-green-refactor loop.
+- **[to-spec](./skills/engineering/to-spec/SKILL.md)** — Tracker-agnostic alternative to `/plan-it` for GitHub/Linear/local-tracked repos: turn the current conversation into a spec and publish it, no interview, just synthesis.
+- **[to-tickets](./skills/engineering/to-tickets/SKILL.md)** — Pairs with `/to-spec`: break a plan, spec, or conversation into tracer-bullet tickets with declared blocking edges, published to the configured tracker.
 - **[issue-it](./skills/engineering/issue-it/SKILL.md)** — Pre-plan intake under `docs/issues/`.
 - **[to-jira](./skills/engineering/to-jira/SKILL.md)** — Ad-hoc Jira handler and bridge reference: create, transition, resolve, comment, assign. Other skills source the connector bridge directly rather than delegating here.
 - **[from-jira](./skills/engineering/from-jira/SKILL.md)** — Create a Doc Cycle plan from a Jira issue — no inbox step.
 - **[verify-it](./skills/engineering/verify-it/SKILL.md)** — Doc Cycle verify phase. Finalizes ADRs, CONTEXT.md, changelog, and planning cleanup. Optionally close Jira issues.
+- **[wayfinder](./skills/engineering/wayfinder/SKILL.md)** — Plan work bigger than one session as a shared map of decision tickets, resolved one at a time. Complements `/plan-it`, doesn't replace it.
+- **[wizard](./skills/engineering/wizard/SKILL.md)** — Generate an interactive bash wizard for steps only a human can perform: provisioning infra, credentials/CI secrets, unfamiliar third-party dashboards, one-off migrations.
 - **[zoom-out](./skills/engineering/zoom-out/SKILL.md)** — Get broader context on unfamiliar code.
 
 ### Productivity
@@ -306,7 +315,11 @@ General workflow tools, not code-specific.
 - **[caveman](./skills/productivity/caveman/SKILL.md)** — Ultra-compressed communication mode. Cuts token usage ~75% by dropping filler while keeping full technical accuracy.
 - **[grill-me](./skills/productivity/grill-me/SKILL.md)** — Get relentlessly interviewed about a plan or design until every branch of the decision tree is resolved.
 - **[handoff](./skills/productivity/handoff/SKILL.md)** — Compact the current conversation into a handoff document so another agent can continue the work.
+- **[teach](./skills/productivity/teach/SKILL.md)** — Teach the user a new skill or concept, within this workspace.
+- **[to-questionnaire](./skills/productivity/to-questionnaire/SKILL.md)** — Turn a decision you can't fully answer into a questionnaire for someone else to fill in.
+- **[wait-what](./skills/productivity/wait-what/SKILL.md)** — Flag that the last message didn't land, and ask for a re-pitch.
 - **[write-a-skill](./skills/productivity/write-a-skill/SKILL.md)** — Create new skills with proper structure, progressive disclosure, and bundled resources.
+- **[writing-for-agents](./skills/productivity/writing-for-agents/SKILL.md)** — Reference for writing any document an agent consumes: a skill, `AGENTS.md`/`CLAUDE.md`, or a doc reached by a pointer.
 
 ## Credits
 
