@@ -1,6 +1,6 @@
 # ai-skills
 
-**Canonical repository:** [https://github.com/rshingleton/skills.git](https://github.com/rshingleton/skills.git)
+A personal fork of [mattpocock/skills](https://github.com/mattpocock/skills), maintained at **[github.com/rshingleton/skills](https://github.com/rshingleton/skills.git)** — install from this repository.
 
 Agent skills tailored to my daily engineering workflow: refactoring existing codebases, adding features, and addressing tech debt across projects tracked in git and Jira. The `issue-it` intake skill, the broader Doc Cycle (`plan-it` → `implement-it` → `audit-it` → `verify-it` → `commit-it`), and introspective skills (`doc-it`, `zoom-out`, `improve-codebase-architecture`) grew out of real needs I hit working with codebases I didn't have full architectural knowledge of.
 
