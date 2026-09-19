@@ -1,8 +1,8 @@
-# Internal Skills (ai-skills)
+# ai-skills
 
 A collection of agent skills (slash commands and behaviors) for engineering workflows. Skills are organized into buckets and consumed by per-repo configuration emitted by `/setup-internal-skills`.
 
-Canonical repo: [ai-skills](https://github.com/rshingleton/skills.git) on Bitbucket. Descended from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT License).
+Canonical repo: [ai-skills](https://github.com/rshingleton/skills.git) on GitHub. Descended from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT License).
 
 ## Language
 

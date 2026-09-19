@@ -1,8 +1,8 @@
-# Internal Skills (ai-skills)
+# ai-skills
 
 **Canonical repository:** [https://github.com/rshingleton/skills.git](https://github.com/rshingleton/skills.git)
 
-Agent skills tailored to my daily engineering workflow: refactoring existing codebases, adding features, and addressing tech debt across projects tracked in Bitbucket and Jira. The `issue-it` intake skill, the broader Doc Cycle (`plan-it` → `implement-it` → `audit-it` → `verify-it` → `commit-it`), and introspective skills (`doc-it`, `zoom-out`, `improve-codebase-architecture`) grew out of real needs I hit working with codebases I didn't have full architectural knowledge of.
+Agent skills tailored to my daily engineering workflow: refactoring existing codebases, adding features, and addressing tech debt across projects tracked in git and Jira. The `issue-it` intake skill, the broader Doc Cycle (`plan-it` → `implement-it` → `audit-it` → `verify-it` → `commit-it`), and introspective skills (`doc-it`, `zoom-out`, `improve-codebase-architecture`) grew out of real needs I hit working with codebases I didn't have full architectural knowledge of.
 
 **Agent-assisted coding is becoming more mainstream.** Teams use coding agents for implementation, exploration, and documentation with growing acceptance in day-to-day engineering. These skills are not a substitute for engineering judgment. They are meant to **supplement** knowledge and practice, not replace it. The successful engineer uses agents to move faster on well-understood work, then applies **eyes-on** review: read the diff, run the tests, question the design. Manual auditing of agent-produced code is **always** recommended before anything ships.
 
@@ -31,8 +31,6 @@ Instructions use the open **`AGENTS.md`** format, loaded natively by every tool 
 
 ## Quickstart (30-second setup)
 
-**VPN or on-site required.** The repo is readable without credentials on the network.
-
 ### Option A — one-liner (recommended)
 
 Installs into `~/.agents/skills` and caches a clone at `~/.local/share/ai-skills`:
@@ -59,7 +57,7 @@ Or from a clone: `bash scripts/cleanup-legacy-skills.sh` (dry-run) / `bash scrip
 
 ```bash
 git clone https://github.com/rshingleton/skills.git
-cd ai-skills
+cd skills
 bash scripts/skills.sh
 ```
 
@@ -312,9 +310,9 @@ General workflow tools, not code-specific.
 
 ## Credits
 
-This is a **highly modified fork** of [mattpocock/skills](https://github.com/mattpocock/skills) (MIT License), originally created by [Matt Pocock](https://github.com/mattpocock). Canonical home: [ai-skills on Bitbucket](https://github.com/rshingleton/skills.git).
+This is a **highly modified fork** of [mattpocock/skills](https://github.com/mattpocock/skills) (MIT License), originally created by [Matt Pocock](https://github.com/mattpocock).
 
-**Fork maintainer:** Russ Shingleton — you@example.com
+**Fork maintainer:** Russ Shingleton ([@rshingleton](https://github.com/rshingleton))
 
 This is a personal tool built for my workflow. Questions and feedback are welcome — I'll do my best to respond when I can.
 
