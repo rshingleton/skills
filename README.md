@@ -64,7 +64,16 @@ cd skills
 bash scripts/skills.sh
 ```
 
-### Jira credentials (when using Jira skills)
+### Jira setup: MCP connector or API token
+
+Jira skills (`plan-it --jira`, `to-jira`, `from-jira`, `implement-it`, `verify-it`) talk to Jira through [scripts/jira-connector-bridge.sh](./scripts/jira-connector-bridge.sh), which routes each call to one of two paths:
+
+- **MCP connector (preferred when available).** Register it once with `claude mcp add --transport http jira https://your-jira-mcp-server/mcp`, then authenticate via `claude /mcp`. No `JIRA_API_TOKEN` needed. Full setup steps: [to-jira/OPERATIONS.md](./skills/engineering/to-jira/OPERATIONS.md#setup-one-time).
+- **Bash/API token (fallback).** Used automatically when no connector is registered — see below.
+
+The bridge auto-detects which path to use, but the heuristic just checks whether you're running inside Claude Code — it doesn't verify a connector is actually registered. Set `JIRA_MCP_CONNECTOR_AVAILABLE=true` or `=false` in your `.env` (see [.env.example](./.env.example)) to force one path explicitly instead of relying on the guess.
+
+### Jira credentials (fallback path, no MCP connector)
 
 Skills that call the Jira API need `JIRA_BASE_URL`, `JIRA_API_TOKEN`, and `JIRA_PROJECT_KEY`. Use either exports or a `.env` file (see [.env.example](./.env.example)).
 
