@@ -5,6 +5,8 @@ description: Create new agent skills with proper structure, progressive disclosu
 
 # Writing Skills
 
+See also [`writing-for-agents`](../writing-for-agents/SKILL.md) for the underlying levers (context pointers, description wording, when to inline vs. link) this process applies.
+
 ## Process
 
 1. **Gather requirements** - ask user about:

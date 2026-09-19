@@ -179,8 +179,10 @@ Tell the user setup is complete.
 >
 > Email/ServiceNow: [SCENARIO-EMAIL-SERVICENOW.md](./SCENARIO-EMAIL-SERVICENOW.md). Unfamiliar codebase: `/doc-it`.
 
-**If Jira chosen:** remind them to set `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` (shell export or `.env` per [issue-tracker-jira.md](./issue-tracker-jira.md#loading-credentials)), plus optional `JIRA_DEFAULT_EPIC`, `JIRA_ASSIGNEE`, `JIRA_DEFAULT_ESTIMATE_HOURS`, or `default_epic` in `docs/agents/issue-tracker.md`, and optional watcher env vars (`~/.agents/skills/setup-internal-skills/jira-notifications.md` or `~/.claude/skills/setup-internal-skills/jira-notifications.md` for Claude Code).
+**If Jira chosen:** remind them to set `JIRA_BASE_URL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` (shell export or `.env` per [issue-tracker-jira.md](./issue-tracker-jira.md#loading-credentials)), plus optional `JIRA_DEFAULT_EPIC`, `JIRA_ASSIGNEE`, `JIRA_DEFAULT_ESTIMATE_HOURS`, or `default_epic` in `docs/agents/issue-tracker.md`, and optional watcher env vars (`~/.agents/skills/setup-internal-skills/jira-notifications.md` or `~/.claude/skills/setup-internal-skills/jira-notifications.md` for Claude Code). Creating the API token itself is a manual dashboard walk — `/wizard` can generate a one-off script for it if the user wants one.
 
 They can edit `docs/agents/issue-tracker.md` and `AGENTS.md` later; re-run setup to switch trackers.
 
 Mention [AGENT-PLATFORMS.md](../../../docs/AGENT-PLATFORMS.md) in this skills repo for platform-specific setup (Cursor, Copilot, Claude, optional OpenCode).
+
+**Optional setup companions:** `/setup-pre-commit` for Husky/lint-staged hooks, `/git-guardrails-claude-code` to block destructive git commands (`push`, `reset --hard`, `clean -f`, `branch -D`) in this session.

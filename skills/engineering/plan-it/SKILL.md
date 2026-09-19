@@ -113,3 +113,7 @@ alternative.
 - **Read-only code** during planning.
 - **Full phase coverage** before any implement-it.
 - **One Jira map per plan** — `jira.md`, not parallel tracker trees.
+
+## See also
+
+- **Work spanning more than one plan or session:** scope it with `/wayfinder` first, then run `/plan-it` per decision it resolves — `/plan-it` assumes a single plan already has clear boundaries.

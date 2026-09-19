@@ -5,3 +5,5 @@ disable-model-invocation: true
 ---
 
 Call the Skill tool twice, for "grilling" and "domain-modeling".
+
+If a question surfaces that the user can't answer alone, hand it off with `/to-questionnaire` instead of stalling the interview on it.
