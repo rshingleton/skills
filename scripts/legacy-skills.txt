@@ -1,0 +1,24 @@
+# Skill folder names to remove when migrating from mattpocock/skills or pre -it Doc Cycle forks.
+# One name per line. Lines starting with # are ignored.
+
+# Renamed in ai-skills
+setup-matt-pocock-skills
+to-prd
+to-issues
+
+# Doc Cycle predecessors (upstream or custom forks)
+implement
+verify
+audit-engineering
+
+# Removed from internal fork (misc bucket)
+git-guardrails-claude-code
+migrate-to-shoehorn
+scaffold-exercises
+setup-pre-commit
+
+# Upstream deprecated bucket (if still installed)
+qa
+ubiquitous-language
+design-an-interface
+request-refactor-plan
