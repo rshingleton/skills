@@ -21,9 +21,26 @@ if (plugin.version === version) {
 
 if (process.argv.includes("--check")) {
   console.error(
-    `plugin.json version is ${plugin.version}, package.json is ${version}. Run \`node scripts/sync-plugin-version.mjs\`.`,
+    `plugin.json version is ${plugin.version ?? "(missing)"}, package.json is ${version}. Run \`node scripts/sync-plugin-version.mjs\`.`,
   );
   process.exit(1);
+}
+
+if (plugin.version === undefined) {
+  // No existing "version" line to replace — insert one right after "name".
+  const updated = source.replace(
+    /("name"\s*:\s*"[^"]*",?)/,
+    `$1\n  "version": "${version}",`,
+  );
+
+  if (JSON.parse(updated).version !== version) {
+    console.error(`Could not find a "name" field to insert a version after in ${pluginPath}.`);
+    process.exit(1);
+  }
+
+  writeFileSync(pluginPath, updated);
+  console.log(`plugin.json version field added: ${version}`);
+  process.exit(0);
 }
 
 // Rewrite only the version line, to keep the key order and the formatting.
