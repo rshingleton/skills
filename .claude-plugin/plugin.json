@@ -1,6 +1,6 @@
 {
   "name": "ai-skills",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "skills": [
     "./skills/engineering/audit-it",
     "./skills/engineering/commit-it",
