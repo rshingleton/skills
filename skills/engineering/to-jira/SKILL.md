@@ -17,7 +17,7 @@ or create issue(s) from a local intake/plan artifact with the `create` flow belo
 sources credentials or curls Jira directly.
 
 `plan-it`, `implement-it`, and `verify-it` do **not** delegate to this skill for their own
-automated Jira calls -- each sources [`jira-connector-bridge.sh`](../../../scripts/jira-connector-bridge.sh)
+automated Jira calls -- each sources [`jira-connector-bridge.sh`](../setup-internal-skills/scripts/jira-connector-bridge.sh)
 directly (see [OPERATIONS.md](OPERATIONS.md)), so a phase's Jira operations don't depend on this
 skill being invocable. This skill remains the canonical reference for that bridge interface and
 the standalone entry point for one-off operations outside a phase.
@@ -204,7 +204,8 @@ When the source is `docs/planning/<id>/`:
 **Before any operation,** detect connector availability:
 
 ```bash
-source scripts/jira-connector-bridge.sh
+source ~/.agents/skills/setup-internal-skills/scripts/jira-connector-bridge.sh 2>/dev/null ||
+  source scripts/jira-connector-bridge.sh
 jira_bridge_detect  # Sets USE_CONNECTOR=true if Jira MCP tools are available
 ```
 

@@ -9,7 +9,8 @@ Called from the main workflow when any phase row in `jira.md` has a Jira key.
   depend on the `/to-jira` skill being available:
 
   ```bash
-  source scripts/jira-connector-bridge.sh
+  source ~/.agents/skills/setup-internal-skills/scripts/jira-connector-bridge.sh 2>/dev/null ||
+    source scripts/jira-connector-bridge.sh
   jira_bridge_detect
   ```
 

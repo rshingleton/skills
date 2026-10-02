@@ -38,6 +38,39 @@
 
 ## This fork
 
+## 2026-10-02 -- Jira bridge: fix "bridge not found" in app repos
+
+- **Bug fix:** every skill instructed `source scripts/jira-connector-bridge.sh` -- a path that
+  only resolves when the caller's cwd is the ai-skills repo clone itself. `jira-connector-bridge.sh`
+  lived solely under `scripts/` at the repo root, which is never symlinked into an installed
+  skill's directory, so in any application repo the file simply didn't exist at that path and
+  sourcing it failed outright.
+- **Fix:** moved the canonical implementation to
+  `skills/engineering/setup-internal-skills/scripts/jira-connector-bridge.sh`, next to
+  `load-jira-env.sh` and `jira-helpers.sh`, so it installs via the same symlink as the rest of
+  `setup-internal-skills` and resolves at `~/.agents/skills/setup-internal-skills/scripts/jira-connector-bridge.sh`
+  (or `~/.claude/skills/...`) regardless of the caller's cwd. `scripts/jira-connector-bridge.sh`
+  at the repo root is now a thin shim over it (same pattern as `scripts/load-jira-env.sh`), kept
+  for repo-dev convenience.
+- **Bug fix:** the bridge's own bash-fallback credential sourcing had the identical problem one
+  layer down -- it tried `~/.agents/skills/setup-internal-skills/scripts/load-jira-env.sh` then a
+  repo-relative `skills/engineering/...` path, neither of which resolves from an arbitrary cwd.
+  Replaced both with a single `_jira_bridge_load_env` helper that resolves `load-jira-env.sh` by
+  the bridge script's own directory (`${BASH_SOURCE[0]}`), which is reliable precisely because the
+  two files are now always installed as siblings.
+- **Docs:** updated the `source scripts/jira-connector-bridge.sh` instruction in `plan-it/JIRA.md`,
+  `to-jira/SKILL.md`, `to-jira/OPERATIONS.md`, `implement-it/SKILL.md`,
+  `verify-it/JIRA-RESOLUTION.md`, and `docs/JIRA-OPERATIONS-EXAMPLES.md` to try the installed path
+  first and fall back to the repo-relative one.
+- **Tests:** replaced `test_bash_credential_fallback_path` (which asserted the old, broken
+  behavior -- that sourcing failed cleanly from an arbitrary cwd/HOME) with
+  `test_bash_credential_fallback_resolves_from_any_cwd`, asserting it now succeeds.
+- **Also fixed (unrelated):** `scripts/skills.sh` sourced `load-jira-env.sh` right after install
+  completed, which could drop into a blocking interactive credential prompt when no `.env` was
+  configured and stdin/stdout were a TTY -- the installer would appear to hang right after
+  printing "Next steps:". Now sourced with `JIRA_ENV_SILENT=1` so install never blocks on
+  optional credential setup.
+
 ## 2026-08-11 -- Jira Bridge Fixes: transition echo shape and watcher-policy exit code
 
 - **Bug fix:** `jira_bridge_transition()`'s connector-path echo assumed

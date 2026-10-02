@@ -90,7 +90,8 @@ No parent Epic — phase Tasks are standalone in $JIRA_PROJECT_KEY.
 Use the connector bridge for all Jira API operations (routes to MCP or bash helpers transparently):
 
 ```bash
-source scripts/jira-connector-bridge.sh
+source ~/.agents/skills/setup-internal-skills/scripts/jira-connector-bridge.sh 2>/dev/null ||
+  source scripts/jira-connector-bridge.sh
 jira_bridge_detect  # Detects connector availability
 ```
 

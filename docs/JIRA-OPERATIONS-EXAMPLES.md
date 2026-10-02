@@ -8,7 +8,8 @@ pattern this relies on.
 ## Via the bridge (recommended)
 
 ```bash
-source scripts/jira-connector-bridge.sh
+source ~/.agents/skills/setup-internal-skills/scripts/jira-connector-bridge.sh 2>/dev/null ||
+  source scripts/jira-connector-bridge.sh
 jira_bridge_detect
 
 jira_bridge_call create-epic "OSS" "My Epic" "Description"

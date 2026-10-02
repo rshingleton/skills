@@ -31,7 +31,8 @@ browser, and grant access. Credentials cache locally and are available to all CL
 ## Using the bridge (recommended)
 
 ```bash
-source scripts/jira-connector-bridge.sh
+source ~/.agents/skills/setup-internal-skills/scripts/jira-connector-bridge.sh 2>/dev/null ||
+  source scripts/jira-connector-bridge.sh
 jira_bridge_detect                       # sets USE_CONNECTOR=true/false
 jira_bridge_call <operation> <args...>   # routes to connector or bash helpers
 ```

@@ -91,8 +91,10 @@ echo "    Source clone:     $CLONE_DIR"
 echo ""
 echo "==> Next steps:"
 if [ -f "$CLONE_DIR/scripts/load-jira-env.sh" ]; then
+  # Silent: install is not the place to block on an interactive credential
+  # prompt. JIRA_ENV_SILENT suppresses load-jira-env.sh's `read` fallback.
   # shellcheck source=/dev/null
-  source "$CLONE_DIR/scripts/load-jira-env.sh" 2>/dev/null || true
+  JIRA_ENV_SILENT=1 source "$CLONE_DIR/scripts/load-jira-env.sh" 2>/dev/null || true
 fi
 if [ -n "${JIRA_API_TOKEN:-}" ]; then
   echo "  1. Jira credentials: loaded (${_jira_env_loaded:-from environment})"

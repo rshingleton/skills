@@ -308,23 +308,36 @@ test_bash_transition() {
   rm -rf "$bin_dir" "$env_file" "$curl_log"
 }
 
-test_bash_credential_fallback_path() {
-  # Neither ~/.agents/skills/... nor a relative skills/engineering/... path resolves
-  # from an arbitrary CWD -- the bridge's credential sourcing must fail cleanly.
-  local scratch fake_home out status
+test_bash_credential_fallback_resolves_from_any_cwd() {
+  # load-jira-env.sh is resolved relative to the bridge's own file location, not
+  # the caller's CWD or a hardcoded ~/.agents/... guess -- so credential sourcing
+  # must succeed even from a CWD and HOME that have nothing Jira-related in them.
+  local scratch fake_home bin_dir env_file curl_log out status
   scratch=$(mktemp -d)
   fake_home=$(mktemp -d)   # no ~/.agents/skills/setup-internal-skills here
+  bin_dir=$(mktemp -d)
+  env_file=$(mktemp)
+  curl_log=$(mktemp)
+  _stub_curl "$bin_dir"
+  {
+    echo "JIRA_BASE_URL=https://jira.example.com"
+    echo "JIRA_API_TOKEN=dummy-token"
+    echo "JIRA_PROJECT_KEY=DASH"
+  } > "$env_file"
 
-  out=$(cd "$scratch" && HOME="$fake_home" bash -c "
+  out=$(cd "$scratch" && PATH="$bin_dir:$PATH" HOME="$fake_home" CURL_LOG="$curl_log" \
+    JIRA_ENV_FILE="$env_file" JIRA_ENV_SILENT=1 bash -c "
     source '$BRIDGE'
     USE_CONNECTOR=false CONNECTOR_CHECKED=true jira_bridge_call create-epic DASH 'My Epic' ''
   " 2>&1)
   status=$?
 
-  _assert_contains "$out" "Failed to source Jira credentials" \
-    "bash credential fallback: reports a clear error when neither source path resolves"
-  _assert_eq "$status" "1" "bash credential fallback: returns 1 when credentials cannot be sourced"
-  rm -rf "$scratch" "$fake_home"
+  _assert_not_contains "$out" "Failed to source Jira credentials" \
+    "bash credential fallback: does not report a sourcing failure from an arbitrary CWD/HOME"
+  _assert_contains "$(cat "$curl_log")" "issue" \
+    "bash credential fallback: still reaches the real _jira_create_epic call"
+  _assert_eq "$status" "0" "bash credential fallback: returns 0 when credentials resolve"
+  rm -rf "$scratch" "$fake_home" "$bin_dir" "$env_file" "$curl_log"
 }
 
 # ---------------------------------------------------------------------------
@@ -387,7 +400,7 @@ _run_test test_connector_assign
 _run_test test_bash_create_epic
 _run_test test_bash_create_task
 _run_test test_bash_transition
-_run_test test_bash_credential_fallback_path
+_run_test test_bash_credential_fallback_resolves_from_any_cwd
 _run_test test_unknown_operation
 _run_test test_executed_directly_refuses
 _run_test test_connector_output_prefix_consistent
