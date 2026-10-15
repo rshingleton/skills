@@ -71,7 +71,8 @@ SUMMARY=$(head -1 "docs/planning/${PLAN_ID}/${PHASE}/ai-prompt.md" | sed 's/^# /
 EST_HOURS=$(grep -E '^estimate_hours:' "docs/planning/${PLAN_ID}/${PHASE}/ai-prompt.md" | awk '{print $2}')
 BODY_FILE="docs/planning/${PLAN_ID}/${PHASE}/ai-prompt.md"
 
-TASK_KEY=$(jira_bridge_call create-task "$JIRA_PROJECT_KEY" "$SUMMARY" "$BODY_FILE" "$EPIC_KEY" "$EST_HOURS" "${JIRA_ASSIGNEE:-}")
+# ASSIGNEE: resolved first (user-named, else JIRA_ASSIGNEE, else ask) -- never empty by accident
+TASK_KEY=$(jira_bridge_call create-task "$JIRA_PROJECT_KEY" "$SUMMARY" "$BODY_FILE" "$EPIC_KEY" "$EST_HOURS" "$ASSIGNEE")
 ```
 
 After creation, write the Jira key to the `jira.md` phase row immediately.
@@ -126,8 +127,11 @@ jira_bridge_call comment "$1" "$2"
 
 ### `assign` -- set the assignee on an issue
 
+Resolve the assignee first (user-named, else `JIRA_ASSIGNEE`, else ask; see `setup-internal-skills/issue-tracker-jira.md`
+"Assignee"). The value is a Jira username. Read it back afterwards and report it with the key.
+
 ```bash
-jira_bridge_call assign "$1" "${JIRA_ASSIGNEE:-}"
+jira_bridge_call assign "$1" "$ASSIGNEE"
 ```
 
 ### `get-transitions` -- list available transitions for an issue
