@@ -7,6 +7,7 @@ description: >
   approval. Code is already
   committed per phase by implement-it. Does NOT replace code review. Use after
   verify-it, or when user says commit-it, commit, ship, push.
+model: sonnet
 ---
 
 # commit-it

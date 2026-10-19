@@ -57,7 +57,8 @@ Under `skills/`:
 2. Each bucket has a [README.md](skills/engineering/README.md) listing its skills (name → `SKILL.md`).
 3. Domain language for cross-skill terms: [GLOSSARY.md](GLOSSARY.md).
 4. When adding skills, follow [write-a-skill](skills/productivity/write-a-skill/SKILL.md).
-5. No em-dashes anywhere in this repo's prose (`SKILL.md` files, docs, `README.md`, `CHANGELOG.md`, ADRs, code comments) — rewrite with a comma, colon, period, parentheses, or conjunction instead.
+5. Model tiers: a skill that executes work already scoped elsewhere (building a planned phase, finalizing docs, committing) sets `model: sonnet` in its frontmatter, and a skill that spawns subagents names the tier for each one (`model: sonnet` on the Agent call in Claude Code) when the task is bounded by a prompt or diff it is handed. Leave grilling, planning, and auditing on the session's model. Read-only searches use the `Explore` agent, which already runs on Haiku. Hosts without per-skill or per-agent models ignore both.
+6. No em-dashes anywhere in this repo's prose (`SKILL.md` files, docs, `README.md`, `CHANGELOG.md`, ADRs, code comments) — rewrite with a comma, colon, period, parentheses, or conjunction instead.
 
 ## Consumer projects (your app repos)
 

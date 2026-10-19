@@ -57,7 +57,7 @@ Each smell reads *what it is* → *how to fix*; match it against the diff:
 
 ### 4. Spawn both sub-agents in parallel
 
-Issue both sub-agent calls together, in the foreground, and aggregate the reports they return.
+Issue both sub-agent calls together, in the foreground, on the mid-tier model (`model: sonnet` in Claude Code), and aggregate the reports they return. Each axis is a bounded read of one diff against one source, which does not need the top tier.
 
 **Standards sub-agent prompt** should include:
 

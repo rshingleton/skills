@@ -41,7 +41,9 @@ git worktree add "../$repo.worktrees/{ID}/phase-N" -b "plan/{ID}--phase-N" <inte
 
 Phase branches use `--` because git cannot hold both `plan/{ID}` and `plan/{ID}/phase-N`.
 
-Start one background subagent per worktree. Pass pointers, not pasted content:
+Start one background subagent per worktree, on the mid-tier model (`model: sonnet` in Claude
+Code): the phase prompt is already grilled and scoped, so building it does not need the top
+tier. Pass pointers, not pasted content:
 
 - the worktree path, the phase prompt `docs/planning/{ID}/phase-N/ai-prompt.md` and the plan
   README;
@@ -59,7 +61,8 @@ Tell it to:
 
 ## 4. Merge and recompute
 
-When an implementer reports, start a **merge subagent** in the main checkout. It:
+When an implementer reports, start a **merge subagent** in the main checkout, also on the
+mid-tier model. It:
 
 1. Merges `plan/{ID}--phase-N` into the integration branch with `git merge --no-ff`, calling
    `resolving-merge-conflicts` on conflict.
