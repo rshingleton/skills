@@ -25,12 +25,12 @@ This repo (ai-skills) is a Markdown + Bash monorepo of composable AI agent skill
 
 Every SKILL.md must have YAML frontmatter:
 - `name:` — lowercase kebab-case, matches parent directory name
-- `description:` — single paragraph, starts with "Use when..."
+- `description:` single paragraph: a one-line summary of what the skill does, then a "Use when..." clause
 
 ### Line length
 
 - Code blocks in SKILL.md: 100 characters max (tighter than baseline 120)
-- Prose: 72 characters (matches baseline)
+- Prose: no fixed limit; wrap consistently with the surrounding file (severity: LOW)
 - Shell scripts (.sh): follow ShellCheck conventions, 100 chars max
 
 ### Secrets baseline
@@ -39,4 +39,4 @@ Every SKILL.md must have YAML frontmatter:
 
 ### Copyright header
 
-Required on all new `.sh` files. Optional on `.md` files unless siblings in same directory have one.
+Not required on `.sh` or `.md` files; no file in this repo carries one. If a file's siblings in the same directory have one, match them (severity: LOW).

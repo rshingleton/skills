@@ -54,7 +54,7 @@ jira_key:
 1. **Read** each inbox file. Summarize scope for the user.
 2. **Readiness** — if `status: intake`, run [intake evaluation](INTAKE-EVALUATION.md) (codebase exploration, reproduction, clarifying questions). If `status: ready-for-plan`, proceed. Do **not** skip The Grill.
 3. **Hand off to The Grill** — plan-it **always** grills next: questionable items, overlaps, one plan vs multiple plans, vertical slice, ADRs. Intake evaluation refines the inbox; the grill decides the plan.
-4. After The Grill resolves branches, **scaffold** `docs/planning/{ID}/` (phases, `jira.md` stub, ADR as usual).
+4. After The Grill resolves branches, **scaffold** `docs/planning/{ID}/` (phases, `jira.md` stub, and an ADR only when a decision warrants one).
 5. **Move intake** — for each source file:
 
 ```bash
@@ -72,9 +72,9 @@ Update frontmatter on each moved file: `status: in-plan`, `moved_from: docs/issu
 - sources/defer-csv.md — CSV edge cases deferred
 ```
 
-7. **Optional Jira** — [JIRA.md](JIRA.md) → `jira.md`.
+7. **Jira, only with `--jira`**: [JIRA.md](JIRA.md) → `jira.md`. Never ask.
 8. Do **not** copy full issue bodies into phase prompts.
 
 ## After planning
 
-> Plan `{ID}` created — {N} issue(s) moved to `docs/planning/{ID}/sources/`. Inbox cleared for those items. **Next:** `/implement-it` on `phase-1/ai-prompt.md`.
+> Plan `{ID}` created: {N} issue(s) moved to `docs/planning/{ID}/sources/`. Inbox cleared for those items. **Next:** `/implement-it {ID}` → `/audit-it` → `/verify-it` → `/commit-it`. To track it in Jira, run `/plan-it {ID} --jira`.

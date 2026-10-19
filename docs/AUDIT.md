@@ -24,7 +24,7 @@ All 28 skills serve distinct purposes. No duplicate skills, no dead code. 3 depr
 
 ### 1. `plan-it/SKILL.md` exceeds write-a-skill 100-line guideline (214 lines)
 
-The write-a-skill template says "Split into separate files when SKILL.md exceeds 100 lines." At 214 lines, `plan-it` is more than double the limit. It already offloads `JIRA.md`, `FROM-ISSUES.md`, `OUT-OF-SCOPE.md`, `AGENT-BRIEF.md`, and `REFERENCE.md` — but the main file remains long.
+The write-a-skill template says "Split into separate files when SKILL.md exceeds 100 lines." At 214 lines, `plan-it` is more than double the limit. It already offloads `JIRA.md`, `FROM-ISSUES.md` and `AGENT-BRIEF.md`, but the main file remains long. (Its `OUT-OF-SCOPE.md` and `REFERENCE.md` have since been removed: `triage` owns out-of-scope records.)
 
 **Suggestion:** Extract the intake evaluation workflow (lines 86-124) into `INTAKE-EVALUATION.md`, the grill section (lines 127-137) into `GRILL.md`, and the scaffold section (lines 139-170) into `SCAFFOLD.md`. The main SKILL.md would then be a routing table with "Quick start" and "Core tenets."
 

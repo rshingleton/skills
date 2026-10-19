@@ -74,6 +74,45 @@
 
 ## This fork
 
+## 2026-10-19 -- Parallel phases and commit-per-phase in the Doc Cycle (ADR-0011, ADR-0012)
+
+- **implement-it:** commits each phase at handoff, prefixed with its Jira key or `{ID} phase-N`
+  (later fixes reuse the prefix), and records the phase's `Base ref:` before its first edit.
+  `/implement-it {ID}` works the plan's frontier (`FRONTIER.md`): ready phases build in parallel
+  worktrees on `plan/{ID}--phase-N` branches, a merge subagent merges them into the integration
+  branch one at a time, and newly ready phases start. A single ready phase, or a host without
+  background subagents, builds inline. Adds the reuse ladder, grep-callers rule, `shortcut:`
+  markers, a three-round debug-spiral breaker and a `Skipped / Not checked / Risk` handoff line.
+- **audit-it:** a Single-phase audit reads the phase's prefixed non-merge commits since its Base
+  ref; a Full audit diffs the integration branch from its merge-base with `main`. Reports follow
+  a finding contract (concrete case, Must/Should/Nice numbered in one sequence, four parts, a
+  closing `Verdict:` and `Not checked:`). Recorded decisions are not findings. One severity rule
+  for `.compliance-rules`. Mode names: Full, Per-phase, Single-phase, Repo audit. No "review"
+  trigger.
+- **commit-it:** the compliance gate, one commit for verify-it's docs (filed `docs/issues/`
+  included), an approval-gated squash of the unpushed branch, and push or PR on approval. Code
+  commits belong to implement-it.
+- **plan-it:** ADRs only when `domain-modeling`'s three tests pass (`NNNN-slug.md`); a one-phase
+  plan's breakdown approval folds into the grill's final confirmation; Jira only with `--jira`.
+  `OUT-OF-SCOPE.md`, `REFERENCE.md`, the persona and the AI disclaimer removed; 99 lines.
+- **verify-it:** accepts only the ADRs a plan links; with none, the execution notes go in the
+  changelog entry. Never audits itself; reads the audit's closing `Verdict:` line. Routes
+  `no-trigger` shortcut markers to `/issue-it` (`SHORTCUTS.md`); closing messages in
+  `CLOSING.md`; 99 lines.
+- **doc-it:** the tech-debt slice lists `shortcut:` markers in a ledger.
+- **Installer:** `link-skills.sh` and `skills.sh` prune dead links and links into
+  `skills/deprecated/`; `skills.sh --help`. Test: `scripts/link-skills.test.sh`.
+- **Checks:** `scripts/check-skill-calls.sh` verifies every skill named in a "Call the Skill
+  tool" line ships (27 calls).
+- **Rules:** `.compliance-rules/coding-standards.md` matches practice: descriptions are a summary
+  then "Use when", prose has no fixed line limit (LOW), copyright headers are not required (LOW).
+  No file in the repo followed the old rules.
+- **Docs:** README Doc Cycle section, AGENTS.md, copilot-instructions mode names, GLOSSARY (Base
+  ref, Frontier, Integration branch, Phase branch, Audit mode, Shortcut marker), and new
+  `docs/engineering/{plan,implement,audit,verify,commit}-it.md` pages.
+- **Deferred:** triage's AI disclaimer and an eval harness, for the unified skills project
+  (`docs/issues/defer-unified-project-triage-disclaimer-eval-harness.md`).
+
 ## 2026-10-19 -- Doc Cycle skills call the canonical skills (ADR-0010)
 
 - **plan-it:** the grill calls `grilling` and `domain-modeling` (numbered rounds instead of one

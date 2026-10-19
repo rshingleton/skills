@@ -60,3 +60,34 @@ for DEST in "${DESTS[@]}"; do
     echo "linked $name -> $src ($DEST)"
   done
 done
+
+# Prune stale links so skills that left the promoted buckets stop loading.
+# A symlink is removed when its target is gone (wherever it pointed) or when it
+# resolves under this repo's skills/deprecated/. Real directories, live links
+# into other checkouts, and live links to promoted skills are left alone.
+REPO_REAL="$(cd "$REPO" && pwd -P)"
+
+prune_stale_links() {
+  local dest="$1"
+  local link resolved
+  [ -d "$dest" ] || return 0
+  for link in "$dest"/*; do
+    [ -L "$link" ] || continue
+    if [ ! -e "$link" ]; then
+      rm -f "$link"
+      echo "pruned $(basename "$link") ($dest): target gone"
+      continue
+    fi
+    resolved="$(cd "$link" 2>/dev/null && pwd -P)" || continue
+    case "$resolved" in
+      "$REPO_REAL"/skills/deprecated/*)
+        rm -f "$link"
+        echo "pruned $(basename "$link") ($dest): deprecated"
+        ;;
+    esac
+  done
+}
+
+for DEST in "${DESTS[@]}"; do
+  prune_stale_links "$DEST"
+done

@@ -24,10 +24,11 @@ Updates **`docs/planning/<plan-id>/jira.md`** from Epic children via [jira-epic-
 
 ## When to publish
 
-Ask during `/plan-it` after phases are scaffolded:
+Only when the user passes a flag. plan-it never asks whether to publish; its closing message
+mentions `--jira` once.
 
-- *"Create Jira issues for this plan?"* → continue with **`--jira`** (or user says yes mid-skill).
-- *"Sync from existing Epic?"* → **`--jira --sync-only`** when `JIRA_DEFAULT_EPIC` already has phase Tasks.
+- **`--jira`**: create Jira issues for the plan.
+- **`--jira --sync-only`**: sync keys when `JIRA_DEFAULT_EPIC` already has phase Tasks.
 
 Requires `JIRA_*` env — source via `load-jira-env.sh`. Watcher policy: [jira-notifications.md](../setup-internal-skills/jira-notifications.md).
 

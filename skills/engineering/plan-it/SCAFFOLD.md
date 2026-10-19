@@ -22,14 +22,18 @@ Before writing any file, present the breakdown as a numbered list. For each phas
 - **Delivers:** the behaviour it makes work
 
 Ask whether the granularity and the blocking edges are right, and whether any phase should be
-merged or split. End your turn and wait. Iterate until the user approves; a one-phase plan
-still needs approval.
+merged or split. End your turn and wait. Iterate until the user approves.
+
+A one-phase plan has a single approval stop: present its one phase inside the grill's final
+confirmation, and treat the user's confirmation of shared understanding as approval of the
+breakdown. Do not stop again before writing files.
 
 ## Files
 
 Create `docs/planning/{ID}/`:
 
-- **README.md**: phase table, hand-off (`/implement-it` → `/audit-it` → `/verify-it`), non-goals.
+- **README.md**: phase table, hand-off (`/implement-it {ID}` → `/audit-it` → `/verify-it` →
+  `/commit-it`), decisions from the grill, links to any ADRs the plan wrote, non-goals.
   The phase table has a `Blocked by` column:
 
   ```markdown
@@ -61,7 +65,7 @@ Create `docs/planning/{ID}/`:
       cases in the parser.
     ```
 
-- **jira.md**: stub when user may use Jira later ([JIRA.md](JIRA.md), include **Parent Epic** when `epic_key` is known):
+- **jira.md**: stub, so `--jira` can fill it later ([JIRA.md](JIRA.md), include **Parent Epic** when `epic_key` is known):
 
 ```markdown
 ---
@@ -83,7 +87,7 @@ parent_source:
 | phase-1 | | | |
 ```
 
-**Small plan check.** If the plan has ≤3 phases and the user wants Jira, ask
-whether to use a single Task instead of Epic+Tasks ([JIRA.md](JIRA.md#small-plan-3-phases)).
+**Small plan check.** Only with `--jira`: if the plan has ≤3 phases, ask whether to use a
+single Task instead of Epic+Tasks ([JIRA.md](JIRA.md#small-plan-3-phases)).
 
 Write all phase prompts before implementation begins.

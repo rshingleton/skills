@@ -92,6 +92,27 @@ Append a dated section to the project changelog:
 
 ---
 
+## Durable Update: plan with no ADR
+
+A plan whose decisions were all reversible links no ADR. Full verify touches no file in
+`docs/adr/` and writes the audit's execution notes into the plan's changelog entry instead:
+
+```markdown
+## 2026-05-14: {plan title} (`{key}`)
+
+- {Feature}: {one-line description}
+- {Module}: {specific change} ({file/commit ref})
+
+Execution notes:
+- Decided: {reversible decision from the plan README, and why}
+- Discovered: {unexpected finding during implementation}
+- Audit: {non-blocking note carried from audit-report.md}
+```
+
+Then compact as usual: `rm -rf docs/planning/{key}`. The changelog entry is the durable record.
+
+---
+
 ## Compact -- extract essence, discard artifacts
 
 All phases done. Review ADRs and changelog for gaps, then discard the planning directory.
@@ -112,7 +133,7 @@ docs/planning/{key}/
 
 After — durable records hold the condensed value:
 ```
-docs/adr/{N}-{title}.md    # decision rationale, now Accepted
+docs/adr/{NNNN}-{slug}.md    # decision rationale, now Accepted (only if the plan linked one)
 CHANGELOG.md                 # what shipped
 GLOSSARY.md                  # domain terms introduced
 ```

@@ -18,5 +18,7 @@ Add this plan agenda to the design tree:
   observable check instead.
 - **Deferred decisions and risk.**
 
-Scaffold only after the user confirms shared understanding. Do not answer your own questions
+Scaffold only after the user confirms shared understanding. When the plan is one phase, put
+that phase (title, delivers) in the final confirmation, so one answer approves both
+([SCAFFOLD.md](SCAFFOLD.md#approve-the-breakdown)). Do not answer your own questions
 and continue in the same turn.
