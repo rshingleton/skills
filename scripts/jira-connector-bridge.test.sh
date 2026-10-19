@@ -66,14 +66,24 @@ _run_test() {
 }
 
 # Installs a stub `curl` on PATH that records its argv to $CURL_LOG and returns
-# a minimal valid Jira response instead of hitting the network.
+# a minimal valid Jira response instead of hitting the network. A request whose
+# argv matches the glob in $CURL_FAIL_MATCH gets an HTTP 400 instead.
 _stub_curl() {
   local bin_dir="$1"
   mkdir -p "$bin_dir"
   cat > "$bin_dir/curl" <<'STUB'
 #!/usr/bin/env bash
 echo "$@" >> "$CURL_LOG"
+# shellcheck disable=SC2053  # unquoted RHS is the glob match on purpose
+if [ -n "${CURL_FAIL_MATCH:-}" ] && [[ "$*" == $CURL_FAIL_MATCH ]]; then
+  echo '{"errorMessages": ["stubbed failure"]}'
+  echo "400"
+  exit 0
+fi
 case "$*" in
+  *fields=labels*)
+    echo '{"fields": {"labels": ["existing"]}}'
+    ;;
   *transitions*)
     echo '{"transitions": [{"id": "31", "to": {"name": "Done"}}]}'
     ;;
@@ -341,6 +351,157 @@ test_bash_credential_fallback_resolves_from_any_cwd() {
 }
 
 # ---------------------------------------------------------------------------
+# Write exit status -- every write helper returns the result of its own write,
+# and watcher policy still runs after it without changing that result.
+# ---------------------------------------------------------------------------
+
+# Runs one jira_bridge_call on the bash path against the stubbed curl.
+# Usage: _bridge_write_status <fail_glob> <curl_log> <op> [args...]
+# Prints the call's exit status; the curl log is left for the caller to inspect.
+_bridge_write_status() {
+  local fail_glob="$1" curl_log="$2" bin_dir env_file; shift 2
+  bin_dir=$(mktemp -d)
+  env_file=$(mktemp)
+  _stub_curl "$bin_dir"
+  {
+    echo "JIRA_BASE_URL=https://jira.example.com"
+    echo "JIRA_API_TOKEN=dummy-token"
+    echo "JIRA_PROJECT_KEY=DASH"
+    echo "JIRA_WATCHER_IGNORE=bob"
+  } > "$env_file"
+
+  source "$BRIDGE"
+  PATH="$bin_dir:$PATH" CURL_LOG="$curl_log" CURL_FAIL_MATCH="$fail_glob" \
+    JIRA_ENV_FILE="$env_file" JIRA_ENV_SILENT=1 \
+    USE_CONNECTOR=false CONNECTOR_CHECKED=true \
+    jira_bridge_call "$@" >/dev/null 2>&1
+  echo "$?"
+  rm -rf "$bin_dir" "$env_file"
+}
+
+# Calls one helper from jira-helpers.sh directly against the stubbed curl.
+# Usage: _helper_write_status <fail_glob> <curl_log> <helper> [args...]
+_helper_write_status() {
+  local fail_glob="$1" curl_log="$2" bin_dir; shift 2
+  bin_dir=$(mktemp -d)
+  _stub_curl "$bin_dir"
+  source "$REPO_ROOT/scripts/jira-helpers.sh"
+  export PATH="$bin_dir:$PATH" CURL_LOG="$curl_log" CURL_FAIL_MATCH="$fail_glob" \
+    JIRA_BASE_URL="https://jira.example.com" JIRA_API_TOKEN="dummy-token" \
+    JIRA_WATCHER_IGNORE="bob"
+  "$@" >/dev/null 2>&1
+  echo "$?"
+  rm -rf "$bin_dir"
+}
+
+readonly WATCHER_REMOVAL="-X DELETE"
+readonly TRANSITION_POST='*-X POST*/transitions?notifyUsers=false*'
+readonly CREATE_POST='*-X POST*/rest/api/2/issue?notifyUsers=false*'
+readonly ISSUE_PUT='*-X PUT*'
+readonly LABELS_GET='*-X GET*fields=labels*'
+
+test_write_status_transition() {
+  local curl_log status
+  curl_log=$(mktemp)
+  status=$(_bridge_write_status "$TRANSITION_POST" "$curl_log" transition "DASH-1" "Done")
+  _assert_eq "$status" "1" "write status: bash transition returns 1 when the POST gets a 400"
+  _assert_contains "$(cat "$curl_log")" "$WATCHER_REMOVAL" \
+    "write status: bash transition still applies watcher policy after a failed POST"
+
+  : > "$curl_log"
+  status=$(_bridge_write_status "" "$curl_log" transition "DASH-1" "Done")
+  _assert_eq "$status" "0" "write status: bash transition returns 0 when the POST succeeds"
+  rm -f "$curl_log"
+}
+
+test_write_status_create_epic() {
+  local curl_log status
+  curl_log=$(mktemp)
+  status=$(_bridge_write_status "$CREATE_POST" "$curl_log" create-epic "DASH" "My Epic" "Desc")
+  _assert_eq "$status" "1" "write status: bash create-epic returns 1 when the POST gets a 400"
+
+  status=$(_bridge_write_status "" "$curl_log" create-epic "DASH" "My Epic" "Desc")
+  _assert_eq "$status" "0" "write status: bash create-epic returns 0 when the POST succeeds"
+  rm -f "$curl_log"
+}
+
+test_write_status_create_task() {
+  local curl_log body_file status
+  curl_log=$(mktemp)
+  body_file=$(mktemp)
+  echo "Task body" > "$body_file"
+  status=$(_bridge_write_status "$CREATE_POST" "$curl_log" \
+    create-task "DASH" "My Task" "$body_file" "DASH-1" "8")
+  _assert_eq "$status" "1" "write status: bash create-task returns 1 when the POST gets a 400"
+
+  status=$(_bridge_write_status "" "$curl_log" \
+    create-task "DASH" "My Task" "$body_file" "DASH-1" "8")
+  _assert_eq "$status" "0" "write status: bash create-task returns 0 when the POST succeeds"
+  rm -f "$curl_log" "$body_file"
+}
+
+test_write_status_update_issue() {
+  local curl_log status
+  curl_log=$(mktemp)
+  status=$(_helper_write_status "$ISSUE_PUT" "$curl_log" \
+    _jira_update_issue "DASH-1" '{"summary": "New"}')
+  _assert_eq "$status" "1" "write status: _jira_update_issue returns 1 when the PUT gets a 400"
+  _assert_contains "$(cat "$curl_log")" "$WATCHER_REMOVAL" \
+    "write status: _jira_update_issue still applies watcher policy after a failed PUT"
+
+  status=$(_helper_write_status "" "$curl_log" \
+    _jira_update_issue "DASH-1" '{"summary": "New"}')
+  _assert_eq "$status" "0" "write status: _jira_update_issue returns 0 when the PUT succeeds"
+  rm -f "$curl_log"
+}
+
+test_write_status_update_description() {
+  local curl_log body_file status
+  curl_log=$(mktemp)
+  body_file=$(mktemp)
+  echo "# Heading" > "$body_file"
+  status=$(_helper_write_status "$ISSUE_PUT" "$curl_log" \
+    _jira_update_description "DASH-1" "$body_file")
+  _assert_eq "$status" "1" \
+    "write status: _jira_update_description returns 1 when the PUT gets a 400"
+  _assert_contains "$(cat "$curl_log")" "$WATCHER_REMOVAL" \
+    "write status: _jira_update_description still applies watcher policy after a failed PUT"
+
+  status=$(_helper_write_status "" "$curl_log" _jira_update_description "DASH-1" "$body_file")
+  _assert_eq "$status" "0" \
+    "write status: _jira_update_description returns 0 when the PUT succeeds"
+  rm -f "$curl_log" "$body_file"
+}
+
+test_write_status_set_labels() {
+  local curl_log status
+  curl_log=$(mktemp)
+  status=$(_helper_write_status "$ISSUE_PUT" "$curl_log" _jira_set_labels "DASH-1" "new")
+  _assert_eq "$status" "1" "write status: _jira_set_labels returns 1 when the PUT gets a 400"
+  _assert_contains "$(cat "$curl_log")" "$WATCHER_REMOVAL" \
+    "write status: _jira_set_labels still applies watcher policy after a failed PUT"
+
+  : > "$curl_log"
+  status=$(_helper_write_status "" "$curl_log" _jira_set_labels "DASH-1" "new")
+  _assert_eq "$status" "0" "write status: _jira_set_labels returns 0 when the PUT succeeds"
+  _assert_contains "$(cat "$curl_log")" '"existing"' \
+    "write status: _jira_set_labels keeps the labels it read"
+  _assert_contains "$(cat "$curl_log")" '"new"' \
+    "write status: _jira_set_labels adds the requested label"
+  rm -f "$curl_log"
+}
+
+test_write_status_set_labels_get_fails() {
+  local curl_log status
+  curl_log=$(mktemp)
+  status=$(_helper_write_status "$LABELS_GET" "$curl_log" _jira_set_labels "DASH-1" "new")
+  _assert_eq "$status" "1" "write status: _jira_set_labels returns 1 when the labels GET fails"
+  _assert_not_contains "$(cat "$curl_log")" "-X PUT" \
+    "write status: _jira_set_labels sends no PUT when the labels GET fails"
+  rm -f "$curl_log"
+}
+
+# ---------------------------------------------------------------------------
 # Error handling
 # ---------------------------------------------------------------------------
 
@@ -401,6 +562,13 @@ _run_test test_bash_create_epic
 _run_test test_bash_create_task
 _run_test test_bash_transition
 _run_test test_bash_credential_fallback_resolves_from_any_cwd
+_run_test test_write_status_transition
+_run_test test_write_status_create_epic
+_run_test test_write_status_create_task
+_run_test test_write_status_update_issue
+_run_test test_write_status_update_description
+_run_test test_write_status_set_labels
+_run_test test_write_status_set_labels_get_fails
 _run_test test_unknown_operation
 _run_test test_executed_directly_refuses
 _run_test test_connector_output_prefix_consistent

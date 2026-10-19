@@ -74,6 +74,40 @@
 
 ## This fork
 
+## 2026-10-19 -- Doc Cycle skills call the canonical skills (ADR-0010)
+
+- **plan-it:** the grill calls `grilling` and `domain-modeling` (numbered rounds instead of one
+  question at a time). The scaffold adds slicing rules, user approval of the phase breakdown, a
+  `Blocked by` column in the plan README, and a `## Seams` section in every phase prompt.
+  `AGENT-BRIEF.md` removed.
+- **implement-it:** builds each phase with `tdd` at the plan's agreed seams; refactoring moved
+  out of the loop. Unexplained or flaky failures go to `diagnosing-bugs`. Records `Start ref:`
+  in the phase's `execution-notes.md` before its first edit. Judgement-call standards and
+  per-step compliance checks moved to review; `EXAMPLES.md` removed.
+- **audit-it:** Spec and Standards come from `code-review` (two isolated sub-agents, one call
+  per phase) against the start ref, the phase prompt, and the new `REVIEW-STANDARDS.md`. Reports
+  add a "Guardrail candidates" list for mechanical rules. Architecture design smells are now
+  non-blocking judgement calls; accretion beyond ADR intent still blocks.
+- **Deprecated:** `diagnose`, replaced by `diagnosing-bugs`; removed by
+  `skills.sh --cleanup-legacy`.
+- **Plugin:** `code-review`, `codebase-design`, `diagnosing-bugs`, `domain-modeling` and
+  `grilling` now ship in `plugin.json` and the README.
+
+## 2026-10-18 -- Jira write helpers return the result of their own write
+
+- **Bug fix:** `_jira_transition`, `_jira_update_issue`, `_jira_update_description` and
+  `_jira_set_labels` in `jira-helpers.sh` reported success after a failed Jira API call, because
+  `_jira_apply_watcher_policy` (which always returns 0) was their last statement. Each now keeps
+  its write's exit status, runs watcher policy, and returns the kept status. On the bash path,
+  `jira_bridge_call transition` now returns non-zero when the transition fails.
+- **Bug fix:** `_jira_set_labels` sent its PUT even when the GET of current labels failed. It now
+  returns 1 without writing when the GET fails or yields no labels array.
+- **Tests:** `scripts/jira-connector-bridge.test.sh` grew to 59 assertions: a forced HTTP 400
+  and a 200 for each of the six write helpers (including `_jira_create_epic` and
+  `_jira_create_task`, which were already correct), plus the labels GET guard. `_stub_curl`
+  gained `CURL_FAIL_MATCH` to fail a chosen request.
+- Closes the follow-up filed under the 2026-08-11 entry. See ADR-0009, Amendment 1.
+
 ## 2026-10-02 -- Jira bridge: fix "bridge not found" in app repos
 
 - **Bug fix:** every skill instructed `source scripts/jira-connector-bridge.sh` -- a path that

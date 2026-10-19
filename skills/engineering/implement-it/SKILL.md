@@ -1,10 +1,10 @@
 ---
 name: implement-it
 description: >
-  Doc Cycle — implement phase. Executes plan phases with TDD, repo standards,
-  and diagnosis loops. Use when a plan phase needs coding, test authoring, or
-  bug fixing, or when user says implement-it, implement it, implement, write
-  code, engineer, tdd, red green refactor.
+  Doc Cycle implement phase. Builds one plan phase test-first at the seams the
+  plan agreed, to repo standards. Use when a Doc Cycle plan phase needs building,
+  or when user says implement-it, implement phase N, implement the plan, or
+  continue the plan.
 ---
 
 ## Role
@@ -13,15 +13,11 @@ Implementation Agent (Engineer). Writes production code and tests for the curren
 
 ## Quick start
 
-```text
-/implement-it
-```
-
-From a planned project:
-1. Read the current phase's `ai-prompt.md`
-2. Red-green-refactor loop per requirements
-3. Hard bugs → handoff to `/diagnose`
-4. After all phases complete → `/audit-it`
+From a planned project, `/implement-it`:
+- Read the current phase's `ai-prompt.md`
+- Build it with the `tdd` skill at the phase's `## Seams`
+- Hard bugs: hand off to `diagnosing-bugs`
+- After all phases complete: `/audit-it`
 
 ## Workflow
 
@@ -29,7 +25,7 @@ From a planned project:
 
 Read the orchestration `README.md` and the current phase's `ai-prompt.md`. **Strictly** load only files listed there.
 
-Discover repo standards per [STANDARDS.md](STANDARDS.md) §1 before the first edit. If `.compliance-rules/` exists at repo root, read all rule files as part of standards discovery — they apply throughout every TDD cycle.
+Before the first edit, discover repo standards and tooling per [STANDARDS.md](STANDARDS.md) §1, and write `Start ref: <output of git rev-parse HEAD>` to `docs/planning/{ID}/phase-{N}/execution-notes.md`. `/audit-it` diffs the phase from it.
 
 Flag ambiguities to the Planning Agent (Architect) via the user — do not guess past the prompt.
 
@@ -48,43 +44,31 @@ If the phase row has a key:
 1. If the issue has no assignee: resolve one (the name the user gave, else `JIRA_ASSIGNEE`; if neither is set, ask, recommending the authenticated Jira user) and run `jira_bridge_call assign <KEY> "$ASSIGNEE"` before moving to In Progress. An existing assignee is left alone. See `setup-internal-skills/issue-tracker-jira.md` "Assignee".
 2. `jira_bridge_call transition <KEY> "In Progress"`
 
-If the row is empty, tell the user to run `/plan-it --jira {ID}` or `--sync-only` — do not guess keys.
-
-Missing Jira access is not blocking — continue with implementation.
+If the row is empty, tell the user to run `/plan-it --jira {ID}` or `--sync-only`; do not guess keys. Missing Jira access is not blocking: continue with implementation.
 
 **Sources** — optional note under `docs/planning/{ID}/sources/*.md` that implementation started; Jira keys only from `jira.md`.
 
-### 2. TDD Loop
+### 2. Build with tdd
 
-Every feature follows test-driven development. **Compliance rules from `.compliance-rules/` (if present) are checked at every step** — not just at handoff.
+Call the Skill tool with "tdd" and follow its red, green loop. Pass it the phase prompt's `## Seams` section and say that these seams were agreed during planning, so `tdd` writes tests only at them and does not ask the user to confirm them again.
 
-- **Red:** Write a failing test for the desired behavior. Run it to confirm failure. Check compliance rules on the new test file.
-- **Green:** Write minimal production code to pass the test. No speculative code. Run the test to confirm it passes. Check compliance rules on the diff.
-- **Refactor:** Clean up with all tests green. Run compliance rules to ensure no regressions.
+If the phase prompt has no `## Seams` section (a plan written before seams were scaffolded), propose seams yourself, each with a one-line note on what it catches and what it misses, and confirm them with the user once, before the first test. End the turn and wait for the answer.
 
-Apply [STANDARDS.md](STANDARDS.md) §2 on every cycle. Run the full test suite and lint/type-check after each phase. Never skip Red.
+Refactoring and judgement-call standards are not part of the loop; they belong to review. Follow [STANDARDS.md](STANDARDS.md) §2 while coding, and run the repo's automated checks (test, lint, format, type-check) after each phase. `.compliance-rules/` is checked by `/audit-it`.
 
-See [EXAMPLES.md](EXAMPLES.md) for Red/Green/Refactor and diagnosis walkthroughs.
+### 3. Hard bugs
 
-### 3. Diagnosis Loop
-
-For bugs during implementation:
-
-- **Reproduce** → **Minimize** → **Hypothesize** (one sentence) → **Instrument** → **Fix** (minimal) → **Regression-test** (full suite + lint)
-
-Hard or flaky bugs: hand off to `/diagnose` instead of improvising.
+A failure you can explain in one hypothesis and fix directly stays in the loop. A failure you cannot, or one that is flaky, goes to diagnosis: call the Skill tool with "diagnosing-bugs" and follow it until the fix and its regression test are in, then resume the loop.
 
 ### 4. Handoff
 
 When tests pass and acceptance criteria are met:
 
-1. Run [STANDARDS.md](STANDARDS.md) §3 pre-handoff checklist (self-check).
-2. Confirm every criterion in `ai-prompt.md` is fulfilled.
-3. Brief self-check: working tree aligns with linked ADR intent.
-4. Run full project test suite and lint/type-check.
-5. Signal `Phase {N} Complete`.
+- Run the [STANDARDS.md](STANDARDS.md) §3 pre-handoff checklist.
+- Confirm every criterion in `ai-prompt.md` is fulfilled and the working tree matches linked ADR intent.
+- Signal `Phase {N} Complete`.
 
-Optional: leave draft bullets in `docs/planning/{ID}/phase-{N}/execution-notes.md` for the auditor — do not update ADR status, GLOSSARY, or changelog.
+Optional: add draft bullets for the auditor to `execution-notes.md` below the start ref; do not update ADR status, GLOSSARY, or changelog.
 
 ### 5. Next skill
 
@@ -109,8 +93,7 @@ Still implementing — do **not** suggest full `/audit-it` or `/verify-it`.
 ## Core Tenets
 
 - **Spec-bound:** `ai-prompt.md` and linked ADRs are the scope contract — not the whole backlog.
-- **Standards-first:** Discover and follow repo docs before generating code ([STANDARDS.md](STANDARDS.md)).
-- **Test-first:** Every feature starts with a failing test. Red → Green → Refactor. Never skip Red.
+- **Standards-first:** Discover repo docs and tooling before generating code ([STANDARDS.md](STANDARDS.md)); review enforces the judgement calls.
+- **Test-first:** Every feature starts with a failing test at an agreed seam; the `tdd` skill owns the loop.
 - **Non-Architect:** Do not author new plans or change architectural direction.
-- **Compliance-throughout:** `.compliance-rules/` (if present) checked on every Red→Green→Refactor step, not just at handoff.
 - **Decoupled:** Do not perform git commits; do not finalize durable documentation.

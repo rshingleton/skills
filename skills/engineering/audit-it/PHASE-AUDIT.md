@@ -23,8 +23,7 @@ Cycles through every implemented phase one at a time, running full Mechanical �
 2. **For each phase**, run sections [1-6](#1-context) individually:
    - Context scoped to that phase's `ai-prompt.md` and diff
    - Mechanical: full project test suite
-   - Spec: acceptance criteria from that phase's prompt
-   - Standards: phase's pre-handoff checklist
+   - Spec and Standards: one `code-review` call against that phase's prompt and start ref
    - Compliance, Architecture: phase-scoped
 3. **Compile** — collect all verdicts and findings into a combined result table:
 
@@ -43,9 +42,9 @@ Cycles through every implemented phase one at a time, running full Mechanical �
 
 - `docs/planning/{ID}/README.md` — orchestration map and phase list
 - **Every** `docs/planning/{ID}/phase-*/ai-prompt.md`
-- Optional `phase-*/execution-notes.md`
+- `phase-*/execution-notes.md` (holds each phase's `Start ref:`)
 - Linked ADRs and `GLOSSARY.md`
-- Combined diff for the plan
+- Combined diff for the plan, from phase-1's start ref
 
 Confirm all implementation phases are complete. If any phase is missing, stop.
 
@@ -53,9 +52,9 @@ Confirm all implementation phases are complete. If any phase is missing, stop.
 
 - `docs/planning/{ID}/README.md` — phase order, dependency info
 - `docs/planning/{ID}/phase-N/ai-prompt.md` — the phase's spec contract
-- Optional `docs/planning/{ID}/phase-N/execution-notes.md`
+- `docs/planning/{ID}/phase-N/execution-notes.md` (holds the phase's `Start ref:`)
 - Linked ADRs and `GLOSSARY.md`
-- Diff scoped to this phase's changes (compare implementation-start ref or working tree state before phase N vs now)
+- Diff scoped to this phase's changes, from its start ref to the working tree
 
 Do not trust implement-it self-checks — verify independently.
 
@@ -68,31 +67,27 @@ Re-run the full project test suite and lint/type-check commands.
 | FAIL | **Blocking** — return to `/implement-it` |
 | PASS | Continue |
 
-## 3. Spec
+## 3. Spec and Standards: call code-review
 
-Check the audited phase(s) against their `ai-prompt.md`:
+Call the Skill tool with "code-review". Single-phase and multi-phase audits call it once per phase, against that phase's spec; the full audit calls it once, with every phase prompt as the spec. Pass it:
 
-- [ ] Every acceptance criterion met in the diff
-- [ ] No behaviour beyond prompt + linked ADR scope (scope creep)
-- [ ] No criterion partially or incorrectly implemented
+- **Fixed point:** the `Start ref:` in the phase's `execution-notes.md` (full audit: phase-1's). If none is recorded, ask the user for the ref the phase started from, one question, and wait.
+- **Diff command:** `git diff <start-ref>` (working tree against the ref, since implement-it does not commit), plus the untracked files from `git ls-files --others --exclude-standard`, read in full. Say this replaces the three-dot `...HEAD` diff.
+- **Spec:** the phase's `ai-prompt.md` and the plan's `sources/*.md`, by path. Say there is no issue tracker: the spec is given, so it must not look one up or suggest `/setup-matt-pocock-skills`. If other phases share the start ref, list their `ai-prompt.md` paths too, so their changes count as other phases' work, not scope creep.
+- **Standards sources:** whatever code-review finds in the repo, plus `.compliance-rules/coding-standards*.md` (if present) and [REVIEW-STANDARDS.md](REVIEW-STANDARDS.md).
 
-| Result | Action |
-|--------|--------|
-| **Full audit** — any miss in any phase | **Blocking** — return to `/implement-it` (name the phase) |
-| **Single-phase** — any miss | **Blocking** — return to `/implement-it` for this phase; other phases unaffected |
-| PASS | Continue |
+Copy code-review's Standards and Spec reports verbatim into the audit report under `## Spec` and `## Standards`. Do not merge, rerank, or rewrite findings; put audit-it's verdict line above each report.
 
-## 4. Standards
+## 4. Spec and Standards: verdict
 
-Audit implement-it's pre-handoff checklist ([implement-it/STANDARDS.md](../implement-it/STANDARDS.md) §3) for each phase — do not assume it was run.
+| Axis | Result | Action |
+|------|--------|--------|
+| Spec | Any missing, partial, or wrong requirement, or scope creep | **Blocking**: return to `/implement-it` (name the phase; other phases unaffected) |
+| Standards | Hard violation of a documented standard | **Blocking**: return to `/implement-it` (name the phase) |
+| Standards | Judgement call (including every baseline smell) | **Non-blocking**: note for ADR execution notes |
+| Either | No findings | PASS, continue |
 
-Spot-check the combined diff against standards docs from [STANDARDS.md](../implement-it/STANDARDS.md) §1. Skip rules tooling already enforces.
-
-| Result | Action |
-|--------|--------|
-| Hard violation | **Blocking** — return to `/implement-it` (name the phase) |
-| Judgement call | **Non-blocking** — note for ADR execution notes |
-| PASS | Continue |
+**Guardrail candidates.** For each violated rule that is mechanical (a fixed pattern, a banned API, an import shape, a file-location rule), add it to the report's "Guardrail candidates" list as a candidate lint rule or hook, per `retro`'s mechanical vs judgement classification. List only; do not build them.
 
 ## 5. Compliance
 
@@ -101,6 +96,8 @@ Blocking subset (full PR gate: `/internal-compliance`):
 ### 5.1 Repo compliance rules
 
 If `.compliance-rules/` exists at repo root, read all `*.md` and `*.yaml` files. Apply their rules to the diff — treat any HIGH-severity violation as blocking.
+
+Also read, when present, `SECURITY_POLICY.md` (repo root or `docs/`) and `docs/agents/compliance/`. A diff that breaks either is blocking.
 
 ### 5.2 Universal checks
 
@@ -139,20 +136,22 @@ Classify each flagged module with **signal**, **dependency category**, and **imp
 | **Leaky seam** | Callers must know internals | Poor locality — callers break when internals change | dependency is in-process (merge flattens leak) |
 | **Indirection tax** | Pass-through with no added behaviour | Zero leverage — ceremony without behaviour | no test adapter exists (seam is speculative) |
 
-### 6.3 Verify implement-it self-checks
+### 6.3 Seams and test surface
 
-implement-it's [STANDARDS.md](../implement-it/STANDARDS.md) §3 requires deletion test, seam discipline, and test-surface checks before handoff. Verify:
+Check the diff against the Design rules in [REVIEW-STANDARDS.md](REVIEW-STANDARDS.md); implement-it no longer self-checks them:
 
-- [ ] implement-it self-check was thorough — e.g. missed single-adapter seams?
-- [ ] Tests cross internal seams (mocking internals, fragile setup) — sign the interface is insufficient?
-- [ ] implement-it flagged borderline cases or surfaced trade-offs in execution notes?
+- [ ] Any single-adapter seam (speculative indirection)?
+- [ ] Do tests cross internal seams (mocking internals, fragile setup), a sign the interface is insufficient?
+- [ ] Did implement-it record borderline cases or trade-offs in execution notes? (Context for the notes, not a gate.)
 
 ### 6.4 Verdict
 
+Shallow modules, speculative seams, and tests crossing internal seams are judgement calls, as in §4.
+
 | Result | Action |
 |--------|--------|
-| Self-check missed issues OR egregious accretion vs ADR intent | **Blocking** — return to `/implement-it` (name the phase) |
-| Minor debt caught by self-check, none missed | **Non-blocking** — note for verify-it → ADR execution notes |
+| Egregious accretion vs ADR intent (layers, modules, or seams the ADR does not call for) | **Blocking**: return to `/implement-it` (name the phase) |
+| Shallow module, speculative seam, or test crossing internal seams | **Non-blocking**: note for verify-it → ADR execution notes |
 | OK | Continue |
 
 **On re-audit:** Re-run all checks — not just previously failing ones. A fix for one issue may introduce regressions elsewhere. The full gate resets on every pass.

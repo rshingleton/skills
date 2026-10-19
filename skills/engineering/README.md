@@ -17,7 +17,7 @@ Pre-plan work lives in **`docs/issues/`** (inbox only). At plan creation, files 
 Pipeline for plan-it–driven work:
 
 - **[plan-it](./plan-it/SKILL.md)** — Always grills; scaffold phases, ADRs, `--from-issues`, optional `--jira` → `jira.md`.
-- **[implement-it](./implement-it/SKILL.md)** — TDD implementation with repo standards and spec-bound scope. Transitions Jira to "In Progress" on start.
+- **[implement-it](./implement-it/SKILL.md)**: Builds each phase with `tdd` at the plan's agreed seams, with repo standards and spec-bound scope. Transitions Jira to "In Progress" on start.
 - **[audit-it](./audit-it/SKILL.md)** — Independent phase auditor (spec, standards, compliance, architecture). Single-phase mode (`--phase phase-N`) for early feedback. Repo reviews write `docs/AUDIT.md`. Gates verify-it.
 - **[verify-it](./verify-it/SKILL.md)** — After audit passes, finalize ADRs, GLOSSARY.md, changelog, and planning cleanup. Incremental close (`--phase phase-N`) for per-phase Jira resolution and GLOSSARY updates.
 - **[commit-it](./commit-it/SKILL.md)** — After verify, stage changes, auto-draft commit message from changelog, and commit locally. Push only after user approval.
@@ -50,7 +50,10 @@ Not using Jira? `to-spec` → `to-tickets` covers the same intake/planning groun
 
 ## Other engineering skills
 
-- **[diagnose](./diagnose/SKILL.md)** — Disciplined diagnosis loop for hard bugs and performance regressions.
+- **[code-review](./code-review/SKILL.md)**: Two-axis review (Standards and Spec) of the diff since a fixed point, in parallel sub-agents. Called by `audit-it` for its Spec and Standards findings.
+- **[codebase-design](./codebase-design/SKILL.md)**: Shared vocabulary for designing deep modules (module, interface, depth, seam). Called by `tdd` and `improve-codebase-architecture`.
+- **[diagnosing-bugs](./diagnosing-bugs/SKILL.md)**: Diagnosis loop for hard bugs and performance regressions. Called by `implement-it` for bugs it cannot explain in one hypothesis.
+- **[domain-modeling](./domain-modeling/SKILL.md)**: Builds and sharpens the project's domain language, challenging fuzzy terms, keeping `GLOSSARY.md` current, and offering ADRs for hard-to-reverse decisions. Called by `plan-it` and `grill-with-docs`.
 - **[grill-with-docs](./grill-with-docs/SKILL.md)** — Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates `GLOSSARY.md` and ADRs inline.
 - **[improve-codebase-architecture](./improve-codebase-architecture/SKILL.md)** — Find deepening opportunities; optional intake via [audit-to-issues](./setup-internal-skills/audit-to-issues.md).
 - **[internal-compliance](./internal-compliance/SKILL.md)** — Pre-flight compliance check against internal security linting rules before finalizing any PR.

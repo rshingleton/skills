@@ -17,6 +17,9 @@ migrate-to-shoehorn
 scaffold-exercises
 setup-pre-commit
 
+# Moved to skills/deprecated/ (replaced by diagnosing-bugs)
+diagnose
+
 # Upstream deprecated bucket (if still installed)
 qa
 ubiquitous-language

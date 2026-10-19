@@ -52,6 +52,7 @@ git-guardrails-claude-code
 migrate-to-shoehorn
 scaffold-exercises
 setup-pre-commit
+diagnose
 qa
 ubiquitous-language
 design-an-interface

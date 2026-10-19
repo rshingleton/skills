@@ -17,6 +17,17 @@ _Avoid_: using "issue" for a plan phase or Jira task
 **Plan**:
 Doc Cycle orchestration under `docs/planning/<id>/` — phases, `ai-prompt.md`, ADR draft. Produced by `/plan-it`. Optional **`jira.md`** maps phases to Jira keys.
 
+**Seam** (plan):
+A test boundary agreed during `/plan-it` and recorded in the phase prompt's `## Seams` section, each with a note on what tests there catch and miss. `/implement-it` passes them to `tdd` as already agreed.
+_Avoid_: test point, hook
+
+**Start ref**:
+The commit `HEAD` pointed at when `/implement-it` began a phase, written as `Start ref:` in that phase's `execution-notes.md`. `/audit-it` diffs the phase from it (working tree against the ref, since implement-it does not commit).
+_Avoid_: base commit, baseline
+
+**Guardrail candidate**:
+A violated rule that is mechanical (a fixed pattern, banned API, import shape, file-location rule), listed in an audit report as a candidate lint rule or hook. Listed only; building it is separate work.
+
 **Epic** (Jira):
 Jira Epic issue linking phase Tasks. Referenced in `jira.md` as `epic_key`. Not a duplicate spec file under `docs/issues/`.
 _Avoid_: PRD, product requirements document
@@ -30,6 +41,7 @@ State machine (`intake` → `ready-for-plan` → `wontfix`) mapped to local inbo
 - A **Plan** holds moved intake under **`sources/`**, lists them in README `## Sources`, and owns **`jira.md`** when published to Jira
 - **implement-it** / **verify-it** read phase Jira keys from **`jira.md`** (`_jira_phase_key` helper in [issue-tracker-jira.md](skills/engineering/setup-internal-skills/issue-tracker-jira.md)), not from intake files
 - **plan-it** `--jira --sync-only` re-pulls Epic Task keys into `jira.md` without re-grilling
+- **plan-it**, **implement-it** and **audit-it** call canonical skills for generic methods (`grilling` and `domain-modeling`; `tdd` and `diagnosing-bugs`; `code-review`) and keep only Doc Cycle specifics (ADR-0010)
 - **plan-it** handles intake evaluation and planning in one session — triage-style assessment then the grill
 - **plan-it**, **implement-it**, **verify-it**, and **from-jira** each source the connector bridge (canonically `setup-internal-skills/scripts/jira-connector-bridge.sh`, installed alongside `load-jira-env.sh`; `scripts/jira-connector-bridge.sh` at the repo root is a dev-convenience shim over it) directly for their own Jira operations rather than delegating to `to-jira` as a skill -- **to-jira** remains the ad-hoc entry point for one-off operations and the canonical reference for the bridge interface (see `to-jira/OPERATIONS.md`). API operations are callable `_jira_*` functions in `jira-helpers.sh` (sourced via `load-jira-env.sh`)
 

@@ -4,6 +4,7 @@ General workflow tools, not code-specific.
 
 - **[caveman](./caveman/SKILL.md)** — Ultra-compressed communication mode. Cuts token usage ~75% by dropping filler while keeping full technical accuracy.
 - **[grill-me](./grill-me/SKILL.md)** — Get relentlessly interviewed about a plan or design until every branch of the decision tree is resolved.
+- **[grilling](./grilling/SKILL.md)**: The interview primitive, asking numbered rounds over the design-tree frontier, each question with a recommended answer. Called by `plan-it`, `grill-me`, and `grill-with-docs`.
 - **[handoff](./handoff/SKILL.md)** — Compact the current conversation into a handoff document so another agent can continue the work.
 - **[teach](./teach/SKILL.md)** — Teach the user a new skill or concept, within this workspace.
 - **[to-questionnaire](./to-questionnaire/SKILL.md)** — Turn a decision you can't fully answer into a questionnaire for someone else to fill in.
