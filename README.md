@@ -267,7 +267,7 @@ At plan creation, `--from-issues` **moves** inbox files to `docs/planning/<id>/s
 | **`/doc-it`** | `docs/reference/` + `docs/reference-audit/` | Baseline maps plus sliced audit (`tech-debt.md`, `testing.md`, `architecture.md`, `follow-ups.md`). Two phases in one skill. |
 | `/zoom-out` | *(chat only)* | Quick orientation; no files. |
 | `/audit-it` (repo) | `docs/AUDIT.md` | Tech-debt / simplification lens after you already know the repo. |
-| `/verify-it` | ADRs, `CONTEXT.md`, changelog | **After** implementation of a plan, not discovery. |
+| `/verify-it` | ADRs, `GLOSSARY.md`, changelog | **After** implementation of a plan, not discovery. |
 
 **Typical flows:**
 
@@ -297,9 +297,9 @@ Skills I use daily for code work.
 - **[commit-it](./skills/engineering/commit-it/SKILL.md)** — Doc Cycle close phase; commit locally, push only after user approval.
 - **[diagnose](./skills/engineering/diagnose/SKILL.md)** — Disciplined diagnosis loop for hard bugs and performance regressions.
 - **[doc-it](./skills/engineering/doc-it/SKILL.md)** — **Baseline codebase documentation:** Phase 1 writes `docs/reference/`. Phase 2 writes `docs/reference-audit/` (`tech-debt.md`, `testing.md`, `architecture.md`, `follow-ups.md`, index `README.md`). Not `/verify-it` or `/zoom-out`.
-- **[grill-with-docs](./skills/engineering/grill-with-docs/SKILL.md)** — Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates `CONTEXT.md` and ADRs inline.
+- **[grill-with-docs](./skills/engineering/grill-with-docs/SKILL.md)** — Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates `GLOSSARY.md` and ADRs inline.
 - **[implement-it](./skills/engineering/implement-it/SKILL.md)** — Doc Cycle implement phase. TDD with repo standards. Transitions Jira to "In Progress" on start.
-- **[improve-codebase-architecture](./skills/engineering/improve-codebase-architecture/SKILL.md)** — Find deepening opportunities in a codebase, informed by `CONTEXT.md` and `docs/adr/`; optional intake issues via [audit-to-issues](./skills/engineering/setup-internal-skills/audit-to-issues.md).
+- **[improve-codebase-architecture](./skills/engineering/improve-codebase-architecture/SKILL.md)** — Find deepening opportunities in a codebase, informed by `GLOSSARY.md` and `docs/adr/`; optional intake issues via [audit-to-issues](./skills/engineering/setup-internal-skills/audit-to-issues.md).
 - **[internal-compliance](./skills/engineering/internal-compliance/SKILL.md)** — Pre-flight compliance check against internal security linting rules before finalizing any PR.
 - **[plan-it](./skills/engineering/plan-it/SKILL.md)** — Doc Cycle plan phase. Always grills; phases, ADRs, `--from-issues` (moves intake to `sources/`), optional Jira → `jira.md`.
 - **[prototype](./skills/engineering/prototype/SKILL.md)** — Build a throwaway prototype to flesh out a design.
@@ -312,7 +312,7 @@ Skills I use daily for code work.
 - **[issue-it](./skills/engineering/issue-it/SKILL.md)** — Pre-plan intake under `docs/issues/`.
 - **[to-jira](./skills/engineering/to-jira/SKILL.md)** — Ad-hoc Jira handler and bridge reference: create, transition, resolve, comment, assign. Other skills source the connector bridge directly rather than delegating here.
 - **[from-jira](./skills/engineering/from-jira/SKILL.md)** — Create a Doc Cycle plan from a Jira issue — no inbox step.
-- **[verify-it](./skills/engineering/verify-it/SKILL.md)** — Doc Cycle verify phase. Finalizes ADRs, CONTEXT.md, changelog, and planning cleanup. Optionally close Jira issues.
+- **[verify-it](./skills/engineering/verify-it/SKILL.md)** — Doc Cycle verify phase. Finalizes ADRs, GLOSSARY.md, changelog, and planning cleanup. Optionally close Jira issues.
 - **[wayfinder](./skills/engineering/wayfinder/SKILL.md)** — Plan work bigger than one session as a shared map of decision tickets, resolved one at a time. Complements `/plan-it`, doesn't replace it.
 - **[wizard](./skills/engineering/wizard/SKILL.md)** — Generate an interactive bash wizard for steps only a human can perform: provisioning infra, credentials/CI secrets, unfamiliar third-party dashboards, one-off migrations.
 - **[zoom-out](./skills/engineering/zoom-out/SKILL.md)** — Get broader context on unfamiliar code.

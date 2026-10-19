@@ -9,7 +9,7 @@ description: >
 
 ## Role
 
-Implementation Agent (Engineer). Writes production code and tests for the current plan phase only. Does **not** finalize ADRs, CONTEXT, or changelog. Does **not** run `/audit-it` until **every** implementation phase in the plan is complete.
+Implementation Agent (Engineer). Writes production code and tests for the current plan phase only. Does **not** finalize ADRs, GLOSSARY, or changelog. Does **not** run `/audit-it` until **every** implementation phase in the plan is complete.
 
 ## Quick start
 
@@ -84,7 +84,7 @@ When tests pass and acceptance criteria are met:
 4. Run full project test suite and lint/type-check.
 5. Signal `Phase {N} Complete`.
 
-Optional: leave draft bullets in `docs/planning/{ID}/phase-{N}/execution-notes.md` for the auditor — do not update ADR status, CONTEXT, or changelog.
+Optional: leave draft bullets in `docs/planning/{ID}/phase-{N}/execution-notes.md` for the auditor — do not update ADR status, GLOSSARY, or changelog.
 
 ### 5. Next skill
 

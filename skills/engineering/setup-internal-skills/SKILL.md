@@ -15,7 +15,7 @@ Scaffold per-repo configuration the engineering skills assume:
 
 - **Issue tracker** — intake in `docs/issues/` (default); Jira via `docs/planning/<id>/jira.md` when opted in
 - **Triage labels** — canonical triage role strings
-- **Domain docs** — `CONTEXT.md`, ADRs, consumer rules
+- **Domain docs** — `GLOSSARY.md`, ADRs, consumer rules
 - **Compliance policies** — paths for `/internal-compliance`
 
 Prompt-driven skill. Explore, confirm with the user, then write.
@@ -32,7 +32,7 @@ Read whatever exists; don't assume:
 - **Copilot:** `.github/copilot-instructions.md` (read full file if present)
 - **Claude:** `CLAUDE.md` (pointer only — see PLATFORM-AUDIT.md). Skills: `~/.claude/skills/` (global) or `.claude/skills/` (per-project). Skills installed via `scripts/skills.sh` or `scripts/link-skills.sh` now populate both `~/.agents/skills/` and `~/.claude/skills/`
 - **Gemini / agy:** no config file needed — loads `AGENTS.md` natively. Gemini migrating to `agy` CLI. Skills: `<project>/.agents/skills/` (workspace, preferred for agy — other tools use `~/.agents/skills/` instead), `~/.gemini/antigravity-cli/skills/`, `~/.gemini/skills/`
-- `CONTEXT.md`, `CONTEXT-MAP.md`, `docs/adr/`, `src/*/docs/adr/`
+- `GLOSSARY.md`, `GLOSSARY-MAP.md`, `docs/adr/`, `src/*/docs/adr/`. A legacy `CONTEXT.md` / `CONTEXT-MAP.md` (including per-context ones) is `git mv`'d to the new name: the skills only read `GLOSSARY.md`
 - `docs/agents/issue-tracker.md` — prior setup output? (only file written here)
 - `docs/issues/` — local issue tracker in use
 - `.scratch/` — legacy local tracker (migrate to `docs/issues/`)
@@ -66,7 +66,7 @@ Three states: `intake` → `ready-for-plan` → `wontfix`.
 
 **Section C — Domain docs.**
 
-Single-context (`CONTEXT.md` + `docs/adr/`) vs multi-context (`CONTEXT-MAP.md`).
+Single-context (`GLOSSARY.md` + `docs/adr/`) vs multi-context (`GLOSSARY-MAP.md`).
 
 **Section D — Compliance policies.**
 

@@ -4,9 +4,9 @@
 
 Use intake and `sources/` as context, not a substitute for grilling: challenge vague scope, merge or split issues, and decide one plan vs several.
 
-- Domain language vs `CONTEXT.md`
+- Domain language vs `GLOSSARY.md`
 - Shallow modules / mixed concerns
 - Smallest vertical slice + verification strategy
 - Deferred decisions and risk
 
-Explore the codebase when that answers faster than asking. Update `CONTEXT.md` and ADRs inline. Do not proceed until branches are resolved.
+Explore the codebase when that answers faster than asking. Update `GLOSSARY.md` and ADRs inline. Do not proceed until branches are resolved.

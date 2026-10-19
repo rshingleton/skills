@@ -31,14 +31,14 @@ description: >
 ## Before you start
 
 1. `/setup-internal-skills` if `docs/agents/` is missing.
-2. Read `CONTEXT.md`, `docs/adr/`, prior `docs/reference/` and `docs/reference-audit/`.
+2. Read `GLOSSARY.md`, `docs/adr/`, prior `docs/reference/` and `docs/reference-audit/`.
 3. Confirm scope on huge repos (subtree, single service, one context).
 
 ## Phase 1 — Reference
 
 - Agent tool: `subagent_type=Explore`, thoroughness **very thorough**.
 - Create `docs/reference/` per [REFERENCE-LAYOUT.md](REFERENCE-LAYOUT.md).
-- Use `CONTEXT.md` vocabulary; list **Glossary gaps** in `domains.md`.
+- Use `GLOSSARY.md` vocabulary; list **Glossary gaps** in `domains.md`.
 - Current state only; cite paths; index last in `reference/README.md`.
 - **Style:** Write javadoc-style architecture docs -- precise, navigable, grepable. Each page answers "what lives here, what are its boundaries, how does data flow." Prefer tables, maps, and interface summaries over prose. The goal is a faster reference than grepping the entire codebase.
 - Pause for user review before Phase 2 unless they want both without stopping.

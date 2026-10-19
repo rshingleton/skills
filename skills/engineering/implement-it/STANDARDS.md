@@ -10,7 +10,7 @@ Scan once per phase for how this repo expects code to be written:
 |--------|---------|
 | `CONTRIBUTING.md`, `CLAUDE.md`, `AGENTS.md` | Process and agent conventions |
 | `STYLE.md`, `STANDARDS.md`, `STYLEGUIDE.md` | Explicit style rules |
-| `CONTEXT.md`, `CONTEXT-MAP.md` | Domain vocabulary in APIs and test names |
+| `GLOSSARY.md`, `GLOSSARY-MAP.md` | Domain vocabulary in APIs and test names |
 | `docs/adr/` (relevant to this area) | Architectural constraints |
 | `.editorconfig`, `eslint`/`biome`/`prettier`/`ruff` configs | Machine-enforced formatting |
 
@@ -61,7 +61,7 @@ Before signaling phase complete:
 [ ] No secrets, credential comments, or env files in the diff
 [ ] Compliance rules at `.compliance-rules/` (if present) are satisfied
 [ ] New dependencies (if any) comply with policy
-[ ] CONTEXT.md vocabulary and ADRs respected; conflicts surfaced to user
+[ ] GLOSSARY.md vocabulary and ADRs respected; conflicts surfaced to user
 [ ] Deletion test passed for each new module
 [ ] Every new seam has production + test adapters; no speculative single-adapter seams
 [ ] Tests exercise modules through their public interface, not internal knowledge

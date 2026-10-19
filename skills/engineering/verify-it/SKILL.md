@@ -1,7 +1,7 @@
 ---
 name: verify-it
 description: >
-  Doc Cycle — verify phase. Finalizes ADRs, CONTEXT.md, changelog, and
+  Doc Cycle — verify phase. Finalizes ADRs, GLOSSARY.md, changelog, and
   planning cleanup after audit-it passes. Does NOT stage or commit. Use after
   Phase N Complete, with audit-it, or when user says verify-it, verify it,
   verify, close phase, finalize.
@@ -15,8 +15,8 @@ Three modes:
 
 | Mode | When | What it does |
 |------|------|-------------|
-| **Full verify** (default) | After **all** phases + full `/audit-it` PASS | Finalize ADRs, CONTEXT, changelog; extract essence from planning docs into ADRs, discard artifacts |
-| **Incremental close** | `--phase phase-N` after single-phase audit PASS | Per-phase ADR notes, CONTEXT, Jira resolution; no changelog or compression |
+| **Full verify** (default) | After **all** phases + full `/audit-it` PASS | Finalize ADRs, GLOSSARY, changelog; extract essence from planning docs into ADRs, discard artifacts |
+| **Incremental close** | `--phase phase-N` after single-phase audit PASS | Per-phase ADR notes, GLOSSARY, Jira resolution; no changelog or compression |
 | **Retroactive cleanup** | `--retro` anytime | Sweep historic `docs/archive/planning/` and orphaned `docs/planning/` dirs, backfill ADRs, delete artifacts |
 
 ## Quick start
@@ -26,7 +26,7 @@ Three modes:
 ```
 
 After audit PASS:
-→ Finalizes ADRs, CONTEXT.md, changelog
+→ Finalizes ADRs, GLOSSARY.md, changelog
 → Extracts any missing decisions from planning docs into ADRs, discards `docs/planning/{ID}/`
 
 Incremental: `/verify-it --phase phase-1` (after `audit-it --phase phase-1` PASS)
@@ -65,7 +65,7 @@ If no `audit-report.md` exists, confirm all implement-it phases are done, then r
 | Step | Full verify | Incremental close (`--phase`) |
 |------|-------------|-------------------------------|
 | **ADR** | `Proposed` → `Accepted`. Add execution notes from audit. | Add execution notes from audit. **Do not** change status (stays `Proposed` until full verify). |
-| **CONTEXT.md** | Merge new terminology. | Merge new terminology (same). |
+| **GLOSSARY.md** | Merge new terminology. | Merge new terminology (same). |
 | **Changelog** | Append one technical summary for the completed plan. | **Skip** — final changelog written at full verify. |
 
 See [EXAMPLES.md](EXAMPLES.md) for concrete before/after diffs.

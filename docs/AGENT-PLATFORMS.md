@@ -99,7 +99,7 @@ docs/planning/<id>/jira.md  # phase ↔ Jira (optional)
 docs/planning/            # Doc Cycle plans
 docs/reference/           # baseline maps (/doc-it Phase 1)
 docs/reference-audit/     # sliced review (/doc-it Phase 2)
-CONTEXT.md
+GLOSSARY.md
 docs/adr/
 .cursor/rules/            # optional extras; Cursor still uses AGENTS.md
 .github/copilot-instructions.md   # Copilot-only; setup patches if present

@@ -47,7 +47,7 @@ Under `skills/`:
    - A mention in the [ask-matt](skills/engineering/ask-matt/SKILL.md) router if it's user-reachable, so the map stays accurate
    - Skills in `misc/`, `in-progress/`, and `deprecated/` must **not** appear in the README, plugin manifest, or get a docs page
 2. Each bucket has a [README.md](skills/engineering/README.md) listing its skills (name → `SKILL.md`).
-3. Domain language for cross-skill terms: [CONTEXT.md](CONTEXT.md).
+3. Domain language for cross-skill terms: [GLOSSARY.md](GLOSSARY.md).
 4. When adding skills, follow [write-a-skill](skills/productivity/write-a-skill/SKILL.md).
 5. No em-dashes anywhere in this repo's prose (`SKILL.md` files, docs, `README.md`, `CHANGELOG.md`, ADRs, code comments) — rewrite with a comma, colon, period, parentheses, or conjunction instead.
 

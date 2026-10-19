@@ -10,7 +10,7 @@ Phase 1 of `/doc-it` creates or refreshes this tree. Keep pages navigable; prefe
 | `overview.md` | System purpose, major boundaries, deployment shape (if inferable) |
 | `module-map.md` | Modules/packages, primary responsibilities, key dependencies (diagram or table) |
 | `entry-points.md` | HTTP routes, CLIs, workers, public APIs, main `main()` paths |
-| `domains.md` | Domain areas → code locations; link `CONTEXT.md` terms; **Glossary gaps** list |
+| `domains.md` | Domain areas → code locations; link `GLOSSARY.md` terms; **Glossary gaps** list |
 | `test-landscape.md` | Test types, where they live, factual coverage (gaps and **TR-*** recommendations go in `docs/reference-audit/testing.md`) |
 
 ## Optional (create when useful)

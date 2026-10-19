@@ -80,7 +80,7 @@ then proceed to grill. If any item is `status: intake`, run
 ### 1. The Grill
 
 See [GRILL.md](GRILL.md) — always runs. One question at a time until shared
-understanding. Update `CONTEXT.md` and ADRs inline.
+understanding. Update `GLOSSARY.md` and ADRs inline.
 
 ### 2. Scaffold
 
@@ -93,7 +93,7 @@ Draft `docs/adr/{ID}-description.md` with status `Proposed`.
 
 ### 4. Deep Modules
 
-Design deep interfaces; update `CONTEXT.md` terminology.
+Design deep interfaces; update `GLOSSARY.md` terminology.
 
 ### 5. Jira (optional)
 
