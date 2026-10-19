@@ -2,11 +2,11 @@
 
 **Canonical instructions:** [AGENTS.md](../AGENTS.md)  
 **Platforms:** [docs/AGENT-PLATFORMS.md](../docs/AGENT-PLATFORMS.md)  
-**Repository:** [github.com/rshingleton/skills/scm/mt/ai-skills.git](https://github.com/rshingleton/skills.git)
+**Repository:** [github.com/rshingleton/skills](https://github.com/rshingleton/skills.git)
 
-This repo is the **internal ai-skills monorepo**. When editing here:
+This repo is the **ai-skills monorepo**. When editing here:
 
-- Follow `AGENTS.md` for bucket layout and README / plugin.json maintenance rules.
+- Follow `AGENTS.md` for bucket layout and README / plugin.json maintenance rules, including its **Mirrors and ORG.md** section.
 - Skills live under `skills/**/SKILL.md` — do not inline skill bodies into this file.
 - Shipped skills must appear in [README.md](../README.md) and [.claude-plugin/plugin.json](../.claude-plugin/plugin.json) (plugin manifest — not skill discovery; skills are consumed via `~/.claude/skills/` or `~/.agents/skills/`).
 

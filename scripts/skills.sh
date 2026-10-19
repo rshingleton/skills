@@ -4,21 +4,24 @@ set -euo pipefail
 # ============================================================================
 # Internal Skills Installer
 # ============================================================================
-# Clones from Bitbucket (VPN or on-site; no auth for read) and symlinks skills
-# into ~/.agents/skills (OpenCode/Cursor/Gemini) and ~/.claude/skills (Claude Code).
+# Clones the skills repo and symlinks skills into ~/.agents/skills
+# (OpenCode/Cursor/Gemini) and ~/.claude/skills (Claude Code).
 #
 # Canonical repo: https://github.com/rshingleton/skills.git
 #
-# One-liner (VPN or on-site):
+# One-liner:
 #   bash <(curl -fsSL 'https://raw.githubusercontent.com/rshingleton/skills/main/scripts/skills.sh')
+#
+# Installing from a mirror: set AI_SKILLS_REPO to its clone URL on the first
+# run. Later runs update from the existing clone's origin. If the clone has an
+# ORG.md, it documents the mirror's own install command.
 #
 # From a clone:
 #   git clone https://github.com/rshingleton/skills.git
-#   bash ai-skills/scripts/skills.sh
+#   bash skills/scripts/skills.sh
 # ============================================================================
 
-REPO_URL="https://github.com/rshingleton/skills.git"
-RAW_INSTALL_URL="https://raw.githubusercontent.com/rshingleton/skills/main/scripts/skills.sh"
+REPO_URL="${AI_SKILLS_REPO:-https://github.com/rshingleton/skills.git}"
 DEFAULT_BRANCH="${DEFAULT_BRANCH:-main}"
 SKILLS_DEST="${SKILLS_DEST:-$HOME/.agents/skills}"
 CLAUDE_SKILLS_DEST="${CLAUDE_SKILLS_DEST:-$HOME/.claude/skills}"

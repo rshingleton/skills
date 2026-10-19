@@ -44,6 +44,8 @@ bash <(curl -fsSL 'https://raw.githubusercontent.com/rshingleton/skills/main/scr
 
 Re-run the same command anytime to pull `main` and refresh symlinks.
 
+**Installing from a private mirror?** Set `AI_SKILLS_REPO` to the mirror's clone URL on the first run; later runs update from that clone. A mirror documents its own install command in an `ORG.md` at its root (see [AGENTS.md](./AGENTS.md#mirrors-and-orgmd)).
+
 **Migrating from Matt Pocock / custom `implement`, `verify`, `audit-engineering`?** Preview removals, then install with cleanup:
 
 ```bash

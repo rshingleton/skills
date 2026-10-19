@@ -26,6 +26,14 @@ bash <(curl -fsSL 'https://raw.githubusercontent.com/rshingleton/skills/main/scr
 
 Or use [scripts/skills.sh](scripts/skills.sh) / [scripts/link-skills.sh](scripts/link-skills.sh) from a clone. Then run `/setup-internal-skills` **in each application repo**.
 
+### Mirrors and ORG.md
+
+This repository is the source of truth and holds nothing organisation-specific. A private mirror may add an `ORG.md` at the root with its own clone URL, install command, and conventions. If `ORG.md` exists, read it and prefer what it says over the GitHub URLs above.
+
+- Mirrors only **add** files; they never edit shared ones, so syncing from here is a plain `git merge`.
+- Generic changes land here first and reach mirrors by merge. Never copy a mirror's files or wording back into this repository.
+- To install from a mirror, set `AI_SKILLS_REPO` to its clone URL on the first run of `scripts/skills.sh`.
+
 ## Skill buckets
 
 Under `skills/`:

@@ -13,7 +13,7 @@ set -euo pipefail
 # Delete:
 #   bash scripts/cleanup-legacy-skills.sh --yes
 #
-# One-liner (VPN or on-site):
+# One-liner:
 #   bash <(curl -fsSL 'https://raw.githubusercontent.com/rshingleton/skills/main/scripts/cleanup-legacy-skills.sh') --yes
 #
 # With install:
