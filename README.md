@@ -8,7 +8,7 @@ Agent skills tailored to my daily engineering workflow: refactoring existing cod
 
 ### Purpose
 
-Each skill is a focused workflow in `SKILL.md` that an agent loads when invoked by name (for example `/plan-it` or `/commit-it`). Together they cover alignment and shared vocabulary (`/grill-with-docs`, `/grill-me`), intake and planning (`/issue-it`, `/plan-it`), implementation with tests (`/implement-it`, `/tdd`, `/diagnose`), independent audit (`/audit-it`), durable documentation after a plan (`/verify-it`), closing out the work (`/commit-it`), and **baseline codebase reference** (`/doc-it` → `docs/reference/` and `docs/reference-audit/`). Engineering skills target day-to-day code work; productivity skills cover general workflow. The [skill map](#skill-map--planning-slicing-executing) and [reference](#reference) sections list everything that ships in this repo.
+Each skill is a focused workflow in `SKILL.md` that an agent loads when invoked by name (for example `/plan-it` or `/commit-it`). Together they cover alignment and shared vocabulary (`/grill-with-docs`, `/grill-me`), intake and planning (`/issue-it`, `/plan-it`), implementation with tests (`/implement-it`, `/tdd`, `/diagnosing-bugs`), independent audit (`/audit-it`), durable documentation after a plan (`/verify-it`), closing out the work (`/commit-it`), and **baseline codebase reference** (`/doc-it` → `docs/reference/` and `docs/reference-audit/`). Engineering skills target day-to-day code work; productivity skills cover general workflow. The [skill map](#skill-map--planning-slicing-executing) and [reference](#reference) sections list everything that ships in this repo.
 
 ### Usage guidelines
 
@@ -199,7 +199,7 @@ For automated tests, a red-green-refactor loop is critical. This is where the ag
 
 I've built a **[`/tdd`](./skills/engineering/tdd/SKILL.md) skill** you can slot into any project. It encourages red-green-refactor and gives the agent plenty of guidance on what makes good and bad tests.
 
-For debugging, I've also built a **[`/diagnose`](./skills/engineering/diagnose/SKILL.md)** skill that wraps best debugging practices into a simple loop.
+For debugging, I've also built a **[`/diagnosing-bugs`](./skills/engineering/diagnosing-bugs/SKILL.md)** skill that wraps best debugging practices into a simple loop.
 
 ### #4: We Built A Ball Of Mud
 
@@ -289,6 +289,8 @@ Unfamiliar repo: /doc-it  →  follow-ups  →  issue-it / plan-it --from-issues
 
 Deprecated: `/to-epic`, `/to-jiras`, `/promote-to-jira`, `/issue-it --jira` — use `/to-jira` or `/plan-it --jira` instead ([issue-it](./skills/engineering/issue-it/SKILL.md)).
 
+Deprecated: `/diagnose`. Use `/diagnosing-bugs` instead.
+
 ## Reference
 
 ### Engineering
@@ -296,11 +298,14 @@ Deprecated: `/to-epic`, `/to-jiras`, `/promote-to-jira`, `/issue-it --jira` — 
 Skills I use daily for code work.
 
 - **[audit-it](./skills/engineering/audit-it/SKILL.md)** — Doc Cycle audit phase; repo reviews write `docs/AUDIT.md`. Gates verify-it.
+- **[code-review](./skills/engineering/code-review/SKILL.md)**: Two-axis review (Standards and Spec) of the diff since a fixed point, in parallel sub-agents. Called by `/audit-it` for its Spec and Standards findings.
 - **[commit-it](./skills/engineering/commit-it/SKILL.md)** — Doc Cycle close phase; commit locally, push only after user approval.
-- **[diagnose](./skills/engineering/diagnose/SKILL.md)** — Disciplined diagnosis loop for hard bugs and performance regressions.
+- **[codebase-design](./skills/engineering/codebase-design/SKILL.md)**: Shared vocabulary for designing deep modules (module, interface, depth, seam). Called by `/tdd` and `/improve-codebase-architecture`.
+- **[diagnosing-bugs](./skills/engineering/diagnosing-bugs/SKILL.md)**: Diagnosis loop for hard bugs and performance regressions. Called by `/implement-it` for bugs it cannot explain in one hypothesis.
 - **[doc-it](./skills/engineering/doc-it/SKILL.md)** — **Baseline codebase documentation:** Phase 1 writes `docs/reference/`. Phase 2 writes `docs/reference-audit/` (`tech-debt.md`, `testing.md`, `architecture.md`, `follow-ups.md`, index `README.md`). Not `/verify-it` or `/zoom-out`.
+- **[domain-modeling](./skills/engineering/domain-modeling/SKILL.md)**: Builds and sharpens the project's domain language, challenging fuzzy terms, keeping `GLOSSARY.md` current, and offering ADRs for hard-to-reverse decisions. Called by `/plan-it` and `/grill-with-docs`.
 - **[grill-with-docs](./skills/engineering/grill-with-docs/SKILL.md)** — Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates `GLOSSARY.md` and ADRs inline.
-- **[implement-it](./skills/engineering/implement-it/SKILL.md)** — Doc Cycle implement phase. TDD with repo standards. Transitions Jira to "In Progress" on start.
+- **[implement-it](./skills/engineering/implement-it/SKILL.md)**: Doc Cycle implement phase. Builds each phase with `/tdd` at the plan's agreed seams, to repo standards. Transitions Jira to "In Progress" on start.
 - **[improve-codebase-architecture](./skills/engineering/improve-codebase-architecture/SKILL.md)** — Find deepening opportunities in a codebase, informed by `GLOSSARY.md` and `docs/adr/`; optional intake issues via [audit-to-issues](./skills/engineering/setup-internal-skills/audit-to-issues.md).
 - **[internal-compliance](./skills/engineering/internal-compliance/SKILL.md)** — Pre-flight compliance check against internal security linting rules before finalizing any PR.
 - **[plan-it](./skills/engineering/plan-it/SKILL.md)** — Doc Cycle plan phase. Always grills; phases, ADRs, `--from-issues` (moves intake to `sources/`), optional Jira → `jira.md`.
@@ -325,6 +330,7 @@ General workflow tools, not code-specific.
 
 - **[caveman](./skills/productivity/caveman/SKILL.md)** — Ultra-compressed communication mode. Cuts token usage ~75% by dropping filler while keeping full technical accuracy.
 - **[grill-me](./skills/productivity/grill-me/SKILL.md)** — Get relentlessly interviewed about a plan or design until every branch of the decision tree is resolved.
+- **[grilling](./skills/productivity/grilling/SKILL.md)**: The interview primitive, asking numbered rounds over the design-tree frontier, each question with a recommended answer. Called by `/plan-it`, `/grill-me`, and `/grill-with-docs`.
 - **[handoff](./skills/productivity/handoff/SKILL.md)** — Compact the current conversation into a handoff document so another agent can continue the work.
 - **[teach](./skills/productivity/teach/SKILL.md)** — Teach the user a new skill or concept, within this workspace.
 - **[to-questionnaire](./skills/productivity/to-questionnaire/SKILL.md)** — Turn a decision you can't fully answer into a questionnaire for someone else to fill in.

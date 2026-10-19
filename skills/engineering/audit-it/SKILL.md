@@ -38,6 +38,8 @@ Repo audit: `/audit-it repo`
 
 Run [PHASE-AUDIT.md](PHASE-AUDIT.md) across **all implemented phases** in one holistic pass. This is the independent gate on verify-it.
 
+Spec and Standards come from the `code-review` skill, given the phase prompt, its start ref, and [REVIEW-STANDARDS.md](REVIEW-STANDARDS.md). audit-it owns the Mechanical, Compliance, and Architecture checks, the verdict, and the report.
+
 ## Multi-phase audit
 
 Pass `--phases` to audit each phase individually, cycling through them one at a time. Each phase runs the same Mechanical → Spec → Standards → Compliance → Architecture checks as single-phase audit. Findings are compiled and presented together at the end.

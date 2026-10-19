@@ -1,10 +1,10 @@
-# Standards & Code Discipline
+# Standards While Coding
 
-Apply **while coding** and re-check **before handoff**. PR-level gates remain `/internal-compliance` and `/review`. Doc Cycle: `/plan-it` → `/implement-it` (every phase) → `/audit-it` → `/verify-it`.
+What the implementer does while writing code. Judgement-call standards (matching the repo, module depth, seams, test surface) are enforced at review: `/audit-it` passes [audit-it/REVIEW-STANDARDS.md](../audit-it/REVIEW-STANDARDS.md) and the repo's `.compliance-rules/` to `code-review`. Doc Cycle: `/plan-it` → `/implement-it` (every phase) → `/audit-it` → `/verify-it`.
 
-## 1. Discover standards (before first edit)
+## 1. Discover standards and tooling (before first edit)
 
-Scan once per phase for how this repo expects code to be written:
+Scan once per phase for how this repo expects code to be written and checked:
 
 | Source | Use for |
 |--------|---------|
@@ -12,59 +12,26 @@ Scan once per phase for how this repo expects code to be written:
 | `STYLE.md`, `STANDARDS.md`, `STYLEGUIDE.md` | Explicit style rules |
 | `GLOSSARY.md`, `GLOSSARY-MAP.md` | Domain vocabulary in APIs and test names |
 | `docs/adr/` (relevant to this area) | Architectural constraints |
-| `.editorconfig`, `eslint`/`biome`/`prettier`/`ruff` configs | Machine-enforced formatting |
+| `.editorconfig`, `eslint`/`biome`/`prettier`/`ruff` configs, `package.json` scripts, CI workflow | The test, lint, format, and type-check commands |
 
-Also skim, when present: `SECURITY_POLICY.md`, `.compliance-rules/`, `docs/agents/compliance/`.
-
-**`.compliance-rules/` layering** (if present): `coding-standards.md` defines repo-specific overrides to this file, and `coding-standards-<lang>.md` files add per-language rules. Later files override earlier ones.
-
-**Run** the project's test, lint, and format commands. Do not manually re-check what tooling already enforces.
+**Run** the project's test, lint, and format commands. Do not manually re-check what tooling already enforces. `.compliance-rules/` is checked at audit, not on every step.
 
 ## 2. While coding
 
-**Spec-bound.** `ai-prompt.md` is the contract — only what it and linked ADRs require. No scope creep; no drive-by refactors in files outside the phase scope.
+**Spec-bound.** `ai-prompt.md` is the contract: only what it and linked ADRs require. No scope creep; no drive-by refactors in files outside the phase scope.
 
-**Match the repo.** Read surrounding code before editing. Match naming, imports, layout, error-handling patterns, and comment density.
-
-**Minimal surface.** Smallest change that satisfies the current test. No speculative features or "while I'm here" cleanup.
-
-**Comments.** Explain non-obvious *why*, not obvious *what*. Never leave credential placeholders in comments (`// TODO: insert API key`).
-
-**Compliance rules.** If `.compliance-rules/` exists at repo root, read all rule files and apply them **on every TDD cycle** (Red→Green→Refactor). Treat HIGH-severity rules as blocking — fix before proceeding to the next step. Do not defer compliance to handoff.
-
-**Secrets.** No hardcoded keys, tokens, or passwords. Do not create or stage `.env` / `.env.*`. No plaintext credentials in connection strings.
-
-**Dependencies.** If manifests change: no `"*"` or unbounded `>=` ranges; no unofficial registries; cross-check `.dependency-audit.json` when it exists.
-
-**Module depth.** Each new module should earn its keep — imagine deleting it. If behaviour vanishes, the module is a pass-through (shallow). If behaviour redistributes across N callers, it's earning depth.
-
-**Seam discipline.** Every interface needs at least two adapters (production + test). A seam with one adapter is speculative indirection.
-
-**Test surface.** Tests exercise the module through its public interface. If a test must know internals to set up or assert, the interface is wrong.
-
-**File hygiene** (unless repo lint config overrides):
-
-- UTF-8; LF line endings (see `.gitattributes`)
-- `.sh` executable; other files not accidentally `+x`
-- Copyright header on new files when siblings in that directory have one
-- ~120 characters per line of code unless config says otherwise
+**Secrets.** No hardcoded keys, tokens, or passwords. Do not create or stage `.env` / `.env.*`. No plaintext credentials in connection strings. Never leave credential placeholders in comments (`// TODO: insert API key`).
 
 ## 3. Pre-handoff self-check
 
 Before signaling phase complete:
 
-```
+```text
 [ ] Every acceptance criterion in ai-prompt.md is met
 [ ] No behaviour beyond ai-prompt / linked ADR scope
-[ ] Full test suite + lint/type-check green
-[ ] Diff aligns with standards docs from §1
+[ ] Full test suite + lint/format/type-check green
 [ ] No secrets, credential comments, or env files in the diff
-[ ] Compliance rules at `.compliance-rules/` (if present) are satisfied
-[ ] New dependencies (if any) comply with policy
 [ ] GLOSSARY.md vocabulary and ADRs respected; conflicts surfaced to user
-[ ] Deletion test passed for each new module
-[ ] Every new seam has production + test adapters; no speculative single-adapter seams
-[ ] Tests exercise modules through their public interface, not internal knowledge
 ```
 
-Fix failures before handoff. After handoff, `/audit-it` re-audits independently; `/verify-it` finalizes docs only on audit PASS. For branch review or org PR gates, use `/review` or `/internal-compliance`.
+Fix failures before handoff. `/audit-it` then reviews the diff against the repo's standards independently; `/verify-it` finalizes docs only on audit PASS. For branch review or org PR gates, use `/code-review` or `/internal-compliance`.

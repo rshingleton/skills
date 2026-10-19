@@ -79,13 +79,14 @@ then proceed to grill. If any item is `status: intake`, run
 
 ### 1. The Grill
 
-See [GRILL.md](GRILL.md) — always runs. One question at a time until shared
-understanding. Update `GLOSSARY.md` and ADRs inline.
+Always runs, however small the work looks. Call the Skill tool twice, for "grilling" and
+"domain-modeling", then add the plan agenda in [GRILL.md](GRILL.md). End your turn after
+each round and wait for answers.
 
 ### 2. Scaffold
 
-See [SCAFFOLD.md](SCAFFOLD.md) — create `docs/planning/{ID}/` with README,
-phase prompts, and jira.md stub.
+See [SCAFFOLD.md](SCAFFOLD.md): get the phase breakdown approved, then create
+`docs/planning/{ID}/` with README, phase prompts, and jira.md stub.
 
 ### 3. ADR
 
@@ -93,14 +94,15 @@ Draft `docs/adr/{ID}-description.md` with status `Proposed`.
 
 ### 4. Deep Modules
 
-Design deep interfaces; update `GLOSSARY.md` terminology.
+Design deep interfaces at the seams agreed in the grill.
 
 ### 5. Jira (optional)
 
-Delegate all API operations to [`to-jira`](../to-jira/SKILL.md). Follow
-[JIRA.md](JIRA.md) for Epic and Task creation. If Jira not requested, ask
-the user. For a single intake item, suggest `/to-jira create` as lighter
-alternative.
+Follow [JIRA.md](JIRA.md) for Epic and Task creation: publish operations
+source the connector bridge directly. Only the small-plan single-Task
+shortcut goes through [`to-jira`](../to-jira/SKILL.md). If Jira not
+requested, ask the user. For a single intake item, suggest
+`/to-jira create` as lighter alternative.
 
 ### 6. Next skill
 

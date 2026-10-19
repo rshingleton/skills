@@ -1,3 +1,5 @@
 # Deprecated
 
-Skills I no longer use. This bucket is currently empty: a retired skill is deleted, and the changeset that removes it names whatever replaced it.
+Skills I no longer use. The installers skip this bucket, and `scripts/legacy-skills.txt` removes old installs of them.
+
+- **[diagnose](./diagnose/SKILL.md)**: replaced by [diagnosing-bugs](../engineering/diagnosing-bugs/SKILL.md).

@@ -1,10 +1,10 @@
 # Coding Standards & Style — Repo Overrides
 
-**Baseline:** `implement-it/STANDARDS.md` defines language-agnostic standards (spec-bound, minimal surface, seam discipline, file hygiene, etc.). This file provides repo-specific overrides and points to language-specific extensions.
+**Baseline:** `implement-it/STANDARDS.md` (while coding: spec-bound, secrets) and `audit-it/REVIEW-STANDARDS.md` (at review: minimal surface, seam discipline, file hygiene, etc.) define language-agnostic standards. This file provides repo-specific overrides and points to language-specific extensions.
 
 ## How layers stack
 
-1. `implement-it/STANDARDS.md` — generic standards (always apply first)
+1. `implement-it/STANDARDS.md` and `audit-it/REVIEW-STANDARDS.md`: generic standards (always apply first)
 2. `coding-standards.md` — this file, repo-wide overrides (applied next)
 3. `coding-standards-<lang>.md` — per-language rules (applied last, highest priority)
 

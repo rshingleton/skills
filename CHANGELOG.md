@@ -74,6 +74,25 @@
 
 ## This fork
 
+## 2026-10-19 -- Doc Cycle skills call the canonical skills (ADR-0010)
+
+- **plan-it:** the grill calls `grilling` and `domain-modeling` (numbered rounds instead of one
+  question at a time). The scaffold adds slicing rules, user approval of the phase breakdown, a
+  `Blocked by` column in the plan README, and a `## Seams` section in every phase prompt.
+  `AGENT-BRIEF.md` removed.
+- **implement-it:** builds each phase with `tdd` at the plan's agreed seams; refactoring moved
+  out of the loop. Unexplained or flaky failures go to `diagnosing-bugs`. Records `Start ref:`
+  in the phase's `execution-notes.md` before its first edit. Judgement-call standards and
+  per-step compliance checks moved to review; `EXAMPLES.md` removed.
+- **audit-it:** Spec and Standards come from `code-review` (two isolated sub-agents, one call
+  per phase) against the start ref, the phase prompt, and the new `REVIEW-STANDARDS.md`. Reports
+  add a "Guardrail candidates" list for mechanical rules. Architecture design smells are now
+  non-blocking judgement calls; accretion beyond ADR intent still blocks.
+- **Deprecated:** `diagnose`, replaced by `diagnosing-bugs`; removed by
+  `skills.sh --cleanup-legacy`.
+- **Plugin:** `code-review`, `codebase-design`, `diagnosing-bugs`, `domain-modeling` and
+  `grilling` now ship in `plugin.json` and the README.
+
 ## 2026-10-18 -- Jira write helpers return the result of their own write
 
 - **Bug fix:** `_jira_transition`, `_jira_update_issue`, `_jira_update_description` and
