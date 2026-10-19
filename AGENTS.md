@@ -66,16 +66,21 @@ After installing skills, run **`/setup-internal-skills`** once per repo. It writ
 - `AGENTS.md` — `## Agent skills` block (issue tracker, triage, domain docs)
 - `docs/agents/*.md` — machine-readable config skills read at runtime
 - `docs/issues/` — **inbox only** (unplanned intake; moved to `docs/planning/<id>/sources/` at `--from-issues`)
-- `docs/planning/<id>/` — phases, ADRs, `sources/`
+- `docs/planning/<id>/`: phases and `sources/` (ADRs, when a plan warrants one, go in `docs/adr/`)
 - `docs/planning/<id>/jira.md` — phase ↔ Jira keys when published
 
 On **existing repos**, setup audits Copilot and Cursor files (see `PLATFORM-AUDIT.md` in the setup skill): patches `.github/copilot-instructions.md` in place, lists `.cursor/rules/` without requiring new Cursor config.
 
 **Intake:** `/issue-it` (capture local or paste email/ServiceNow) · audit skills → [audit-to-issues.md](skills/engineering/setup-internal-skills/audit-to-issues.md). Plan: `/plan-it --from-issues` (intake evaluation + planning in one session).
 
-**Plan:** `/plan-it` (ad-hoc or `--from-issues`) — **always grills** before scaffold; optional triage pre-work does not replace the grill.
+**Plan:** `/plan-it` (ad-hoc or `--from-issues`) **always grills** before scaffold; optional triage pre-work does not replace the grill. A one-phase plan's breakdown approval folds into the grill's final confirmation. ADRs only for decisions that pass domain-modeling's three tests. Jira only with `--jira`; plan-it never asks.
 
-**Doc Cycle:** `/plan-it` → `/implement-it` (each phase) → `/audit-it` (once, or `--phase` per phase) → `/verify-it` (once, or `--phase` per phase) → `/commit-it` (stage, commit, PR).
+**Doc Cycle:** `/plan-it` → `/implement-it {ID}` → `/audit-it` → `/verify-it` → `/commit-it`.
+
+- `/implement-it {ID}` works the plan's frontier: every phase whose blockers are done. Two or more ready phases build in parallel, each in its own worktree and `plan/{ID}--phase-N` branch, merged into the integration branch (the current branch, or `plan/{ID}` from `main`). `/implement-it docs/planning/{ID}/phase-N` builds one phase inline. Either way each phase ends in one commit prefixed with its Jira key or `{ID} phase-N` (later fixes reuse the prefix), and its `execution-notes.md` records the `Base ref` it started from.
+- `/audit-it` modes: Full (`/audit-it`, the gate on verify-it), Per-phase (`--phases`), Single-phase (`--phase phase-N`, early feedback from the phase's Base ref), Repo audit (`/audit-it repo`).
+- `/verify-it` finalizes docs after an audit PASS (ADRs, GLOSSARY, changelog, planning removal), or closes one phase with `--phase phase-N`; it does not audit, stage or commit.
+- `/commit-it` runs the compliance gate, commits verify-it's docs in one commit, offers to squash the unpushed branch, and pushes or opens a PR only on approval.
 
 **Codebase reference:** `/doc-it` → `docs/reference/` + `docs/reference-audit/`. Optional inbox from follow-ups via audit-to-issues.
 

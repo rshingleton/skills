@@ -15,15 +15,35 @@ A single pre-plan item — bug, defer, todo, or feature request as one `docs/iss
 _Avoid_: using "issue" for a plan phase or Jira task
 
 **Plan**:
-Doc Cycle orchestration under `docs/planning/<id>/` — phases, `ai-prompt.md`, ADR draft. Produced by `/plan-it`. Optional **`jira.md`** maps phases to Jira keys.
+Doc Cycle orchestration under `docs/planning/<id>/`: phases, `ai-prompt.md`, and an ADR draft under `docs/adr/` only when one is warranted (ADR-0012). Produced by `/plan-it`. Optional **`jira.md`** maps phases to Jira keys.
 
 **Seam** (plan):
 A test boundary agreed during `/plan-it` and recorded in the phase prompt's `## Seams` section, each with a note on what tests there catch and miss. `/implement-it` passes them to `tdd` as already agreed.
 _Avoid_: test point, hook
 
-**Start ref**:
-The commit `HEAD` pointed at when `/implement-it` began a phase, written as `Start ref:` in that phase's `execution-notes.md`. `/audit-it` diffs the phase from it (working tree against the ref, since implement-it does not commit).
-_Avoid_: base commit, baseline
+**Base ref**:
+The commit a phase branched from, written as `Base ref:` in that phase's `execution-notes.md`. A Single-phase audit reads the phase's prefixed commits since it (ADR-0011).
+_Avoid_: start ref, baseline
+
+**Frontier**:
+The phases of a plan whose blocking phases are all merged. `/implement-it {ID}` builds every frontier phase, in parallel when there is more than one.
+_Avoid_: ready queue, next phases
+
+**Integration branch**:
+The branch every phase of a plan merges into: the current branch unless it is `main`, else `plan/{ID}`.
+_Avoid_: plan branch, feature branch
+
+**Phase branch**:
+One phase's own branch, `plan/{ID}--phase-N`, built in its own worktree and merged into the integration branch.
+_Avoid_: ticket branch
+
+**Audit mode**:
+One of `/audit-it`'s four passes: **Full audit** (the plan's combined diff, the gate on `/verify-it`), **Per-phase audit** (`--phases`, each phase on its own, compiled), **Single-phase audit** (`--phase phase-N`, early feedback), **Repo audit** (`repo`, not tied to a plan).
+_Avoid_: phase audit, multi-phase audit, holistic audit
+
+**Shortcut marker**:
+A code comment `shortcut: <the limit>, <when to upgrade>` recording a deliberate shortcut. `/audit-it` treats it as a recorded decision, `/doc-it` lists it in the tech-debt ledger, and `/verify-it` offers a `no-trigger` one (no upgrade condition) to `/issue-it`.
+_Avoid_: TODO, hack
 
 **Guardrail candidate**:
 A violated rule that is mechanical (a fixed pattern, banned API, import shape, file-location rule), listed in an audit report as a candidate lint rule or hook. Listed only; building it is separate work.
@@ -40,6 +60,7 @@ State machine (`intake` → `ready-for-plan` → `wontfix`) mapped to local inbo
 - **Issue tracker** holds intake **Issues** until planned
 - A **Plan** holds moved intake under **`sources/`**, lists them in README `## Sources`, and owns **`jira.md`** when published to Jira
 - **implement-it** / **verify-it** read phase Jira keys from **`jira.md`** (`_jira_phase_key` helper in [issue-tracker-jira.md](skills/engineering/setup-internal-skills/issue-tracker-jira.md)), not from intake files
+- **implement-it** commits each phase, prefixed with its Jira key or `{ID} phase-N`; **commit-it** commits only the docs **verify-it** changed (ADR-0011)
 - **plan-it** `--jira --sync-only` re-pulls Epic Task keys into `jira.md` without re-grilling
 - **plan-it**, **implement-it** and **audit-it** call canonical skills for generic methods (`grilling` and `domain-modeling`; `tdd` and `diagnosing-bugs`; `code-review`) and keep only Doc Cycle specifics (ADR-0010)
 - **plan-it** handles intake evaluation and planning in one session — triage-style assessment then the grill

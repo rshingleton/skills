@@ -14,7 +14,7 @@ Each skill is a focused workflow in `SKILL.md` that an agent loads when invoked 
 
 1. **Install once** on your machine using the [quickstart](#quickstart-30-second-setup) below. Skills land in `~/.agents/skills` (and `~/.claude/skills` for Claude Code) — loaded natively by Cursor, OpenCode, Gemini/agy, and Claude Code. Copilot doesn't load `SKILL.md` automatically; it gets a pointer to `AGENTS.md` instead (see [Agent platforms](#agent-platforms)).
 2. **Configure each application repo** with `/setup-internal-skills`. That seeds `AGENTS.md`, `docs/agents/`, intake inbox `docs/issues/`, and plans under `docs/planning/`.
-3. **Compose skills for the task.** You are not required to run a fixed pipeline. Capture work in the **inbox** (`/issue-it` or audit skills → [audit-to-issues](./skills/engineering/setup-internal-skills/audit-to-issues.md)), then **`/plan-it --from-issues` evaluates and grills** before scaffolding. The **Doc Cycle** is `/plan-it` → `/implement-it` (each phase) → `/audit-it` → `/verify-it` → `/commit-it`. Optional Jira phase keys: `/plan-it --jira` → `jira.md`.
+3. **Compose skills for the task.** You are not required to run a fixed pipeline. Capture work in the **inbox** (`/issue-it` or audit skills → [audit-to-issues](./skills/engineering/setup-internal-skills/audit-to-issues.md)), then **`/plan-it --from-issues` evaluates and grills** before scaffolding. The **Doc Cycle** is `/plan-it` → `/implement-it {ID}` (ready phases in parallel, one commit per phase) → `/audit-it` → `/verify-it` → `/commit-it`. Optional Jira phase keys: `/plan-it --jira` → `jira.md`.
    - **Using Jira?** Stick with `/plan-it` → `/implement-it` → `/audit-it` → `/verify-it` → `/commit-it`, with `/to-jira`/`/from-jira` as the Jira bridge.
    - **Not using Jira** (GitHub Issues, Linear, or local tracking)? `/to-spec` → `/to-tickets` is the tracker-agnostic equivalent of the intake/planning step — synthesize the conversation into a spec, then slice it into tracer-bullet tickets on whatever tracker you've configured. The two paths aren't meant to be mixed on the same piece of work.
    - **Work bigger than one plan/session?** `/wayfinder` maps it as a set of decision tickets you resolve one at a time — a companion for scoping ahead of `/plan-it`, not a replacement for it.
@@ -257,10 +257,12 @@ At plan creation, `--from-issues` **moves** inbox files to `docs/planning/<id>/s
 
 | | `/implement-it` | `/audit-it` | `/verify-it` | `/commit-it` |
 |---|---|---|---|---|
-| **Does** | TDD per plan phase | Phase audit (spec, standards, compliance, architecture) | Durable docs after audit PASS | Commit locally, ask before push |
+| **Does** | TDD per phase at the plan's seams; one commit per phase; `{ID}` builds ready phases in parallel worktrees | Full, Per-phase (`--phases`) or Single-phase (`--phase`) audit: spec, standards, compliance, architecture | Finalizes docs after audit PASS: ADRs, GLOSSARY, changelog, planning removal | Compliance gate, docs commit, optional squash, push or PR on approval |
 | **Jira** | Assignee + In Progress when `JIRA_ASSIGNEE` set | — | Assignee + close (transition to "Done") | — |
 
-**Doc Cycle (plan-it–driven):** `/plan-it` → `/implement-it` (each phase) → `/audit-it` → `/verify-it` → `/commit-it`
+**Doc Cycle (plan-it driven):** `/plan-it` → `/implement-it {ID}` → `/audit-it` → `/verify-it` → `/commit-it`
+
+`/implement-it {ID}` works the plan's **frontier**: every phase whose `Blocked by` phases are done. With two or more ready phases, each builds in its own worktree (`../<repo>.worktrees/{ID}/phase-N`, branch `plan/{ID}--phase-N`) and merges into the integration branch (the current branch, or `plan/{ID}` when on `main`); then the next frontier starts. A linear plan, or a host without background subagents, builds the phases one after another. `/implement-it docs/planning/{ID}/phase-N` builds a single phase inline. Every phase ends in one commit, prefixed with its Jira key or `{ID} phase-N`, and records its `Base ref` in `execution-notes.md`; a Single-phase audit reads that phase's prefixed commits since the Base ref, later fix commits included. `/commit-it` then commits only the docs `/verify-it` changed.
 
 **Codebase reference (onboarding or unfamiliar repo):**
 
@@ -277,7 +279,8 @@ At plan creation, `--from-issues` **moves** inbox files to `docs/planning/<id>/s
 Ad-hoc plan:     /plan-it  →  grill  →  phases  →  Doc Cycle
 Intake → plan:   /issue-it  →  /plan-it --from-issues  →  Doc Cycle
 With Jira:       …  →  /plan-it --from-issues --jira  →  implement-it  →  audit-it  →  verify-it  →  commit-it
-Incremental:     …  →  implement phase-N  →  audit-it --phase phase-N  →  verify-it --phase phase-N  →  …  →  full audit  →  full verify  →  commit-it
+Whole plan:      /implement-it <id>  →  /audit-it  →  /verify-it  →  /commit-it   (ready phases in parallel)
+Incremental:     …  →  implement phase-N  →  audit-it --phase phase-N  →  verify-it --phase phase-N  →  …  →  Full audit  →  full verify  →  commit-it
 Audit backlog:   /doc-it  →  audit-to-issues  →  /plan-it --from-issues
 Re-sync Jira:    /plan-it <id> --jira --sync-only   (keys in jira.md only)
 Jira → plan:     /from-jira CDS-142                  (fetch Jira → grill → scaffold plan)
@@ -297,18 +300,18 @@ Deprecated: `/diagnose`. Use `/diagnosing-bugs` instead.
 
 Skills I use daily for code work.
 
-- **[audit-it](./skills/engineering/audit-it/SKILL.md)** — Doc Cycle audit phase; repo reviews write `docs/AUDIT.md`. Gates verify-it.
+- **[audit-it](./skills/engineering/audit-it/SKILL.md)**: Doc Cycle audit phase. Full, Per-phase (`--phases`) and Single-phase (`--phase`) plan audits; Repo audit writes `docs/AUDIT.md`. The Full audit gates verify-it.
 - **[code-review](./skills/engineering/code-review/SKILL.md)**: Two-axis review (Standards and Spec) of the diff since a fixed point, in parallel sub-agents. Called by `/audit-it` for its Spec and Standards findings.
-- **[commit-it](./skills/engineering/commit-it/SKILL.md)** — Doc Cycle close phase; commit locally, push only after user approval.
+- **[commit-it](./skills/engineering/commit-it/SKILL.md)**: Doc Cycle close phase. Compliance gate, one commit for verify-it's docs, optional squash, push or PR only after user approval.
 - **[codebase-design](./skills/engineering/codebase-design/SKILL.md)**: Shared vocabulary for designing deep modules (module, interface, depth, seam). Called by `/tdd` and `/improve-codebase-architecture`.
 - **[diagnosing-bugs](./skills/engineering/diagnosing-bugs/SKILL.md)**: Diagnosis loop for hard bugs and performance regressions. Called by `/implement-it` for bugs it cannot explain in one hypothesis.
 - **[doc-it](./skills/engineering/doc-it/SKILL.md)** — **Baseline codebase documentation:** Phase 1 writes `docs/reference/`. Phase 2 writes `docs/reference-audit/` (`tech-debt.md`, `testing.md`, `architecture.md`, `follow-ups.md`, index `README.md`). Not `/verify-it` or `/zoom-out`.
 - **[domain-modeling](./skills/engineering/domain-modeling/SKILL.md)**: Builds and sharpens the project's domain language, challenging fuzzy terms, keeping `GLOSSARY.md` current, and offering ADRs for hard-to-reverse decisions. Called by `/plan-it` and `/grill-with-docs`.
 - **[grill-with-docs](./skills/engineering/grill-with-docs/SKILL.md)** — Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates `GLOSSARY.md` and ADRs inline.
-- **[implement-it](./skills/engineering/implement-it/SKILL.md)**: Doc Cycle implement phase. Builds each phase with `/tdd` at the plan's agreed seams, to repo standards. Transitions Jira to "In Progress" on start.
+- **[implement-it](./skills/engineering/implement-it/SKILL.md)**: Doc Cycle implement phase. Builds each phase with `/tdd` at the plan's agreed seams, to repo standards, and commits it. `/implement-it {ID}` builds the whole plan, running ready phases in parallel worktrees. Transitions Jira to "In Progress" on start.
 - **[improve-codebase-architecture](./skills/engineering/improve-codebase-architecture/SKILL.md)** — Find deepening opportunities in a codebase, informed by `GLOSSARY.md` and `docs/adr/`; optional intake issues via [audit-to-issues](./skills/engineering/setup-internal-skills/audit-to-issues.md).
 - **[internal-compliance](./skills/engineering/internal-compliance/SKILL.md)** — Pre-flight compliance check against internal security linting rules before finalizing any PR.
-- **[plan-it](./skills/engineering/plan-it/SKILL.md)** — Doc Cycle plan phase. Always grills; phases, ADRs, `--from-issues` (moves intake to `sources/`), optional Jira → `jira.md`.
+- **[plan-it](./skills/engineering/plan-it/SKILL.md)**: Doc Cycle plan phase. Always grills; phases with `Blocked by` edges and seams, ADRs only where they earn one, `--from-issues` (moves intake to `sources/`), Jira only with `--jira` → `jira.md`.
 - **[prototype](./skills/engineering/prototype/SKILL.md)** — Build a throwaway prototype to flesh out a design.
 - **[research](./skills/engineering/research/SKILL.md)** — Delegate reading legwork to a background agent: investigate a question against primary sources and capture the findings as a Markdown file.
 - **[resolving-merge-conflicts](./skills/engineering/resolving-merge-conflicts/SKILL.md)** — Resolve an in-progress git merge/rebase conflict.
@@ -319,7 +322,7 @@ Skills I use daily for code work.
 - **[issue-it](./skills/engineering/issue-it/SKILL.md)** — Pre-plan intake under `docs/issues/`.
 - **[to-jira](./skills/engineering/to-jira/SKILL.md)** — Ad-hoc Jira handler and bridge reference: create, transition, resolve, comment, assign. Other skills source the connector bridge directly rather than delegating here.
 - **[from-jira](./skills/engineering/from-jira/SKILL.md)** — Create a Doc Cycle plan from a Jira issue — no inbox step.
-- **[verify-it](./skills/engineering/verify-it/SKILL.md)** — Doc Cycle verify phase. Finalizes ADRs, GLOSSARY.md, changelog, and planning cleanup. Optionally close Jira issues.
+- **[verify-it](./skills/engineering/verify-it/SKILL.md)**: Doc Cycle docs-finalize phase, after an audit PASS. Accepts the plan's ADRs, merges GLOSSARY.md, writes the changelog entry, removes the planning directory. Optionally closes Jira issues. Does not audit, stage or commit.
 - **[wayfinder](./skills/engineering/wayfinder/SKILL.md)** — Plan work bigger than one session as a shared map of decision tickets, resolved one at a time. Complements `/plan-it`, doesn't replace it.
 - **[wizard](./skills/engineering/wizard/SKILL.md)** — Generate an interactive bash wizard for steps only a human can perform: provisioning infra, credentials/CI secrets, unfamiliar third-party dashboards, one-off migrations.
 - **[zoom-out](./skills/engineering/zoom-out/SKILL.md)** — Get broader context on unfamiliar code.

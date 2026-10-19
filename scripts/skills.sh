@@ -19,6 +19,11 @@ set -euo pipefail
 # From a clone:
 #   git clone https://github.com/rshingleton/skills.git
 #   bash skills/scripts/skills.sh
+#
+# Every run prunes stale links after linking: a symlink in either target whose
+# skill is gone or now sits under deprecated/ is removed and reported.
+# --cleanup-legacy additionally removes the legacy folders named in
+# scripts/legacy-skills.txt, real directories included.
 # ============================================================================
 
 REPO_URL="${AI_SKILLS_REPO:-https://github.com/rshingleton/skills.git}"
@@ -28,9 +33,30 @@ CLAUDE_SKILLS_DEST="${CLAUDE_SKILLS_DEST:-$HOME/.claude/skills}"
 CLONE_DIR="${SKILLS_CLONE_DIR:-$HOME/.local/share/ai-skills}"
 CLEANUP_LEGACY="${CLEANUP_LEGACY:-0}"
 
+usage() {
+  cat <<'EOF'
+Usage: skills.sh [--cleanup-legacy] [--help]
+
+Clones or updates the skills repo and links its promoted skills into
+~/.agents/skills and ~/.claude/skills.
+
+Every run then prunes stale links automatically: symlinks whose skill is gone
+or now sits under deprecated/ are removed and reported. Real directories and
+links to live skills are left alone.
+
+  --cleanup-legacy  Also remove the legacy skill folders listed in
+                    scripts/legacy-skills.txt (same as CLEANUP_LEGACY=1).
+  --help            Show this help.
+EOF
+}
+
 for arg in "$@"; do
   case "$arg" in
     --cleanup-legacy) CLEANUP_LEGACY=1 ;;
+    --help|-h)
+      usage
+      exit 0
+      ;;
   esac
 done
 
@@ -82,9 +108,39 @@ link_skills() {
   done
 }
 
+# Remove symlinks whose target is gone (wherever it pointed) or resolves under
+# the clone's skills/deprecated/. Real directories, live links into other
+# checkouts, and live links to promoted skills are left alone.
+prune_stale_links() {
+  local dest="$1"
+  local label="$2"
+  local clone_real link resolved
+  [ -d "$dest" ] || return 0
+  clone_real="$(cd "$CLONE_DIR" && pwd -P)" || return 1
+  for link in "$dest"/*; do
+    [ -L "$link" ] || continue
+    if [ ! -e "$link" ]; then
+      rm -f "$link"
+      echo "  [$label] pruned $(basename "$link"): target gone"
+      continue
+    fi
+    resolved="$(cd "$link" 2>/dev/null && pwd -P)" || continue
+    case "$resolved" in
+      "$clone_real"/skills/deprecated/*)
+        rm -f "$link"
+        echo "  [$label] pruned $(basename "$link"): deprecated"
+        ;;
+    esac
+  done
+}
+
 echo "==> Linking skills..."
 link_skills "$SKILLS_DEST" "agents"
 link_skills "$CLAUDE_SKILLS_DEST" "claude"
+
+echo "==> Pruning stale links..."
+prune_stale_links "$SKILLS_DEST" "agents"
+prune_stale_links "$CLAUDE_SKILLS_DEST" "claude"
 
 echo ""
 echo "==> Install complete."

@@ -1,44 +1,69 @@
-# Commit-it — Stage, message, commit (push on approval)
+# commit-it: docs commit, push and PR on approval
 
 ## Stage
 
-One commit per Jira key. If the working tree has changes for multiple issues,
-commit each group separately.
+Stage only what `/verify-it` changed, by path:
 
-Present `git status --short` and identify which changes belong to the current
-Jira key. Ask the user to confirm the file set. If unrelated changes are
-present, warn and suggest separate commits.
+```bash
+git add docs/adr/ GLOSSARY.md <changelog file>
+git add <each docs/issues/*.md verify-it filed>   # shortcut issues, if any
+git add -A docs/planning/{ID}/   # records the planning removal
+```
 
-## Jira key resolution
+Present `git status --short` and ask the user to confirm the file set. If
+anything else is uncommitted, leave it unstaged and say so.
 
-Commit messages must be prefixed with a Jira key (`CDS-135: <msg>`).
-Read `docs/planning/{ID}/jira.md`:
+## Key resolution
+
+Prefix the message with one key, read from `docs/planning/{ID}/jira.md`. If
+verify-it already removed the planning directory, read it from the last
+commit: `git show HEAD:docs/planning/{ID}/jira.md`.
 
 | Scenario | Key to use |
 |----------|-----------|
-| Incremental close (`--phase phase-N`) | That phase's row in `## Phase tasks` |
-| Full close, Epic exists | `epic_key` from frontmatter |
-| Full close, no Epic | First phase key from `## Phase tasks` |
-
-If `jira.md` is missing or keys empty, ask the user.
+| Epic exists | `epic_key` from frontmatter |
+| No Epic, phase keys exist | First phase key from `## Phase tasks` |
+| No `jira.md` or no keys | The plan ID, `{ID}` |
 
 ## Commit message
 
 Format:
 
 ```
-{JIRA-KEY}: <short summary>
+{KEY}: <short summary of the docs closed>
 
 <bullet-points>
 ```
 
-Ask the user to confirm or edit. Do not push without approval.
-
-Execute:
+Ask the user to confirm or edit, then:
 
 ```bash
 git commit -m "<title>" -m "<body>"
 ```
+
+## Squash (optional)
+
+Before pushing, offer once to squash the integration branch into one commit.
+Recommend keeping the phase commits when the PR will be squash-merged anyway.
+
+Offer it only when all of these hold:
+
+- The current branch is not `main` or `master`.
+- None of the branch's commits are on the remote yet
+  (`git log @{u}..HEAD` lists them all, or the branch has no upstream).
+- The tree is clean after the docs commit.
+
+On a yes:
+
+```bash
+base=$(git merge-base main HEAD)
+git log --format='%s' "$base"..HEAD   # phase subjects, for the body
+git reset --soft "$base"
+git commit -m "{KEY}: <plan summary>" -m "<one bullet per phase subject>"
+```
+
+`{KEY}` follows the key resolution above. Show the message for approval
+before committing, as for the docs commit. On a no, leave the history as is.
 
 ## Push and PR
 
@@ -65,18 +90,8 @@ the user says yes.
 git push -u origin HEAD
 ```
 
-**Optional PR** — only if the user asks (unprompted; do not offer):
+**Optional PR**, only if the user asks (do not offer):
 
 ```bash
 gh pr create --title "<title>" --body "<summary>"
 ```
-
-## Multi-phase plans with incremental close
-
-If `/verify-it --phase` was used and phases remain, the tree may contain
-next-phase changes. Offer:
-
-- **Commit finished work now** (risks mixing phases — not recommended)
-- **Wait until all phases are implemented, audited, and verified**
-
-Defer to user preference.

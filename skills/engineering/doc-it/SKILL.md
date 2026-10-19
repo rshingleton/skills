@@ -49,7 +49,7 @@ Create **`docs/reference-audit/`** per [REFERENCE-AUDIT-LAYOUT.md](REFERENCE-AUD
 
 | File | Content |
 |------|---------|
-| `tech-debt.md` | [TECH-DEBT.md](TECH-DEBT.md) inventory (required) |
+| `tech-debt.md` | [TECH-DEBT.md](TECH-DEBT.md) inventory and `shortcut:` ledger (required) |
 | `testing.md` | Gaps and **TR-*** recommendations ([TESTING-SLICE.md](TESTING-SLICE.md)) |
 | `architecture.md` | Numbered findings, core value, accretion |
 | `follow-ups.md` | Draft issues, docs to review, next skills |
@@ -59,7 +59,7 @@ Re-explore code where the reference pass is thin.
 
 ### Track findings (optional)
 
-After `follow-ups.md` exists, offer to file selected items as inbox issues per [audit-to-issues.md](../setup-internal-skills/audit-to-issues.md) (`source: doc-it`). Pull from **Issues (draft)** in `follow-ups.md` and actionable TD-*/TR-*/architecture IDs. User picks which rows — do not file the whole audit automatically.
+After `follow-ups.md` exists, offer to file selected items as inbox issues per [audit-to-issues.md](../setup-internal-skills/audit-to-issues.md) (`source: doc-it`). Pull from **Issues (draft)** in `follow-ups.md` and actionable TD-*/TR-*/architecture IDs. The shortcut ledger is not offered here; `/verify-it` routes `no-trigger` markers. User picks which rows; do not file the whole audit automatically.
 
 ## Handoff
 

@@ -108,6 +108,15 @@ passed.
   - Static check 2's grep misses lowercase "call the Skill tool" and "Call the Skill tool
     twice, for ..." forms.
 
+- **Open items closed by `doc-cycle-parallel` (ADR-0011, ADR-0012):**
+  - §4 vs §5.1 severity: one severity rule under §5.1 (HIGH or none stated is Must, MEDIUM
+    Should, LOW Nice), which §4 references.
+  - `audit-it/SKILL.md` (86 lines) and `plan-it/SKILL.md` (99) are under the ceiling.
+  - audit-it no longer triggers on "review".
+  - Shared start refs: retired; each phase is committed and records its `Base ref`.
+  - Static check 2: `scripts/check-skill-calls.sh` matches any case and the "twice, for" form.
+  - Parallel implementation, deferred above, is ADR-0011.
+
 ## References
 
 - `docs/planning/skill-composition/`: plan, phase prompts, audit report (compacted at verify-it)

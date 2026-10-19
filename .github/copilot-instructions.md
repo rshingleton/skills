@@ -14,7 +14,7 @@ Install skills into `~/.agents/skills` with [scripts/skills.sh](../scripts/skill
 
 **Intake:** `docs/issues/` — `issue-it` (capture or paste email/ServiceNow), or `audit-to-issues`. **Plan:** `plan-it` always grills; `--from-issues` evaluates intake then → `sources/`.
 
-**Doc Cycle:** `plan-it` → `implement-it` → `audit-it` → `verify-it` → `commit-it`. **Phase audit modes:** `--phase phase-N` for incremental close, `--phases` for multi-phase cycle. **Phase Jira:** `plan-it --jira` → `jira.md` only. `--parent EPIC` overrides `JIRA_DEFAULT_EPIC`. Re-sync: `plan-it <id> --jira --sync-only`.
+**Doc Cycle:** `plan-it` → `implement-it` → `audit-it` → `verify-it` → `commit-it`. `implement-it {ID}` builds ready phases in parallel worktrees and commits each phase; `commit-it` commits verify-it's docs and pushes only on approval. **Audit modes:** Full (`audit-it`), Per-phase (`--phases`), Single-phase (`--phase phase-N`), Repo audit (`audit-it repo`). **Phase Jira:** `plan-it --jira` → `jira.md` only. `--parent EPIC` overrides `JIRA_DEFAULT_EPIC`. Re-sync: `plan-it <id> --jira --sync-only`.
 
 **Codebase reference:** `doc-it` → `docs/reference/` + `docs/reference-audit/`.
 

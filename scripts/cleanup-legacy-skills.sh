@@ -7,6 +7,10 @@ set -euo pipefail
 # Matt Pocock renames, removed misc skills, and pre -it Doc Cycle names
 # (implement, verify, audit-engineering).
 #
+# skills.sh and link-skills.sh already prune stale symlinks on every run
+# (target gone, or now under deprecated/). This script also removes real
+# directories left by old copy-based installs.
+#
 # Dry-run (default):
 #   bash scripts/cleanup-legacy-skills.sh
 #
@@ -29,7 +33,7 @@ for arg in "$@"; do
   case "$arg" in
     --yes|-y) YES=1 ;;
     --help|-h)
-      sed -n '1,20p' "$0"
+      sed -n '1,25p' "$0"
       exit 0
       ;;
   esac

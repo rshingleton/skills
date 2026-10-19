@@ -1,6 +1,6 @@
 # Audit findings → intake issues
 
-Use when **`/doc-it`**, **`/improve-codebase-architecture`**, or **`/audit-it`** (repo mode) produced actionable items and the user wants them in the **inbox** for planning — not lost in audit markdown only.
+Use when **`/doc-it`**, **`/improve-codebase-architecture`**, **`/audit-it`** (repo mode), or **`/verify-it`** (shortcut markers) produced actionable items and the user wants them in the **inbox** for planning, not lost in audit markdown only.
 
 Capture with **`/issue-it`** (one `docs/issues/<slug>.md` per item). Do **not** create plans or Jira here.
 
@@ -19,6 +19,7 @@ Skip if the user declines. Do not file everything automatically — **quiz** whi
 | `/doc-it` | `docs/reference-audit/follow-ups.md`, `tech-debt.md` (TD-*), `testing.md` (TR-*), `architecture.md` (numbered findings) |
 | `/improve-codebase-architecture` | Numbered candidates from the presentation step (or grilled outcome) |
 | `/audit-it` (repo) | `docs/AUDIT.md` simplification / deletion proposals |
+| `/verify-it` | `no-trigger` `shortcut:` markers the plan's diff added ([SHORTCUTS.md](../verify-it/SHORTCUTS.md)) |
 
 ## Issue type mapping
 
@@ -29,6 +30,7 @@ Skip if the user declines. Do not file everything automatically — **quiz** whi
 | Architecture finding worth a slice | `feature` | `ready-for-plan` |
 | Bug / incorrect behaviour | `bug` | `intake` or `ready-for-plan` |
 | Revisit later / low priority | `defer` | `intake` |
+| `shortcut:` marker with no upgrade trigger (`no-trigger`) | `defer` | `intake` |
 
 ## `source:` frontmatter
 
@@ -38,6 +40,7 @@ Set to the audit skill:
 source: doc-it
 source: improve-codebase-architecture
 source: audit-it
+source: verify-it
 ```
 
 ## File content

@@ -22,6 +22,8 @@ Rules marked *mechanical* could be a lint rule or hook; list a violation of one 
 
 **Test surface.** Tests exercise the module through its public interface. If a test must know internals to set up or assert, the interface is wrong.
 
+**Recorded shortcuts.** A `shortcut: <the limit>, <when to upgrade>` comment that names its limit is a recorded decision, not a finding, here and in audit-it's own Architecture checks. Flag it only when the load the plan, ADR, or code states already crosses that limit, and cite where. A marker with no upgrade trigger is not a finding either; `/verify-it` routes it to the inbox.
+
 ## File hygiene (*mechanical*)
 
 Unless the repo's lint config overrides:
