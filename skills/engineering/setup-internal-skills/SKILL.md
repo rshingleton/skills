@@ -26,7 +26,7 @@ Prompt-driven skill. Explore, confirm with the user, then write.
 
 Read whatever exists; don't assume:
 
-- `git remote -v` — for **this skills repo**, expect `https://github.com/rshingleton/skills.git`; for app repos, verify `github.com/rshingleton/skills` when applicable
+- `git remote -v` — for **this skills repo**, expect `https://github.com/rshingleton/skills.git`, or the mirror URL in the skills clone's `ORG.md` if it has one; for app repos, verify the expected remote when applicable
 - **Open standard:** `AGENTS.md`, `opencode.json`
 - **Cursor:** `.cursor/rules/*.mdc`, legacy `.cursorrules` (Cursor also loads root `AGENTS.md` — see [PLATFORM-AUDIT.md](./PLATFORM-AUDIT.md))
 - **Copilot:** `.github/copilot-instructions.md` (read full file if present)
