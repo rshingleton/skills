@@ -6,6 +6,7 @@ description: >
   whole plan, running ready phases in parallel worktrees. Use when a Doc Cycle
   plan phase needs building, or when user says implement-it, implement phase N,
   implement the plan, or continue the plan.
+model: sonnet
 ---
 
 ## Role

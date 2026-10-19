@@ -6,6 +6,7 @@ description: >
   entry, and removes the planning directory. Does NOT audit, stage, or commit.
   Use after an audit-it PASS, or when user says verify-it, verify it, verify,
   close phase, finalize.
+model: sonnet
 ---
 
 Finalizes docs after an audit PASS. It never audits implement-it output itself; without a
