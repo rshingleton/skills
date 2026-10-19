@@ -102,8 +102,9 @@ Then execute the flow:
 3. Sync-only early exit: If --sync-only, run jira-epic-sync.md then stop
 4. Create Epic (if no parent): jira_bridge_call create-epic "$JIRA_PROJECT_KEY" "<Plan Title>" "<Description>" (echoes MCP call if connector available, or invokes _jira_create_epic if not)
 5. Ask about title prefix before creating tasks: "Prefix phase titles with plan name in Jira? E.g. Auth v2: Implement login form instead of Implement login form (y/N)"
-6. Create Tasks: For each phase-N without a Jira row, jira_bridge_call create-task "$JIRA_PROJECT_KEY" "$SUMMARY" "$BODY_FILE" "$EPIC_KEY" "$EST_HOURS" "${JIRA_ASSIGNEE}"
-7. Write jira.md with Parent Epic section and phase table with keys from step 6
+6. Resolve the assignee before creating anything: the name the user gave, else `JIRA_ASSIGNEE`; if neither is set, ask (recommend the authenticated Jira user, accept a typed username). See `setup-internal-skills/issue-tracker-jira.md` "Assignee".
+7. Create Tasks: For each phase-N without a Jira row, jira_bridge_call create-task "$JIRA_PROJECT_KEY" "$SUMMARY" "$BODY_FILE" "$EPIC_KEY" "$EST_HOURS" "$ASSIGNEE"
+8. Write jira.md with Parent Epic section and phase table with keys from step 7
 
 See to-jira/OPERATIONS.md for the full bridge interface and both connector and bash examples.
 

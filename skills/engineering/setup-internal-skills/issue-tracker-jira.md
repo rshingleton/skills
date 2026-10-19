@@ -33,7 +33,7 @@ The skills read these from the environment:
 | `JIRA_WATCHER_IGNORE` | Optional. Comma-separated Jira usernames to **remove** from watchers after each write (`DELETE .../watchers?username=...`). When set, replaces the `JIRA_EMAIL` default. |
 | `JIRA_WATCHER_USERNAME` | Optional. Comma-separated Jira usernames to **add** as watchers after each **create** (`POST .../watchers`). |
 | `JIRA_DEFAULT_EPIC` | Optional. Default parent Epic key for new Tasks when skills omit `--parent` (see [Default Epic](#default-epic-optional)). |
-| `JIRA_ASSIGNEE` | Optional. Jira **username** (`assignee.name`) for agent-owned work. Set on creates and on Doc Cycle updates (`/implement-it`, `/verify-it`). Omit to leave assignee unchanged. |
+| `JIRA_ASSIGNEE` | Optional default. Jira **username** (`assignee.name`) for agent-owned work. Used on creates and on Doc Cycle updates (`/implement-it`, `/verify-it`). When unset, skills ask who the assignee is (see [Assignee](#assignee-jira_assignee)); they never leave it unassigned by accident. |
 | `JIRA_DEFAULT_ESTIMATE_HOURS` | Optional. Fallback hours for Task **create** when phase/issue has no `estimate_hours` (e.g. `4` → `"4h"`). Omit to skip timetracking on create. |
 
 ### Loading credentials
@@ -193,13 +193,27 @@ After POST, `_jira_apply_watcher_policy "$KEY" create`.
 
 ## Assignee (`JIRA_ASSIGNEE`)
 
-When `JIRA_ASSIGNEE` is set (e.g. `alice`), include assignee on **creates** and set/update on **Doc Cycle** Jira writes. `_jira_set_assignee` does NOT apply watcher policy — call `_jira_apply_watcher_policy "$KEY" update` separately after the assignee PUT.
+Every Jira **create** sets an assignee, and every **Doc Cycle** write (`/implement-it`, `/verify-it`) makes sure the issue has one. Skills resolve the assignee **before** the first Jira call, in this order:
+
+1. The name the user gave for this request.
+2. `JIRA_ASSIGNEE` (e.g. `alice`).
+3. Neither is set, or the name is ambiguous: **ask** (AskUserQuestion). Offer the authenticated Jira user as the recommended option (connector: current-user lookup, show display name and username), "Other" for a username typed in, and "Leave unassigned" as an explicit choice. Never create or transition an issue unassigned without that answer.
+
+Rules that apply to all three:
+
+- The value is a Jira **username**, not a display name. If the user gives a display name, resolve it with the connector's assignable-user search or user profile first; if it matches more than one person, ask.
+- Ask once per session and reuse the answer for every later Jira call in that session.
+- On **create**, always set the assignee. On an **existing** issue that already has an assignee, leave it alone unless the user asked to change it.
+- Read the assignee back after setting it and report it with the key.
+
+`_jira_set_assignee` does NOT apply watcher policy: call `_jira_apply_watcher_policy "$KEY" update` separately after the assignee PUT.
 
 | Skill | When |
 |-------|------|
 | `/implement-it` | Before transitioning linked issue to In Progress |
 | `/verify-it` | Before comment/transition when closing or updating linked issue |
-| `/plan-it --jira` | Optional on `POST` create (`fields.assignee.name`) |
+| `/plan-it --jira` | On every `POST` create (`fields.assignee.name`) |
+| `/to-jira` | On every create, and on `assign` |
 | `/plan-it --from-issues` | During intake evaluation of Jira items (labels, transitions, comments) |
 
 `/audit-it` does not call Jira.

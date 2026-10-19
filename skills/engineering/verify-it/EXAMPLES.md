@@ -9,8 +9,8 @@ Self-contained examples for each workflow step. Replace placeholder values
 
 | Invocation | Audit required | What it finalizes |
 |---|---|---|
-| `/verify-it` | `docs/planning/{key}/audit-report.md` (full) | ADR, CONTEXT, changelog, compact planning docs into ADRs, all Jira keys |
-| `/verify-it --phase phase-2` | `docs/planning/{key}/audit-report-phase-2.md` | ADR notes + CONTEXT for phase 2, resolves phase 2 Jira key only |
+| `/verify-it` | `docs/planning/{key}/audit-report.md` (full) | ADR, GLOSSARY, changelog, compact planning docs into ADRs, all Jira keys |
+| `/verify-it --phase phase-2` | `docs/planning/{key}/audit-report-phase-2.md` | ADR notes + GLOSSARY for phase 2, resolves phase 2 Jira key only |
 | `/verify-it --retro` | None | Sweep `docs/archive/planning/` + orphaned `docs/planning/`, backfill ADRs, delete artifacts |
 
 ---
@@ -22,7 +22,7 @@ After a single-phase audit passes, close that phase without waiting for the rest
 ```bash
 # Phase 2 implemented → audited → incrementally closed
 /audit-it --phase phase-2       # writes audit-report-phase-2.md
-/verify-it --phase phase-2      # ADR notes, CONTEXT, Jira for phase-2 only
+/verify-it --phase phase-2      # ADR notes, GLOSSARY, Jira for phase-2 only
 ```
 
 Result: phase 2 verified. Remaining phases (1, 3) can proceed independently.
@@ -59,7 +59,7 @@ After — move to `Accepted`, add execution notes:
 
 ---
 
-## Durable Update — CONTEXT.md
+## Durable Update — GLOSSARY.md
 
 Before — no entry for a new concept:
 ```markdown
@@ -114,13 +114,13 @@ After — durable records hold the condensed value:
 ```
 docs/adr/{N}-{title}.md    # decision rationale, now Accepted
 CHANGELOG.md                 # what shipped
-CONTEXT.md                   # domain terms introduced
+GLOSSARY.md                  # domain terms introduced
 ```
 
 Checklist:
 - [ ] Each trade-off or architectural finding from the planning docs is captured in an ADR
 - [ ] Changelog covers what was delivered across all phases
-- [ ] `CONTEXT.md` has any new domain terms
+- [ ] `GLOSSARY.md` has any new domain terms
 - [ ] `rm -rf docs/planning/{key}` — no archive needed
 
 ---
@@ -155,7 +155,7 @@ After:
 docs/
 └── adr/                     # backfilled with any missing decisions
 CHANGELOG.md                  # appended with unrecorded deliverables
-CONTEXT.md                    # any missing terms added
+GLOSSARY.md                   # any missing terms added
 ```
 
 Plan-001's `audit-report.md` can contain findings not worth ADR-ing. Discard those or capture as a `docs/issues/` item if still actionable.

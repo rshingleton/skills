@@ -175,7 +175,12 @@ jira_bridge_create_epic() {
 
 # Create Task via connector or bash helper.
 jira_bridge_create_task() {
-  local project_key="$1" summary="$2" body_file="$3" epic_key="$4" est_hours="$5" assignee="${6:-}"
+  local project_key="$1" summary="$2" body_file="$3" epic_key="$4" est_hours="$5" assignee="${6:-${JIRA_ASSIGNEE:-}}"
+
+  # The caller resolves the assignee first (see issue-tracker-jira.md "Assignee"); an empty one is a miss.
+  if [ -z "$assignee" ]; then
+    echo "WARNING: create-task without an assignee; resolve one (user-named, JIRA_ASSIGNEE, or ask) before calling" >&2
+  fi
 
   if [ "$USE_CONNECTOR" = "true" ]; then
     # Connector path: instructions for agent to call MCP tool
@@ -252,12 +257,17 @@ jira_bridge_comment() {
 jira_bridge_assign() {
   local issue_key="$1" assignee="${2:-${JIRA_ASSIGNEE:-}}"
 
+  if [ -z "$assignee" ]; then
+    echo "WARNING: assign $issue_key without an assignee; resolve one (user-named, JIRA_ASSIGNEE, or ask) before calling" >&2
+  fi
+
   if [ "$USE_CONNECTOR" = "true" ]; then
     echo "CONNECTOR: jira_assign_issue --issue_key '$issue_key'" \
       "--assignee '${assignee}'"
   else
     _jira_bridge_load_env || return 1
-    _jira_set_assignee "$issue_key"
+    # _jira_set_assignee reads JIRA_ASSIGNEE, so hand it the resolved value, not just the env default
+    JIRA_ASSIGNEE="$assignee" _jira_set_assignee "$issue_key"
   fi
 }
 

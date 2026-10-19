@@ -60,7 +60,7 @@ On **PASS**: suggest `/verify-it --phase phase-N` for incremental close, or cont
 
 > Multi-phase audit passed ({N} phases).
 >
-> **Next:** Run `/verify-it` to finalize ADRs, CONTEXT.md, changelog, and planning cleanup.
+> **Next:** Run `/verify-it` to finalize ADRs, GLOSSARY.md, changelog, and planning cleanup.
 
 **Any phase FAIL:**
 
@@ -74,7 +74,7 @@ On **PASS**: suggest `/verify-it --phase phase-N` for incremental close, or cont
 
 > Audit passed ({scope: plan `{ID}`, phases audited}).
 >
-> **Next:** Run `/verify-it` to finalize ADRs, CONTEXT.md, changelog, and planning cleanup.
+> **Next:** Run `/verify-it` to finalize ADRs, GLOSSARY.md, changelog, and planning cleanup.
 
 **Single-phase PASS:**
 
@@ -88,7 +88,7 @@ For whole-codebase or sprint-level reviews (not tied to a single phase):
 
 ### 1. Gather context
 
-Scan: `CHANGELOG.md` / `docs/changelog*`, `docs/adr/`, `docs/reference/`, `CONTEXT.md`. For repos with residual `docs/archive/planning/` or orphaned `docs/planning/` dirs, suggest `/verify-it --retro` to backfill ADRs and delete artifacts.
+Scan: `CHANGELOG.md` / `docs/changelog*`, `docs/adr/`, `docs/reference/`, `GLOSSARY.md`. For repos with residual `docs/archive/planning/` or orphaned `docs/planning/` dirs, suggest `/verify-it --retro` to backfill ADRs and delete artifacts.
 
 Summarize the smallest vertical slice intended vs value-to-complexity ratio.
 

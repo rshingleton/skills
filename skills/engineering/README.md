@@ -19,7 +19,7 @@ Pipeline for plan-it–driven work:
 - **[plan-it](./plan-it/SKILL.md)** — Always grills; scaffold phases, ADRs, `--from-issues`, optional `--jira` → `jira.md`.
 - **[implement-it](./implement-it/SKILL.md)** — TDD implementation with repo standards and spec-bound scope. Transitions Jira to "In Progress" on start.
 - **[audit-it](./audit-it/SKILL.md)** — Independent phase auditor (spec, standards, compliance, architecture). Single-phase mode (`--phase phase-N`) for early feedback. Repo reviews write `docs/AUDIT.md`. Gates verify-it.
-- **[verify-it](./verify-it/SKILL.md)** — After audit passes, finalize ADRs, CONTEXT.md, changelog, and planning cleanup. Incremental close (`--phase phase-N`) for per-phase Jira resolution and CONTEXT updates.
+- **[verify-it](./verify-it/SKILL.md)** — After audit passes, finalize ADRs, GLOSSARY.md, changelog, and planning cleanup. Incremental close (`--phase phase-N`) for per-phase Jira resolution and GLOSSARY updates.
 - **[commit-it](./commit-it/SKILL.md)** — After verify, stage changes, auto-draft commit message from changelog, and commit locally. Push only after user approval.
 
 ## Codebase reference
@@ -51,7 +51,7 @@ Not using Jira? `to-spec` → `to-tickets` covers the same intake/planning groun
 ## Other engineering skills
 
 - **[diagnose](./diagnose/SKILL.md)** — Disciplined diagnosis loop for hard bugs and performance regressions.
-- **[grill-with-docs](./grill-with-docs/SKILL.md)** — Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates `CONTEXT.md` and ADRs inline.
+- **[grill-with-docs](./grill-with-docs/SKILL.md)** — Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates `GLOSSARY.md` and ADRs inline.
 - **[improve-codebase-architecture](./improve-codebase-architecture/SKILL.md)** — Find deepening opportunities; optional intake via [audit-to-issues](./setup-internal-skills/audit-to-issues.md).
 - **[internal-compliance](./internal-compliance/SKILL.md)** — Pre-flight compliance check against internal security linting rules before finalizing any PR.
 - **[prototype](./prototype/SKILL.md)** — Build a throwaway prototype to flesh out a design.

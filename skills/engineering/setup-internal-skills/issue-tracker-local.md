@@ -92,7 +92,7 @@ Intake evaluation: **`/plan-it --from-issues`** updates `status` and `## Comment
 ## verify-it cleanup
 
 - Append completion notes on `sources/*.md`; set `status: done`.
-- Verify-it extracts missing decisions from planning docs into ADRs, then discards `docs/planning/{ID}/`. The durable core (ADRs, changelog, CONTEXT.md) replaces the archive.
+- Verify-it extracts missing decisions from planning docs into ADRs, then discards `docs/planning/{ID}/`. The durable core (ADRs, changelog, GLOSSARY.md) replaces the archive.
 
 ## Legacy
 

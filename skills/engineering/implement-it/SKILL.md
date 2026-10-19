@@ -9,7 +9,7 @@ description: >
 
 ## Role
 
-Implementation Agent (Engineer). Writes production code and tests for the current plan phase only. Does **not** finalize ADRs, CONTEXT, or changelog. Does **not** run `/audit-it` until **every** implementation phase in the plan is complete.
+Implementation Agent (Engineer). Writes production code and tests for the current plan phase only. Does **not** finalize ADRs, GLOSSARY, or changelog. Does **not** run `/audit-it` until **every** implementation phase in the plan is complete.
 
 ## Quick start
 
@@ -45,7 +45,7 @@ jira_bridge_detect
 ```
 
 If the phase row has a key:
-1. If `JIRA_ASSIGNEE` is set and the issue has no existing assignee: `jira_bridge_call assign <KEY> "$JIRA_ASSIGNEE"` (set assignee before moving to In Progress)
+1. If the issue has no assignee: resolve one (the name the user gave, else `JIRA_ASSIGNEE`; if neither is set, ask, recommending the authenticated Jira user) and run `jira_bridge_call assign <KEY> "$ASSIGNEE"` before moving to In Progress. An existing assignee is left alone. See `setup-internal-skills/issue-tracker-jira.md` "Assignee".
 2. `jira_bridge_call transition <KEY> "In Progress"`
 
 If the row is empty, tell the user to run `/plan-it --jira {ID}` or `--sync-only` — do not guess keys.
@@ -84,7 +84,7 @@ When tests pass and acceptance criteria are met:
 4. Run full project test suite and lint/type-check.
 5. Signal `Phase {N} Complete`.
 
-Optional: leave draft bullets in `docs/planning/{ID}/phase-{N}/execution-notes.md` for the auditor — do not update ADR status, CONTEXT, or changelog.
+Optional: leave draft bullets in `docs/planning/{ID}/phase-{N}/execution-notes.md` for the auditor — do not update ADR status, GLOSSARY, or changelog.
 
 ### 5. Next skill
 

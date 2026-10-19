@@ -44,7 +44,7 @@ Cycles through every implemented phase one at a time, running full Mechanical �
 - `docs/planning/{ID}/README.md` — orchestration map and phase list
 - **Every** `docs/planning/{ID}/phase-*/ai-prompt.md`
 - Optional `phase-*/execution-notes.md`
-- Linked ADRs and `CONTEXT.md`
+- Linked ADRs and `GLOSSARY.md`
 - Combined diff for the plan
 
 Confirm all implementation phases are complete. If any phase is missing, stop.
@@ -54,7 +54,7 @@ Confirm all implementation phases are complete. If any phase is missing, stop.
 - `docs/planning/{ID}/README.md` — phase order, dependency info
 - `docs/planning/{ID}/phase-N/ai-prompt.md` — the phase's spec contract
 - Optional `docs/planning/{ID}/phase-N/execution-notes.md`
-- Linked ADRs and `CONTEXT.md`
+- Linked ADRs and `GLOSSARY.md`
 - Diff scoped to this phase's changes (compare implementation-start ref or working tree state before phase N vs now)
 
 Do not trust implement-it self-checks — verify independently.
@@ -172,7 +172,7 @@ Present the same summary in chat.
 | Verdict | Tell the user |
 |---------|----------------|
 | **FAIL** | Audit failed — return to `/implement-it` with blocking findings. Do **not** run `/verify-it`. |
-| **PASS** | Audit passed. **Next:** Run `/verify-it` to finalize ADRs, CONTEXT.md, changelog, and planning cleanup. |
+| **PASS** | Audit passed. **Next:** Run `/verify-it` to finalize ADRs, GLOSSARY.md, changelog, and planning cleanup. |
 
 ### Single-phase audit (`--phase phase-N`)
 

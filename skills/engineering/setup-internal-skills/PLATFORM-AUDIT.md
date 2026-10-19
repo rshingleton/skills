@@ -75,4 +75,4 @@ Gemini is migrating to the **`agy`** (antigravity) CLI. Both read `AGENTS.md` th
 
 ## OpenCode (optional)
 
-Only configure if the team explicitly uses OpenCode. If `opencode.json` exists and is in use, merge `instructions` array to include `"AGENTS.md"` (and `"CONTEXT.md"` if present) without removing other entries. If missing, skip — no template needed unless team requests it.
+Only configure if the team explicitly uses OpenCode. If `opencode.json` exists and is in use, merge `instructions` array to include `"AGENTS.md"` (and `"GLOSSARY.md"` if present) without removing other entries. If missing, skip — no template needed unless team requests it.

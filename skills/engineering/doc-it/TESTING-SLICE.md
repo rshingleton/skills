@@ -17,7 +17,7 @@ Write **`docs/reference-audit/testing.md`**. Build on factual coverage in `docs/
 Each recommendation:
 
 - **ID:** `TR-1`, `TR-2`, …
-- **Target:** module or behaviour (use `CONTEXT.md` terms)
+- **Target:** module or behaviour (use `GLOSSARY.md` terms)
 - **Level:** unit | integration | contract | e2e
 - **Rationale:** one line why this reduces risk
 - **Effort:** S | M | L (rough)

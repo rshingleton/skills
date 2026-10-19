@@ -25,7 +25,7 @@ Called from the main workflow when any phase row in `jira.md` has a Jira key.
 
 For each key to resolve:
 
-1. If `JIRA_ASSIGNEE` is set: `jira_bridge_call assign <KEY> "$JIRA_ASSIGNEE"`.
+1. Make sure the issue has an assignee. If it has none, resolve one (the name the user gave, else `JIRA_ASSIGNEE`; if neither is set, ask, recommending the authenticated Jira user) and run `jira_bridge_call assign <KEY> "$ASSIGNEE"`. An existing assignee is left alone. See `setup-internal-skills/issue-tracker-jira.md` "Assignee".
 2. **Prompt for resolution comment:** draft a concise Jira resolution comment from the phase summary (2-4 sentences covering what was delivered — deliverables only, no references to planning docs or audit reports). Present it to the user as a suggestion: *"Post this resolution comment to {KEY}? (y/edit/skip)"*. If they edit, use their text. If y: `jira_bridge_call comment <KEY> "<comment>"`.
 3. **Resolve:** ask *"Resolve {KEY}? (y/n)"* per key. If yes: `jira_bridge_call transition <KEY> "Done"` (then post the comment from step 2, if provided).
 

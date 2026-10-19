@@ -166,6 +166,8 @@ When invoked with a **bare path** (no subcommand), `/to-jira <path>` runs the `c
 
 Parts of this flow ask you questions before acting — Epic linking, phase splitting, and posting all require confirmation.
 
+**Assignee (every create and `assign`):** resolve it before the first Jira call. Use the name the user gave, else `JIRA_ASSIGNEE`; if neither is set, ask, recommending the authenticated Jira user and accepting a typed username. Never create an issue unassigned without that answer, and read the assignee back after the call and report it with the key. Full rule: `setup-internal-skills/issue-tracker-jira.md` "Assignee".
+
 ## Operations
 
 ### `create` — Create Jira issue(s) from a local artifact
