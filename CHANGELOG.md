@@ -74,6 +74,21 @@
 
 ## This fork
 
+## 2026-10-18 -- Jira write helpers return the result of their own write
+
+- **Bug fix:** `_jira_transition`, `_jira_update_issue`, `_jira_update_description` and
+  `_jira_set_labels` in `jira-helpers.sh` reported success after a failed Jira API call, because
+  `_jira_apply_watcher_policy` (which always returns 0) was their last statement. Each now keeps
+  its write's exit status, runs watcher policy, and returns the kept status. On the bash path,
+  `jira_bridge_call transition` now returns non-zero when the transition fails.
+- **Bug fix:** `_jira_set_labels` sent its PUT even when the GET of current labels failed. It now
+  returns 1 without writing when the GET fails or yields no labels array.
+- **Tests:** `scripts/jira-connector-bridge.test.sh` grew to 59 assertions: a forced HTTP 400
+  and a 200 for each of the six write helpers (including `_jira_create_epic` and
+  `_jira_create_task`, which were already correct), plus the labels GET guard. `_stub_curl`
+  gained `CURL_FAIL_MATCH` to fail a chosen request.
+- Closes the follow-up filed under the 2026-08-11 entry. See ADR-0009, Amendment 1.
+
 ## 2026-10-02 -- Jira bridge: fix "bridge not found" in app repos
 
 - **Bug fix:** every skill instructed `source scripts/jira-connector-bridge.sh` -- a path that

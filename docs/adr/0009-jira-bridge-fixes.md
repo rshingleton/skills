@@ -107,6 +107,47 @@ this full verify.
 - Full test suite: 38/38 passing (36 pre-existing + 2 new assertions for the transition-echo fix).
   No production dependency or coding-standard violations found during audit.
 
+## Amendment 1: write helpers return their own write's status
+
+**Status:** Accepted
+**Date:** 2026-10-18
+**Plan:** `docs/planning/jira-helpers-exit-codes/` (compacted at verify-it)
+
+Decision 2 made `_jira_apply_watcher_policy` always return 0. Because it is the last statement
+of `_jira_transition`, `_jira_update_issue`, `_jira_update_description` and `_jira_set_labels`,
+those four now report success even when their Jira write fails. The rule from here: **watcher
+policy is a best-effort side effect and never determines a helper's exit status.** Each write
+helper keeps the exit status of its own write, runs watcher policy, and returns the kept status.
+`_jira_set_labels` also stops before its PUT when the GET of current labels fails.
+`_jira_create_epic` and `_jira_create_task` already follow the rule.
+
+Out of scope: the MCP connector path (it does not use these helpers) and watcher policy's own
+behaviour.
+
+### Execution Notes
+
+Implemented in one phase, audited (PASS, no blocking findings), closed via full verify.
+
+- The four update-mode helpers use `_jira_curl ... || status=$?`, then watcher policy, then
+  `return "$status"`. The `||` form keeps the status intact for callers running under `set -e`.
+- `_jira_set_labels` reads its GET through `_jira_curl` on its own line and filters with
+  `jq -e '.fields.labels | arrays | ...'`, so a failed GET and a response with no labels array
+  both return 1 before the PUT. On those early returns watcher policy does not run, since no
+  write happened.
+- Tests in `scripts/jira-connector-bridge.test.sh` (59 total): `_stub_curl` gained
+  `CURL_FAIL_MATCH`, a glob over curl's argv that yields an HTTP 400. Transition, create-epic and
+  create-task are tested through `jira_bridge_call` on the bash path; the other three helpers are
+  called directly. Each gets a 400 case (non-zero) and a 200 case (zero), and the update-mode
+  cases assert the watcher-removal request still went out after a failed write.
+- The new failure tests failed against the unfixed helpers (53 pass, 6 fail; re-verified
+  independently at audit) and pass after the fix. The create-epic and create-task tests passed
+  before the fix, confirming they already returned 1 on a failed POST.
+- Behaviour change for callers: `jira_bridge_call transition` (used by `implement-it`,
+  `verify-it` and `to-jira`) now returns non-zero when a transition fails, where it returned 0.
+- Audit notes, not acted on: the "no labels array" branch has no dedicated test (it shares the
+  tested GET-failure exit); no static shell lint ran, because `shellcheck` was not available and
+  the repo has no lint script.
+
 ## References
 
 - ADR-0007: Jira Connector Bridge

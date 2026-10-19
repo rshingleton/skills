@@ -286,9 +286,10 @@ _jira_comment() {
 
 # Transition an issue to a target status.
 # Usage: _jira_transition <key> <status_name>
-# Silent if status not found. Applies watcher policy on success.
+# Returns 1 if the status is not found. Otherwise applies watcher policy after the
+# POST and returns the POST's status (non-zero on a failed write).
 _jira_transition() {
-  local key="$1" target="$2" tid
+  local key="$1" target="$2" tid status=0
   [ -z "$key" ] || [ -z "$target" ] && return 1
   tid=$(_jira_curl GET -s "$JIRA_BASE_URL/rest/api/2/issue/${key}/transitions" \
     | jq -r --arg t "$target" '.transitions[] | select(.to.name == $t) | .id' | head -1)
@@ -296,8 +297,9 @@ _jira_transition() {
   _jira_curl POST -s -o /dev/null \
     -H "Content-Type: application/json" \
     "$JIRA_BASE_URL/rest/api/2/issue/${key}/transitions?notifyUsers=false" \
-    -d "$(jq -n --arg id "$tid" '{transition: {id: $id}}')"
+    -d "$(jq -n --arg id "$tid" '{transition: {id: $id}}')" || status=$?
   _jira_apply_watcher_policy "$key" update
+  return "$status"
 }
 
 # Create a new Epic.
@@ -387,43 +389,51 @@ _jira_create_task() {
 # Usage: _jira_update_issue <key> <json_updates>
 # json_updates is a jq-compatible object to merge into fields.
 # Example: _jira_update_issue KEY-123 '{assignee: {name: "user"}}'
+# Applies watcher policy after the PUT and returns the PUT's status.
 _jira_update_issue() {
-  local key="$1" updates="$2"
+  local key="$1" updates="$2" status=0
   [ -z "$key" ] || [ -z "$updates" ] && return 1
   _jira_curl PUT -s -o /dev/null \
     -H "Content-Type: application/json" \
     "$JIRA_BASE_URL/rest/api/2/issue/${key}?notifyUsers=false" \
-    -d "$(jq -n --argjson u "$updates" '{fields: $u}')"
+    -d "$(jq -n --argjson u "$updates" '{fields: $u}')" || status=$?
   _jira_apply_watcher_policy "$key" update
+  return "$status"
 }
 
 # Update the description of an issue (converts body through wiki markup).
 # Usage: _jira_update_description <key> <file>
-# Echoes nothing on success, non-zero on failure.
+# Echoes nothing on success, non-zero on failure. Applies watcher policy after the
+# PUT and returns the PUT's status.
 _jira_update_description() {
-  local key="$1" file="$2" body
+  local key="$1" file="$2" body status=0
   [ -z "$key" ] || [ ! -f "$file" ] && return 1
   body=$(_jira_wiki_body "$file" 2>/dev/null)
   _jira_curl PUT -s -o /dev/null \
     -H "Content-Type: application/json" \
     "$JIRA_BASE_URL/rest/api/2/issue/${key}?notifyUsers=false" \
-    -d "$(jq -n --arg b "$body" '{fields: {description: $b}}')"
+    -d "$(jq -n --arg b "$body" '{fields: {description: $b}}')" || status=$?
   _jira_apply_watcher_policy "$key" update
+  return "$status"
 }
 
 # Add labels to an issue (appends, does not replace).
 # Usage: _jira_set_labels <key> <label> [label...]
+# Returns 1 without sending the PUT if the current labels cannot be read. Otherwise
+# applies watcher policy after the PUT and returns the PUT's status.
 _jira_set_labels() {
-  local key="$1" label new_labels; shift
+  local key="$1" current new_labels status=0; shift
   [ -z "$key" ] || [ $# -eq 0 ] && return 1
-  new_labels=$(_jira_curl GET -s "$JIRA_BASE_URL/rest/api/2/issue/${key}?fields=labels" \
-    | jq -r --argjson add "$(jq -n --args '$ARGS.positional' -- "$@")" \
-      '.fields.labels + $add | unique')
+  current=$(_jira_curl GET -s "$JIRA_BASE_URL/rest/api/2/issue/${key}?fields=labels") || return 1
+  new_labels=$(echo "$current" \
+    | jq -e -c --argjson add "$(jq -n --args '$ARGS.positional' -- "$@")" \
+      '.fields.labels | arrays | . + $add | unique') || return 1
   _jira_curl PUT -s -o /dev/null \
     -H "Content-Type: application/json" \
     "$JIRA_BASE_URL/rest/api/2/issue/${key}?notifyUsers=false" \
-    -d "$(jq -n --argjson l "$new_labels" '{fields: {labels: $l}}')"
+    -d "$(jq -n --argjson l "$new_labels" '{fields: {labels: $l}}')" || status=$?
   _jira_apply_watcher_policy "$key" update
+  return "$status"
 }
 
 # ---------------------------------------------------------------------------
